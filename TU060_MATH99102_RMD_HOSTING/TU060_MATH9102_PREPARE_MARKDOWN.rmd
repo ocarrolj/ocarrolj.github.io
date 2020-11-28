@@ -1,0 +1,534 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Prepare"
+author: "Joseph O'Carroll"
+date: "08/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 21/11/2020
+Objective: Preparation phase for statistical analysis
+---
+
+```{r global-options, include=FALSE}
+# https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r setup, message=FALSE, warning=FALSE}
+# ********************************************************************
+#
+#   Setup Section
+#
+# ********************************************************************
+needed_packages <- c("tidyverse", "readxl", "lubridate", "jsonlite", "ggplot2", "gtools", "httr", "readr", "psych", "kableExtra", "cowplot", "summarytools")
+# Extract not installed packages
+not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
+# Install not installed packages
+if (length(not_installed)) {
+  install.packages(not_installed)
+}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(psych) ## added for quick stat descriptions
+library(cowplot) ## added for quick stat descriptions
+library(Hmisc)
+library(summarytools)
+
+```
+
+# Introduction:
+
+The purpose of this section is to address all required concepts comprehensively and demonstrate coherent understanding of the statistical analysis preparation phase, as covered during the TU060 MATH9102 Module. The following concepts can be considered to be included in the preparation phase:
+
+* Formulation of a Research Question
+* Formulation of a Hypothesis and the purpose of Hypothesis testing
+* Populations and Samples
+* Describing a sample
+* Statistical measures
+* Identification of analyse challenges/limitations/constraints.
+
+Understanding is illustrated through application to the real-world data Portuguese Secondary School Student Performance dataset provided. The following sections describe the sample data in detail.
+### Citation:
+
+* Cortez and A. Silva. Using Data Mining to Predict Secondary School Student Performance. In A. Brito and J. Teixeira Eds., Proceedings of 5th FUture BUsiness TEChnology Conference (FUBUTEC 2008) pp. 5-12, Porto, Portugal, April, 2008, EUROSIS, ISBN 978-9077381-39-7. (https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf)
+
+# Populations and samples:
+
+The purpose of statistical analysis is to make generalized statements about complete collections of things. This full set of things is referred to as the population. However, we rarely have access to an entire population. Therefore, we conduct our statistical analysis using a small subset of the population known as a sample, and from that sample we infer things about the general population. In this instance the population sample was collected during the 2005-2006 school year from two public secondary schools in the Alentejo region of Portugal.
+
+
+The sample contains 382 records and 33 variables of interest and was constructed from a combination of school records and a closed questionnaire answered by students to collect demographic data. The sample only contains measures for performance in the core Mathematics and Portuguese language subjects. Initially 788 students took part in the sample. During preprocessing the record count was reduced to 382 records, removing records missing student identification details and records which only had performance results for one subject
+
+
+## Description of our statistical data types:
+The variables of interest in the sample are described in the table below. The first part of the table describes demographic concepts and the last four rows denote the variables taken from the school reports related to performance and attendance.  The following sections provide measures of the different statistical data types in sufficient detail for the reader  to be able to understand what we have done and why we have done it without the need to access the student performance sample dataset themselves. We describe the sample by providing summary statistics about the variables of interest.
+
+
+Later on we will illustrate inferential statistical methods by inferring population parameters from sample statistics. Note this exercise will only be done to illustrate the author's understanding of the statistical methods since the portfolio brief clearly indicated the sample data should only be treated as training data to inform model selection, not to actually make statements of significance about the generalizability of findings.
+
+
+### Import dataset
+```{r Import Data, include=TRUE, echo=TRUE}
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv',
+                                      header = TRUE)
+```
+
+```{r Describe the sample}
+############
+# PART: Describe the sample
+############
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+list_variables_names <- names(tbl_sperf_all)
+tbl_sperf_description_all %>%
+  kbl(caption = "Statistical Data Types") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Quantitative Data:
+For numerical data the measurements we need to describe are the center point of the data and the spread of the data. This tells us the overall shape/distribution of the data for the variable of interest. In the sample dataset there are 3 numerical quantitative variables of interest related to student performance. These are: absences, grades in Mathematics and grades in Portuguese. The table below contains statistics that describe the center point (Mean and Median), the spread (Range, IQR, min and max) for each variable measure and the variability (Standard Deviation, Median absolute Deviation). These statistics inform us about the overall shape and distribution of the variables under consideration. The shape of the distribution is important because it will help us during hypothesis testing to determine what sort of tests we can use; for instance, if we can use parametric tests or if we have to revert to the less statistically powerful non-parametric tests.
+
+
+The table also includes measures of skew, kurtosis and Interquartile range (IQR). These statistics help us to understand if we have unusual aspects to our data such as outliers or gaps or clusters which may shift the distribution, make it more flat or make it more pointy. The trimmed statistics is the mean of the variable with the bottom and top 1% of the data removed and gives us an indication of the impact of outliers. For example, the IQR for the mG3 variable is 6, indicating that we have outliers which will need to be taken into account in later analysis.
+
+
+In later sections we will look more closely at the distribution of some of these variables but we can see the grade variables approach a normal distribution with some outliers, gaps and clusters and may be candidates for parametric hypothesis tests. The absence variables are definitely not normally distributed on account of positive skew, and we will need to use the non-parametric tests for evaluating any hypotheses based on these variables.
+
+
+```{r Describe the numerical measurements}
+############
+# PART: Describe the numerical measurements
+############
+
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
+        select(age,
+               absences.m,
+               absences.p,
+               contains('mG'),
+               contains('pG')
+        )
+
+tbl_sperf_numerical_stats <- tbl_sperf_numerical_measurements %>%
+  psych::describe(omit = TRUE, IQR = TRUE)
+
+tbl_sperf_numerical_stats %>%
+  kbl(caption = "Summary statistics for Numerical Data Types") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+```{r Visualise the numerical variables, echo=TRUE}
+############
+# PART: Visualize the numerical variables
+############
+
+#Create histograms
+num_diagram_count <- nrow(tbl_sperf_numerical_stats)
+plots <- list()
+for (n in 1:num_diagram_count) {
+  variable <- row.names.data.frame(tbl_sperf_numerical_stats)[n]
+  binwidth <- 1
+
+  if (variable %in% c('absences.m', 'absences.p')) {
+    binwidth <- 2
+  }
+
+  gs <- ggplot(tbl_sperf_numerical_measurements,
+               aes_string(colnames(tbl_sperf_numerical_measurements)[n])
+  )
+  gs <- gs + stat_function(fun   = dnorm,
+                           color = "red",
+                           args  = list(mean = tbl_sperf_numerical_stats$mean[n],
+                                        sd   = tbl_sperf_numerical_stats$sd[n]),
+                           na.rm = TRUE)
+  gs <- gs + labs(x = variable)
+  gs <- gs + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+  # Gather All the plots
+  plots[[names(tbl_sperf_numerical_measurements)[n]]] <- gs
+}
+
+plot_grid(plotlist = plots,
+          labels   = "auto", ncol = 3
+)
+```
+
+```{r fig.show='hide'}
+# Plot single variable
+gs <- tbl_sperf_numerical_measurements %>%
+  ggplot(aes(x = absences.m))
+gs <- gs + labs(x = 'absences.m')
+gs <- gs + geom_histogram(binwidth = 2, colour = "black", aes(y = ..density.., fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+gs <- gs + stat_function(fun   = dnorm,
+                         color = "red",
+                         args  = list(mean = tbl_sperf_numerical_stats$mean[2],
+                                      sd   = tbl_sperf_numerical_stats$sd[2]),
+                         na.rm = TRUE)
+show(gs)
+```
+### Categorical/Qualitative data:
+
+Categorical variables are qualitative and describe our dataset. They allow us to segment our sample on the basic characteristics of the sample set. There are 28 categorical variables describing the demographics of students. Most of the categorical variables in the sample are nominal or ordinal and numerically encoded. For numeric categorical data, it doesn’t make sense to describe the data in terms of means since the numerical values are just an encoding and have no quantitative meaning. As such, we describe categorical data in terms of values and frequency of occurrence. Important summary statistics include the count of distinct values, a list of possible values, the relative proportion that each value occurs, and the most frequently occurring value. The following table and figures describe the summary statistics for the categorical variables in the sample dataset.
+
+*Note* The dataset contained repetition of variables due to how the demographic survey data was combined with the school report. This repetition has been cleaned from the data.
+
+```{r Describe the categorical measurements}
+
+############
+# PART: Describe the categorical measurements
+############
+# Subsetting the dataset to remove numberical variables.
+# Removign duplicate demographic data.
+# https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/
+# https://uc-r.github.io/descriptives_categorical
+
+tbl_sperf_categorical_measurements <- tbl_sperf_all %>%
+  select(-age,
+         -absences.m,
+         -absences.p,
+         -contains('mG'),
+         -contains('pG'),
+         -contains('.p'),
+  )
+
+#tbl_sperf_categorical_stats <- tbl_sperf_categorical_measurements %>%
+#  psych::describe() %>%
+#  rownames_to_column(var = "Attribute") %>% data.table() %>%
+#  select(Attribute, min,max,median)
+
+###
+#tbl_sperf_categorical_stats %>%
+#  kbl(caption = "Summary statistics for Numerical Data Types") %>%
+#  kable_styling(bootstrap_options = c("striped", "hover"))
+
+tbl_sperf_categorical_stats <- tbl_sperf_categorical_measurements %>%
+ freq()
+
+tbl_sperf_categorical_stats %>% show()
+
+
+```
+```{r Visualisation of categorical measurement statistics 1}
+
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = famsize))
+gs <- gs + labs(x = 'Family size')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["famsize"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = address))
+gs <- gs + labs(x = 'Rural or Urban home')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["address"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Pstatus))
+gs <- gs + labs(x = 'Parental status')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Pstatus"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Medu))
+gs <- gs + labs(x = 'Mothers Education')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Medu"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Fedu))
+  gs <- gs + labs(x = 'Fathers Education')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Fedu"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Mjob))
+  gs <- gs + labs(x = 'Mothers Job')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Mjob"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Fjob))
+  gs <- gs + labs(x = 'Fathers Job')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Fjob"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = reason))
+  gs <- gs + labs(x = 'Reason for selecting school')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Reason"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = nursery))
+  gs <- gs + labs(x = 'Attended nursery school')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["nursery"]] <- gs
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 3,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+
+```{r Visualisation of categorical measurement statistics 2}
+plots <- list()
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = internet))
+  gs <- gs + labs(x = 'internet')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["internet"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = guardian.m))
+  gs <- gs + labs(x = 'Childs guardian')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Guardian"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Fjob))
+  gs <- gs + labs(x = 'Fathers Job')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Fjob"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = traveltime.m))
+  gs <- gs + labs(x = 'Travel time to school')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Traveltime"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = studytime.m))
+  gs <- gs + labs(x = 'Study Time')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Studytime"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = failures.m))
+  gs <- gs + labs(x = '# of previous failures')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["failures"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = sex))
+  gs <- gs + labs(x = 'Sex of student')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["sex"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = School))
+  gs <- gs + labs(x = 'School attended')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["School"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = schoolsup.m))
+  gs <- gs + labs(x = 'School support')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["schoolsup"]] <- gs
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 3,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+
+```
+```{r Visualisation of categorical measurement statistics 3}
+plots <- list()
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = famsup.m))
+  gs <- gs + labs(x = 'Family support')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["famsup"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = paid.m))
+  gs <- gs + labs(x = 'Paid Grinds')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["paid"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = activities.m))
+  gs <- gs + labs(x = 'After school activites')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = higher.m))
+  gs <- gs + labs(x = 'Higher Eductation desired')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["higher"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = romantic.m))
+  gs <- gs + labs(x = 'Has a romatic relationship')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["romantic"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = famrel.m))
+  gs <- gs + labs(x = 'Family relationship')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["famrel"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = goout.m))
+  gs <- gs + labs(x = 'Goes out')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["goout"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Dalc.m))
+  gs <- gs + labs(x = 'Weekday alcohol consumption')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Dalc"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = Walc.m))
+  gs <- gs + labs(x = 'Weekend alcohol conumption')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["Walc"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>%
+  ggplot(aes(x = health.m))
+  gs <- gs + labs(x = 'Student Health')
+  gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["health"]] <- gs
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 3,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+
+
+# Research Goal, Questions and Hypothesis
+
+The following section illustrates the author's ability to formulate and communicate suitable research question(s) for which employing a statistical analysis to investigate is appropriate.
+
+## Research Goal:
+> To gain a deeper understanding of the nature of the relationship between student performance in core secondary school subjects and student demographics.
+
+## Rationale:
+There has been a lot of discourse related to student performance and the potential applicability of probability and statistical methods to predict outcomes. By gaining a deeper understanding of the relationship between student performance and demographics, we can develop better tools for predicting performance which may allow for more meaningful and timely interventions to improve overall student outcomes.
+
+## Main Research Questions:
+> Can a student’s future performance in mathematics and Portuguese be predicted from a combination of past performance and parental education, and is there a differential effect for male and female students?
+
+To answer this main research question, we also must look at a number of contributing descriptive, comparative  and relational questions, which serve to explore specific aspects of the data.
+
+### Descriptive questions:
+
+These questions ask, what type of variation occurs within the variables of interest?
+
+* What is the average grade of students?
+* How many students have failed an exam?
+* What is the frequency distribution of Mothers education?
+* What is the frequency distribution of Father's education?
+
+### Comparative questions:
+These questions ask, what type of variation occurs within the variables of interest for different populations or segments within the same
+ population?
+
+* What is the difference in time spent socializing between male and female students?
+* How much alcohol is consumed at the weekend, and does this differ between male and female students?
+
+### Relational questions:
+Relationship questions ask what type of covariation occurs between variables of interest, is their a causal relationship, and how strong is that relationship if one exists.
+
+#### Question 1
+RQ: What is the relationship between alcohol consumption and final grade for math students
+
+*Hypothesis*; students with lower alcohol consumption will perform better at math and Portuguese
+
+#### Question 2
+RQ: What is the relationship between Portuguese and Math grades?
+
+*Hypothesis*; students who perform well in Portuguese will perform well in Math
+*Hypothesis*; students who perform well in Math will perform well in Portuguese
+
+#### Question 3
+RQ: What is the relationship between having at least one parent be a stay at home parent and student performance?
+
+*Hypothesis*; students whose father stays at home will perform better than those whose father doesn’t
+*Hypothesis*; students whose mother stays at home will perform better than those whose mother doesn’t
+
+#### Question 4
+RQ: What is the relationship between past performance and future performance for students and is there a differential relationship between male and female students.
+
+*Hypothesis*;  students who perform well during interim assessment in subjects will perform better overall. 
+
+
+# Potential Issues and Shortcomings
+
+## Representativeness:
+The sample is not sufficient to be considered representative of the general population of students attending Portuguese Secondary Schools. To make generalised statements regarding Portuguese Secondary School Student population two necessary (though not sufficient) requirements are that the sample be big enough and representative. “Big enough” means that whatever we're interested in investigating as part of our statistical analysis, can be found in our sample if it is present in the population. 
+
+The sample only contains data from two schools in the same region, and only a subset of students within those schools. “Representative” means that the characteristics of our sample mirrors the representation in the population in the same proportions. For example, If we are interested in rural versus urban characteristic behaviours or outcomes for people in Ireland, then we need to have a similar fraction of people in our sample from urban areas and people from rural areas that is in proportion to that which prevails in the wider population.
+
+
+## Validity:
+Are the variables actually measuring what we think they are? The purpose of the grades in the sample dataset is to assess student capability and understanding of the core subject, but we cannot measure this directly so we must use an examination score as a proxy. Some students may be very knowledgeable but struggle with examinations or may have had issues with health on the day of the exam which otherwise impacted grades. Other students may have very little knowledge but excel at taking and passing examinations through rote memorization. 
+
+Another form of measurement error to consider is content validity with regards the survey completed by students. For example students are asked about alcohol consumption on the weekends, the students' concept of what high alcohol consumption levels means may differ from what the survey was designed to evaluate. 
+
+## Confounding Variables:
+The demographics survey asked 37 questions (some questions where later discarded) and was reviewed and tested before being rolled out fully. Nevertheless there is the potential for variables which have not been accounted for, having an impact on the student performance. By failing to account for these confounding variables we may draw incorrect conclusions from our analysis. 
+
+## Accuracy of measurements:
+The student grades were recorded on paper files as opposed to in an IT system. This form of manual paper-based record can be prone to errors in terms of miss-filling or miss-reporting information. 
+ 
