@@ -1,0 +1,34 @@
+Attribute , Description ,Statistical Data Type
+sex , student's sex ,Binary: Categorical with values Female or Male
+age , student's age ,Numeric: Interval ratio with values 15 to 22
+school , student's school ,Binary: Categorical with values Gabriel Pereira or Mousinho da Silveira
+address , student's home address type ,Binary: Categorical with values urban or rural
+Pstatus , parent's cohabitation status ,Binary: Categorical with values together or apart
+Medu , mother's education ,Numeric: Categorical with values 0 to 4a
+Mjob , mother's job ,"Nominal: Categorical (example values: at_home, health etc)"
+Fedu , father's education ,Numeric: Categorical with values 0 to 4a
+Fjob , father's job ,"Nominal: Categorical (example values: at_home, health etc)"
+guardian , student's guardian ,"Nominal: Categorical with values mother, farther or other"
+famsize , family size ,Binary: Categorical with values for < 3 or > 3
+famrel , quality of family relationships ,Numeric ordinal: Categorical with values 1 - very bad to 5 - excellent
+reason , reason to choose this school ,"Nominal: Categorical (example vlaues: reputation, course etc)"
+traveltime , home to school travel time ,Numeric ordinal:Categorical data with values 1 to 4
+studytime , weekly study time ,Numeric ordinal:Categorical data with values 1 to 4
+failures , number of past class failures ,Numeric: with values 1 to 4
+schoolsup , extra educational school support ,Binary: Categorical with values yes or no
+famsup , family educational support ,Binary: Categorical with values yes or no
+activities , extra-curricular activities ,Binary: Categorical with values yes or no
+paidclass , extra paid classes ,Binary: Categorical with values yes or no
+internet , Internet access at home ,Binary: Categorical with values yes or no
+nursery , attended nursery school ,Binary: Categorical with values yes or no
+higher , wants to take higher education ,Binary: Categorical with values yes or no
+romantic , with a romantic relationship ,Binary: Categorical with values yes or no
+freetime , free time after school ,Numeric ordinal: Categorical with values 1 - very low to 5 - very high
+goout , going out with friends ,Numeric ordinal: Categorical with values 1 - very low to 5 - very high
+Walc , weekend alcohol consumption ,Numeric ordinal: Categorical with values 1 - very low to 5 - very high
+Dalc , workday alcohol consumption ,Numeric ordinal: Categorical with values 1 - very low to 5 - very high
+health , current health status ,Numeric ordinal: Categorical with values 1 - very low to 5 - very high
+absences , number of school absences ,Numeric: Interval ratio with values 0 to 93
+G1 , first period grade ,Numeric: Interval ratio with values 0 to 20
+G2 , second period grade ,Numeric: Interval ratio with values 0 to 20
+G3 , final grade ,Numeric: Interval ratio with values 0 to 20
