@@ -88,7 +88,7 @@ There are two dataset that must be imported:
 tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
 names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
 
-# Dateset 2 : Import sperformance-dataset variable description
+# Dateset 2 : Import sperformance-dataset variable description, created by me
 tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv',
                                       header = TRUE)
 ```

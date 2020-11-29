@@ -14,8 +14,8 @@ Objective: Explore phase for statistical analysis
 ```{r global-options, include=FALSE}
 # https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
 knitr::opts_chunk$set(
-  fig.width = 12,
-  fig.height = 8,
+  fig.width = 10,
+  fig.height = 6,
   fig.path = 'Figs/',
   echo      = FALSE,
   warning = FALSE,
@@ -69,28 +69,34 @@ library(FSA)
 ```
 
 # Introduction:
-The purpose of this section is to address all required concepts comprehensively and demonstrate coherent understanding 
-of the statistical analysis exploration phase, as covered during the TU060 MATH9102 Module.
+The purpose of this section is to address comprehensively all required concepts and demonstrate coherent understanding of the statistical analysis exploration phase, as covered during the TU060 MATH9102 Module.
 
-In the preparation phase we came up with a question that needed to be answered and generated a number of hypotheses that 
-could be tested through statistical analysis. The next step is to collect data to see whether the theory is accurate. 
-To do this one or more  variables needs to be identified and appropriate statistical measurements need to be calculated.
+In the preparation phase we came up with a question that needed to be answered and generated a number of hypotheses that could be tested through statistical analysis. The steps for hypotheses testing are:
+
+* Determine whether variables are related to one another.
+* Investigate if differential effects exist for different groups.
+* Provide statistical evidence that justifies the inclusion of these variables in a predictive model.
+
+
+The first step is to collect data to see whether our hypotheses are accurate. To do this, one or more variables need to be identified and appropriate statistical measurements need to be calculated, as set out in the following steps:
 
 * Selection, with justification, of the appropriate variables to investigate the theory identified in the preparation phase.
 * Description of statistical measures associated with variables under consideration.
 * Selection of appropriate assessments/tests to investigate issues with statistical measures.
 * Interpretation of findings and generation appropriate conclusions.
 
-As part of this portfolio assignment, all the scope of variables along with their measurements has already been provided, 
-as such understanding is illustrated through application to the real-world data Portuguese Secondary School Student 
-performance dataset provided.
-
+*note* This phase will only look at determining whether variables are related to one another through correlation as a justification for inclusion in a predictive model. In later phase (analyse & model) we will investigate if differential effects exists for different groups and provide statistical evidence that justifies causal relationships. 
 
 ### Citation:
 
-* Cortez and A. Silva. Using Data Mining to Predict Secondary School Student Performance. In A. Brito and J. Teixeira Eds., Proceedings of 5th FUture BUsiness TEChnology Conference (FUBUTEC 2008) pp. 5-12, Porto, Portugal, April, 2008, EUROSIS, ISBN 978-9077381-39-7. (https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf)
+* Cortez and A. Silva. “Using Data Mining to Predict Secondary School Student Performance.” In A. Brito and J. Teixeira Eds., _Proceedings of 5th FUture BUsiness TEChnology Conference (FUBUTEC 2008)_ pp. 5-12, Porto, Portugal, April, 2008, EUROSIS, ISBN 978-9077381-39-7. (https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf)
 
 ### Import dataset
+There are two dataset that must be imported:
+
+* [sperformance-dataset.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/sperformance-dataset.csv).
+* [TU060_MATH9102_Student_variables_description.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/TU060_MATH9102_Student_variables_description.csv).
+
 ```{r Import Data, include=TRUE, echo=TRUE}
 ############
 # PART: Import data
@@ -100,79 +106,56 @@ tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
 names(tbl_sperf_all)[1] <-
   'School' # Fix issue with the name of first field.
 
-# Dateset 2 : Import sperformance-dataset variable description
+# Dateset 2 : Import sperformance-dataset variable description, created by me
 tbl_sperf_description_all <-
   read.csv('TU060_MATH9102_Student_variables_description.csv',
            header = TRUE)
 ```
 
 # Hypothesis testing - Correlation:
-A general description of all variables in the dataset was provided as part of the preparation phase. Our goal is to accurately 
-summarise and describe what's happening in the data but before we can build a predictive model we need to work out what 
-predictor variables to include in our hypothesis testing. We cannot include all variables in our tests as variables because 
-it would be difficult to see which variables truly influence our outcomes. So our starting point for the exploration 
-phase is to answer the question, what type of co-variation occurs between variables? This will provide the justification 
-for variable selection in hypothesis testing. The steps are to:
+A general description of all variables in the dataset was provided as part of the preparation phase. Our goal is to accurately summarise and describe the data, but before we can build a predictive model we need to work out what predictor variables to include in our hypothesis testing. We cannot include all variables in our tests because it would be difficult to see which variables truly influence our outcomes. Our starting point for the exploration phase is to answer the question: what type of co-variation occurs between variables? This will provide the justification for variable selection in hypothesis testing. 
 
-* Isolate whether variables have a relationship or whether there is a differential effect for different groups.
-* Provide statistical evidence that justifies us including these variables as predictors in a predictive model.
-* Investigate if differential effects exist for different groups.
-
-In the general linear statistical model, the theory is that the concepts of interest, as measured by their variables, 
-are related to each other in such a way that the relationship is linear. This means that when one variable increases the 
-other increases or decreases proportionally or there are patterns which are similar within different groups. The null hypothesis 
-is that any patterns in the data are random and the alternative hypothesis is that the variables have a linear relationship.
-
-Using the general linear statistical model, we are trying to use the equation of a line as our model of the pattern in the relationship 
-between the two variables (Bi variant correlation). For assessing co-variant correlation, the questions we need to answer 
-for each pair of variables are:
+In the general linear statistical model, the theory is that the concepts of interest, as measured by their variables, are related to each other in a linear fashion. This means that when one variable increases the other increases or decreases proportionally. The null hypothesis is that any patterns in the data are random and the alternative hypothesis is that the variables have a linear relationship. Using the general linear statistical model, we use the equation of a line as our model of the pattern in the relationship between the two variables (Bi-variant correlation). For assessing co-variant correlation, the questions we need to answer for each pair of variables are:
 
 * Can the relationship between the two variables be modeled as a straight line?
 * What is the direction of the co-variation (positive or negative)?
 * What is the strength of the co-variation (weak, moderate, or strong)?
-* What is the statistical significance (likelihood the relationship we observe is occurring due to chance)
+* What is the statistical significance (likelihood the relationship we observe is occurring due to chance)?
 
-The relationship between two variables is quantified by a statistical measure called the correlation coefficient (-1 to +1). 
-And from that, we can calculate the covariance, which is how much of the variation in each variable they have in common 
-with the other. The direction and strength of the correlation is measured by a slop of the line. 
+The relationship between two variables is quantified by a statistical measure called the correlation coefficint (-1 to +1). And from that, we can calculate the co-variance, which is how much of the variation in each variable is common to both. The direction and strength of the correlation is measured by a slope of the line.
+The model contains an error term, which gives the variation observed in one variable that is not explained by variation in the predictor variable. 
 
-As with anything there will be an error term in our model which is the variation in the pattern that is not explained by 
-the pattern of increase in the predictor variable. A type 1 error would occur if we find that students' performance in 
-Portuguese and Math are related when they are not and a type 2 error would occur if we find there is no relationship, 
-when there really is one in the population.
+A type 1 error would occur if we find that students’ performance in Portuguese and Math are related when they are not and a type 2 error would occur if we find there is no relationship, when there really is one in the population.
+
 
 ### A note on Heuristics: 
-We will be using a number of heuristics to justify our assessment of normality and correlation. For correlation we will
-use Cohen's effect size heuristics. According to Cohen (1988) an absolute value of r of 0.1 is classified as small, an
-absolute value of 0.3 is classified as medium and of 0.5 is classified as large. 
-
+We will be using a number of heuristics to justify our assessment of normality and correlation. For correlation we will use Cohen’s effect size heuristics. According to Cohen (1988) an absolute value of r of 0.1 is classified as small, an absolute value of 0.3 is classified as medium and of 0.5 is classified as large.
 
 * Cohen, J. (1988). Set Correlation and Contingency Tables. Applied Psychological Measurement, 12(4), 425–434. https://doi.org/10.1177/014662168801200410
 
+For skewnesss and kurtosis standardised score we will use George, D., & Mallery, M. (2003) heuristics. Which states that a Standardised scores (value/std.error) for skewness (and kurtosis) between +/-2 (1.96 rounded) are considered acceptable in order to prove normal univariate distribution.
+
+* George, Darren & Mallery, Paul. (2003). SPSS for Windows Step-by-Step: A Simple Guide and Reference, 14.0 update (7th Edition). http://lst-iiep.iiep-unesco.org/cgi-bin/wwwi32.exe/[in=epidoc1.in]/?t2000=026564/(100).
 
 ## Correlation testing - Past Performance and Future Performance
-From the preparation phase we had the Hypothesis;
+From the preparation phase we had the Hypothesis:
 
-> Hypothesis; students who perform well during interim assessment in subjects will perform better overall.
+> Students who perform well during interim assessment in subjects will perform better overall.
 
-In terms of testing for correlation, the null hypothesis Is that there is no relationship between past performance and future 
-student performance. The alternative hypothesis is that there is a positive relationship between these two variables. 
-This is considered a one tailed hypothesis.
+In terms of testing for correlation, the null hypothesis is that there is no relationship between past performance and future student performance. The alternative hypothesis is that there is a relationship between these two variables.
 
-For each subject we have we have two potential predictor variables which are Grade 1 and 2, and one outcome variable, grade 3. 
-As such we will conduct a total of four tests for correlation.
+For each of the two subjects we have we have two potential predictor variables which are Grade 1 and 2, and one outcome variable, Grade 3. As such we will conduct a total of four tests for correlation.
+
 
 ### Step 1 Check for Normality of the Variables
-Pearson Correlation requires variables values are normally distributed. We validate that by generating summary statistics 
-and histograms and for each of the variables and checking for normality. To illustrate the concept of accessing normality 
-we have selected the grades for Portuguese and Maths form the sample dataset. We have completed the following steps:
+One of the tests for correlation is the Pearson Correlation. This requires that the variables be normally distributed and the relationship linear. We validate the normality conditions by generating summary statistics, histograms and Q-Q Plots for each of the variables. To illustrate the concept of assessing normality, we have selected the grades for Portuguese and Maths from the sample dataset. We have completed the following steps:
 
- * Generated plots
-   + Histogram with normal curve showing
-   + Q-Q Plot
- * Generated Summary statistics
- * Reviewed the statistical measures and plots to see how far awy from normal the sample data is.
- * Report the correct statistics for this data based on an assessment of normality.
+* Generated plots
+ + Histogram with normal curve showing
+ + Q-Q Plot
+* Generated Summary statistics
+* Reviewed the statistical measures and plots to see how far away from normal the sample data is.
+* Reported the correct statistics for this data based on an assessment of normality
 
 
 ```{r Check for Normality of the variables (not cleaned) }
@@ -219,14 +202,9 @@ plot_grid(plotlist = plots,
 
 ```
 
-Any Outliers, Skew, or kurtosis needs to be investigated and explained. We can see above that there appears to be an issue 
-with no grades being reported for some students. Not all student records contain grades 1 through 3. Some records have 
-grades 1 and 2, but no final grade, others are missing grades 1 or 2 but have a final grade. 
+Any outliers, skew, or kurtosis needs to be investigated and explained. We can see above that there appears to be an issue with no grades being reported for some students. Not all student records contain grades 1 through 3. Some records have grades 1 and 2, but no final grade, others are missing grades 1 or 2 but have a final grade.
 
-
-The reference paper highlighted that student performance is being manually recorded using a paper based filing system and 
-this might be a clerical error. For illustration purposes we will assume a zero grade is not possible and represents 
-missing data. We will then regenerate our summary statistics and graphs on a cleaned dataset. 
+The reference paper highlighted that student performance is being manually recorded using a paper-based filing system and this might be a clerical error. For illustration purposes we will assume a zero grade is not possible and represents missing data. We will then regenerate our summary statistics and graphs on a cleaned dataset.
 
 ```{r Check for Normality of the variables cleaned, echo = TRUE}
 ############
@@ -279,7 +257,7 @@ tbl_sperf_numerical_stats_2 %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-```{r Hidden check}
+```{r Hidden check, echo=FALSE,results='hide'}
 ## Hidden - Included to cross check with table.
 #Generate regular summary statistics - lots of packages offer mechanisms to do this
 pastecs::stat.desc(tbl_sperf_numerical_measurements$pG3, basic = F)
@@ -336,38 +314,44 @@ plot_grid(plotlist = plots,
 # PART: Visualisation Histograms Q-Q Plot
 ############
 # For expediance only one Q-Q Plot included for each subject
-qqnorm(tbl_sperf_numerical_measurements$mG3)
-qqline(tbl_sperf_numerical_measurements$mG3, col = 2) #show a line on theplot
 
-# For expediance only one Q-Q Plot included for each subject
-qqnorm(tbl_sperf_numerical_measurements$pG3)
-qqline(tbl_sperf_numerical_measurements$pG3, col = 2) #show a line on theplot
+gs1 <- tbl_sperf_numerical_measurements %>%
+        ggplot(aes(sample = mG3)) +
+        stat_qq() +
+        stat_qq_line(linetype = "dotted",  color = "red", size = 1) +
+        theme_bw() + labs(title = "Q-Q Plot of Maths final Grade",
+              subtitle = "Plot of mG3")
 
+gs2 <- tbl_sperf_numerical_measurements %>%
+        ggplot(aes(sample = pG3)) +
+        stat_qq() +
+        stat_qq_line(linetype = "dotted",  color = "red", size = 1) +
+        theme_bw() + labs(title = "Q-Q Plot of Portuguese final Grade",
+              subtitle = "Plot of pG3")
+
+plot_grid(gs1,gs2,
+          labels   = "auto", ncol = 2
+)
 ```
 
 #### Assessing Portuguese and Maths final grade Distribution – Do they fit the normal distribution
-To illustrate the concept of assessing normality we selected the grades for Portuguese and Maths form the sample dataset.
-The Normal Quantile Plot (Q-Q Plot) showed the data was approximately normal with observations lying on teh reference line. 
-Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a
-normal distribution. Skewness for pG2 not with an acceptable range so we need to look into this further. We need to explore
-outliers, how many of them there are or whether we can transform it to become more normal.
+To illustrate the concept of assessing normality we selected the grades for Portuguese and Maths form the sample dataset. The Normal Quantile Plot (Q-Q Plot) shows that most observations are lying on or around the reference line with more observations towards the middle and less towards either end. As such, the variables are not ideally normal as we have some outliers and gaps affecting the shape of our distribution. 
 
 
-In terms of quantifying how far away from normal our data is, we generated standarised z scores from variable measures and 
-calculated the percentage of the standardised scores that are outside an acceptable range. pG3 exceeded our acceptable range 
-for outside the 99.7% confidence interval. mG2 and pG3 exceeded the 95% confidence interval but as our number of
-examples exceeds 80 we assume we only need to look at the 99.7 interval. pG2 is within our acceptable range, so we can
-assume the excess skewness is not an issue for accepting normality of this variable and pG3 was within out acceptable range
-for standardised skew.
+Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution.
+Skewness for pG2 is not within an acceptable range so we need to look into this further by exploring outliers: how many of them there are or whether we can transform it to become more normal.
 
-Based on this assessment, all performance variables can be treated as normally distributed once missing data outliers 
-have been removed. 
+
+In terms of quantifying the proportion of the data that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. No variable exceeded our acceptable range for outside the 99.7% significance level. The variables mG2 and pG3 fell outside the 95% significance level but as our number of examples exceeds 80 we assume we can accept the 99.7 significance level. The pG2 variable is within our acceptable range, so we can assume the excess skewness is not an issue for accepting normality of this variable and pG3 was within our acceptance range for standardised skew.
+
+Based on this assessment, all performance variables can be treated as normally distributed once missing data outliers have been removed.
+
 
 ### Step 2 Check for Linearity of the Co Variance
-The goal is to model the covariance of variables using the equation of a line. Pearson Correlation requires there to be a 
-linear relationship between the two variables and we validate that through inspection of a scatterplot which should resemble 
-a straight line and not a curved line. Below we graph the predictor/explanatory variable on the X axis and response/outcome 
-variable on the Y axis.
+
+Pearson Correlation requires there to be a linear relationship between the two variables, as Pearson uses the equation of a line to model the relationship. We validate this condition through inspection of a scatter plot, which should resemble a straight line rather than a curved line. For linearity we want the values to be evenly spaced around the line in a rectangular space. Below we have graphed the predictor/explanatory variable on the X axis and response/outcome variable on the Y axis. 
+ 
+After cleaning the dataset for missing values, as explained above, the scatter plots were generated for each variable relationship we want to test. All of the scatterplots show a uniform distribution of values above and below the reference line with few outliers. Based on this inspection, all grade relationships of interest can be treated as linear once missing data outliers have been removed.
 
 ```{r Check for Linearity: of the variables, include=TRUE, echo=TRUE}
 
@@ -434,7 +418,10 @@ tbl_correlation_stats <- stats::cor.test(tbl_sperf_numerical_measurements$pG2, t
 show(tbl_correlation_stats)
 
 ```
-```{r Correlation matrix for all}
+
+#### Just for Fun - Correlation Matrix for all Performance Variables
+Just for fun I also generated the correlation coefficient for all grade variables at the same time. This can be seen below. 
+```{r Correlation matrix for all, echo=TRUE}
 ### Correlation matrix for all
 correlation_matrix <- rcorr(as.matrix(tbl_sperf_numerical_measurements))
 
@@ -456,30 +443,17 @@ gs <- corrplot(correlation_matrix$r, method = "color", col = col(200),
 
 ### Hypothesis test: relationship between Initial grade and Final grade
 
-The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) was
-  investigated using a Pearson correlation. A strong positive correlation was found (r =-.896, n=337, p<.001). There is therefore
-   evidence to reject the null hypothesis and accept the alternative hypothesis that there is relationship between initial math grade and
-    final math grade.
+The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) was investigated using a Pearson Correlation. A strong positive correlation was found (r =-.896, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between initial math grade and final math grade.
 
 
-The relationship between initial grade in Portuguese (pG1 taken from school reports) and final Portuguese grade (pG3 taken from school reports
-) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.866, n=337, p<.001). There is therefore
-   evidence to reject the null hypothesis and accept the alternative hypothesis that there is relationship between initial Portuguese grade and
-    final Portuguese grade.
+The relationship between initial grade in Portuguese (pG1 taken from school reports) and final Portuguese grade (pG3 taken from school reports ) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.866, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between initial Portuguese grade and final Portuguese grade.
+
 
 ### Hypothesis test: relationship between Intermediate grade and Final grade
 
-The relationship between intermediate grade in Maths (mG2 taken from school reports) and final Maths grade (mG3 taken from school reports
-) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.966, n=337, p<.001). There is therefore
-   evidence to reject the null hypothesis and accept the alternative hypothesis that there is relationship between intermediate math grade and
-    final math grade.
+The relationship between intermediate grade in Maths (mG2 taken from school reports) and final Maths grade (mG3 taken from school reports ) was investigated using a Pearson Correlation. A strong positive correlation was found (r =-.966, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between intermediate math grade and final math grade.
 
 
-The relationship between intermediate grade in Portuguese (pG2 taken from school reports) and final Portuguese grade (pG3 taken from school reports
-) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.92, n=337, p<.001). There is therefore
-   evidence to reject the null hypothesis and accept the alternative hypothesis that there is relationship between intermediate Portuguese grade and
-    final Portuguese grade.
-
-
+The relationship between intermediate grade in Portuguese (pG2 taken from school reports) and final Portuguese grade (pG3 taken from school reports ) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.92, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between intermediate Portuguese grade and final Portuguese grade.
 
 
