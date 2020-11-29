@@ -75,6 +75,11 @@ Later on we will illustrate inferential statistical methods by inferring populat
 
 
 ### Import dataset
+There are two dataset that must be imported:
+
+* [sperformance-dataset.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/sperformance-dataset.csv).
+* [TU060_MATH9102_Student_variables_description.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/TU060_MATH9102_Student_variables_description.csv).
+
 ```{r Import Data, include=TRUE, echo=TRUE}
 ############
 # PART: Import data
