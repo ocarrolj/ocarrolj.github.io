@@ -1,7 +1,7 @@
 ---
 title: "TU060 - Math 9102 – PSI - Portfolio - Explore and Analysis for Correlation"
 author: "Joseph O'Carroll"
-date: "28/11/2020"
+date: "20/12/2020"
 output:
   html_document:
     df_print: paged
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(fig.width = 10, fig.height = 6, fig.path = 'Figs/', echo =
 #   Setup Section
 #
 # ********************************************************************
-needed_packages <- c("tidyverse", "readxl", "lubridate", "jsonlite", "ggplot2", "gtools", "httr", "readr", "psych", "kableExtra", "cowplot", "summarytools", "corrplot", "FSA")
+needed_packages <- c("tidyverse", "readxl", "lubridate", "jsonlite", "ggplot2", "gtools", "httr", "readr", "psych", "kableExtra", "cowplot", "summarytools", "corrplot", "FSA", "semTools")
 # Extract not installed packages
 not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
 # Install not installed packages
@@ -39,7 +39,9 @@ library(Hmisc)
 library(summarytools)
 library(corrplot) ## correlation plots
 library(FSA)
-
+library(semTools)
+library(coin)# For Wilcox test (non-parametric)
+library(rstatix)# For calculating effect size
 ```
 
 # Introduction:
