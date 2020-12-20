@@ -1,0 +1,184 @@
+---
+title: "Week 5 Difference  - Non-Parametric Tests"
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+## Step 1 Check for Non-Normality of the Variables
+The process is to validate the normality conditions by generating summary statistics, histograms and Q-Q Plots for each of the variables. We'd most likely discover the variables are not ideally normal so we would quantify how far away from normal the data is by calculating the standard skew and kurtosis. If those are within acceptable bands (+/- 2.58 if our samples size is greater than 80 and we want a 99% cut off) we can assume normality. If not we look at the actual values in the variable, convert them to z-scores and calculate the percentage of those scores that can be considered outliers, if this percentage is within acceptable limits (+/- 2.58 if our samples size is greater than 80 and we want a 99% cut off) then we can go a head and treat our data as approximately normal.
+
+To illustrate the concept of assessing normality for non normal data, we selected the absences for Portuguese and Maths form the sample dataset. The Normal Quantile Plot (Q-Q Plot) shows that most observations are off the reference line with curves in distribution of observations for both subjects. As such, the variables are not approximately normal as we have large clusters and gaps affecting the shape of our distribution.
+
+If we still had any doubts about normality the next step is to quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Skewness for both variables are exceed our acceptable range with values of 32.26 absences.m and 17.41 for absences.p. A particularly doubting person might ask how many of the observations are outside the acceptable range for normality and if whether we can transform it to become more normal.
+
+In terms of quantifying the proportion of the data that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. Neither absences.m nor absences.p was within our acceptable range for outside the 99.7% significance level Level used when sample size exceeds 80). Based on this assessment, all neither continuous variable can be treated as normally distributed.
+
+```{r Check for Normality of the variables cleaned, echo = FALSE}
+############
+# PART: Check for Normality
+############
+# For illsutration just looking at Math.
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
+  select(contains('absence'))
+
+tbl_sperf_numerical_stats <- tbl_sperf_numerical_measurements %>% psych::describe(omit = TRUE, IQR = TRUE)
+
+#-------- Iterate through eact variable -------#
+#Generate regular summary statistics - not as nice as psych package but gives p value
+st <- pastecs::stat.desc(tbl_sperf_numerical_measurements, basic = F)
+tbl_sperf_numerical_stats_2 <- st %>% transpose()
+colnames(tbl_sperf_numerical_stats_2) <- rownames(st)
+rownames(tbl_sperf_numerical_stats_2) <- colnames(st)
+
+# Initialise vectors
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+variable_count <- nrow(tbl_sperf_numerical_stats_2)
+
+# Iterate through varibles
+for (n in 1:variable_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats_2)[n]
+
+  tpskew               <- semTools::skew(tbl_sperf_numerical_measurements[[variable]])
+  tpkurt               <- semTools::kurtosis(tbl_sperf_numerical_measurements[[variable]])
+  std_skew[[variable]] <- tpskew[1] / tpskew[2]
+  std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+  z_score              <- abs(scale(tbl_sperf_numerical_measurements[[variable]]))
+  gt_196[[variable]]   <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+  gt_329[[variable]]   <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+
+}
+
+tbl_sperf_numerical_stats_2$std_skew <- std_skew
+tbl_sperf_numerical_stats_2$std_kurt <- std_kurt
+tbl_sperf_numerical_stats_2$gt_2sd <- gt_196
+tbl_sperf_numerical_stats_2$gt_3sd <- gt_329
+
+# Pretty print
+tbl_sperf_numerical_stats_2 %>%
+  kbl(caption = "Summary statistics for Absences") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+```{r Visualisation Histograms}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+num_diagram_count <- nrow(tbl_sperf_numerical_stats)
+plots <- list()
+for (n in 1:num_diagram_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats)[n]
+  binwidth                                <- 2
+  gs                                      <- tbl_sperf_numerical_measurements %>% ggplot(aes_string(colnames(tbl_sperf_numerical_measurements)[n]))
+  gs                                      <- gs + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+  gs                                      <- gs + stat_function(fun = dnorm, color = "red", args = list(mean = tbl_sperf_numerical_stats$mean[n], sd = tbl_sperf_numerical_stats$sd[n]), na.rm = TRUE)
+  gs                                      <- gs + labs(x = variable)
+  gs                                      <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+  # Gather All the plots
+  plots[[names(tbl_sperf_numerical_measurements)[n]]] <- gs }
+
+plot_grid(plotlist = plots, labels = "auto", ncol = 2)
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+# For expediance only one Q-Q Plot included for each subject
+
+gs1 <- tbl_sperf_numerical_measurements %>% ggplot(aes(sample = absences.m)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Maths Absences", subtitle = "Plot of absences.m")
+
+gs2 <- tbl_sperf_numerical_measurements %>% ggplot(aes(sample = absences.p)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Portuguese Absences", subtitle = "Plot of absences.p")
+
+plot_grid(gs1, gs2, labels = "auto", ncol = 2)
+```
+
+## Step 2 Generate Summary Statistics Reporting
+
+```{r Generate Summary Statistics Reporting}
+############
+# PART: Generate Summary Statistics Reporting
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sabsence_sex_diff <- tbl_sperf_all %>%
+        select(sex, contains('absence'))
+# -------------- Create summary statistics --------------- #
+tbl_sabsence_sex_diff_stats <-
+        psych::describeBy(tbl_sabsence_sex_diff, tbl_sabsence_sex_diff$sex, mat = TRUE, IQR = TRUE)  %>%
+        filter(!is.nan(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sabsence_sex_diff_stats %>%
+        select(-c(mean,sd,trimmed,se)) %>% # Removing invalid statistics for this data type.
+        kbl(caption = "Summary statistics for Absences (zero scores removed) by student Sex") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r Generate Visualisation}
+############
+# PART: Visualisations
+############
+# -------------- Histogram --------------- #
+# Just a little ee ball test to check that variables aren't normal within groups.
+gs <- tbl_sabsence_sex_diff %>%
+  gather(absences.p, absences.m, key = "var", value = "value") %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 2, colour = "black", aes(y = ..density.., fill = ..count..)) +
+  theme_bw() +
+  labs(y = "Proportion", x = "Number of Absences by Group", title = "School Absences by Subject and Sex", subtitle = "Non-Parametric Difference testing: Male and Female") +
+  facet_grid(var ~ sex)
+gs <- gs +
+  stat_function(fun = dnorm, color = "red", args = list(mean = mean(gs$data$value), sd = sd(gs$data$value)), na.rm = TRUE) +
+  facet_grid(var ~ sex)
+
+```
+
+```{r wilcox part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: wilcox
+############
+# -------------- Conduct the U-test --------------- #
+#Conduct the U-test from package stats
+variable_count <- 3
+tbl_test_result <- data.frame()
+tbl_test_effectsize <- data.frame()
+test_result_zscore <-list()
+test_result_reff <- list()
+for (n in 2:variable_count) {
+  variable <- colnames(tbl_sabsence_sex_diff)[n]
+  test_result                <-
+         stats::wilcox.test(tbl_sabsence_sex_diff[, n]~sex,data = tbl_sabsence_sex_diff) %>%
+          broom::tidy() %>% as.data.frame()
+
+  #To calculate Z we can use the Wilcox test from the coin package
+  test_result_zscore[[variable]] <- coin::wilcox_test(tbl_sabsence_sex_diff[, n]~as.factor(sex), data=tbl_sabsence_sex_diff)
+
+  # Build output table
+  row.names(test_result) <- variable
+  tbl_test_result <- rbind(tbl_test_result,test_result)
+
+}
+  #---------- Calculate the R Effect size ---------- #
+  test_result_reff[['absences.m']] <- rstatix::wilcox_effsize(absences.m~sex, data=tbl_sabsence_sex_diff)
+  test_result_reff[['absences.p']] <- rstatix::wilcox_effsize(absences.p~sex, data=tbl_sabsence_sex_diff)
+# -------------- Pretty Print Test statistics --------------- #
+tbl_test_result %>%
+        kbl(caption = "Summary of T-Test Statistics for the Male and Female student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+print.listof(test_result_zscore)
+print.listof(test_result_reff)
+
+```
+
+### Reporting the comparison

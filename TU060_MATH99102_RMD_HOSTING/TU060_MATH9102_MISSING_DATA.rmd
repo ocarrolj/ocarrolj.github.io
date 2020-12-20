@@ -1,0 +1,76 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Analyse"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 2/12/2020
+Objective: Analyse phase for missing data
+---
+
+
+# Missing Data:
+
+So far in our analysis to manage outliers we have been making an assessment if our data is continuous scale data and whether it can be considered to follow the normal distribution. For outliers we’ve looked at the percentage of our data that is outside the normal distribution, we have applied the heuristic from Tabachnik and Fidell (2007), to decide if the amount of those outliers is small enough not to affect our distribution.
+
+The theory is if we have a small number of outliers, where small is determined by our significance level, then we can tolerate a level of accuracy to our alpha level and use parametric tests without significantly increasing the possibility of making an incorrect inference or interpretation of a hypothesis and we will get additional accuracy from using the parametric tests as opposed to non-parametric tests.
+
+Missing data can be considered to be an outlier. This is where we have a variable but we are missing a value for that variable in some records. It's normal, particularly when you're dealing with data related to human beings that not all variables will have values in all cases. In the Student performance dataset we have zero values for 39 (13%) of student final Maths scores (mG3) and 5 (~1%) of student final Portuguese scores. The purpose of this section is to take a deeper look at these variables in terms of their treatment as missing data. To outline the process and criteria for making a decision about these variables, and support reporting back the findings and implications of the choices we have made may have had on any inferences of hypotheses testing conducted.
+
+
+## Visualise the missing data level and pattern
+We have 6 variables measuring student performance in Maths and Portuguese subjects. We can see the most common pattern is where all variables are have data - no missing data. The next most common is where mG3, the final Maths grade, alone is missing - 24 cases, then mG3 and mG2 - 13 cases, followed by pG3 - 3 cases, pG3 and mG3 - 2 cases and lastly 1 case where pG1 was missing. There where no records where all records where missing. At first glance is no real pattern to this missing data other than a the a record being missing for mG2 meant it was missing for mG3 also.
+
+```{r Missing data check, echo = FALSE}
+############
+# PART: Visualise the missing data level and Pattern
+############
+# Select only variables of interest
+tbl_sperf_missing_data <- tbl_sperf_all %>%
+  select(contains('mG'), contains('pG'),sex)
+
+tbl_sperf_missing_data[tbl_sperf_missing_data == 0] <- NA
+summary(tbl_sperf_missing_data) #Get our summary statistics - these are just for us not for publication
+
+#Create and inspect patterns of missingness
+res<-summary(VIM::aggr(tbl_sperf_missing_data, sortVar=TRUE,combined = TRUE, numbers = TRUE))$combinations
+
+#Output the most common combinations
+head(res[rev(order(res[,2])),])
+
+
+tbl_sperf_missing_data %>%
+  filter(is.na(mG3)) %>%
+  gather(mG1, mG2, key = "var", value = "Grade") %>%
+  ggplot(
+    mapping = aes(
+                  x     = Grade,
+                  fill  = var,
+                  group = var
+    )
+  ) +
+  geom_histogram(binwidth = 1, colour = "black", aes(y = ..density.., fill = ..count..)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::comma, limits = c(0, 15), breaks = seq(1:15)) +
+  theme_bw() +
+  labs(
+    x      = "Previous Grades Scores",
+    y      = "Total Transactions Per month",
+    colour = 'year'
+  ) +
+  facet_wrap(~var) + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+    spineMiss(tbl_sperf_missing_data[, c("mG2","mG3")])
+    spineMiss(tbl_sperf_missing_data[, c("mG1","mG3")])
+    matrixplot(tbl_sperf_missing_data, sortby = c('mG3'))
+
+```
+
+## Reporting missing data
+
+Only mG3 is missing for a significant number of records (6.28%) the remaining variables are all missing for less than 5% of the records. If we look look at the relationship between missing Final Maths scores and the scores the students achieves in initial and intermediate assessment we see that the data is potentially missing at random (MAR). This is the scenario where the distribution of missing values of a variable mG3 appear random but are related to the values of another variable(s), in this instance mG1 and mG2. Here we see that missing values mG3 correspond to previous low scores in the subject. Removing these variables from our dataset will reduce the representativeness of the data set for low performing students. The argument against keeping them is that conceptually a zero score _could_ represent failure to sit the exam as opposed to students performance in the exam which is the concept we are trying to measure. As such there is a question of validity, which is whether an zero scores for a grade actually measures what we set out to measure. If we had been part of the data collection process we would have stronger knowledge of how the dataset was compiled and better evidence to base our decision on.
+
+Based analyse of missing data above our working assumption will be that removing the records with zero scores will not have a statistically significant impact on our outcomes, however when it comes to predictive modelling and inference we will run the model including and excluding the records with missing variables to see if it makes a difference.

@@ -1,0 +1,433 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Analyse"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 2/12/2020
+Objective:  Analyse phase for difference of more than two groups
+---
+
+# Comparing More than Two Groups Parametric
+When testing for differences in more than two groups, again the choice of test we perform to investigate if differential effects exist for different groups depends on the measurement level of the variable and the shape of the data. If our data measurement level is at least interval data and normally distributed then we can use the parametric ANOVA test for independent variables or a variant of the ANOVA test for repeated measures. If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we use a non parametric test Kruskal-wallis for independent samples or Freidman for repeated measures.
+
+Similar to the t-test, the ANOVA test is still based on the normal distribution and utilities the mean for each variable but it looks at the variance in the mean within each group and see hows that relates to variation between the groups. We start by looking at the overall mean for the variable of interest in our first calculation of F and then we look to see how different the groups means are from that.
+
+In AVONA testing, the theory is that for the variable of interest for the multiple groups we’re investigating, if they are from the same population then the overall mean will be very close to the mean for each group and the variation around the mean for each group will be very similar. If we find that the group means and variance are different with regards to our significance level, then we can assume the groups are from different populations rather than one overall for the variable of interest.
+
+ANOVA produces F-statistic. which is a ratio value. It is similar to t-score since it compares the amount of systematic variance in the data to the amount of unsystematic variance. In other words it compares what we see to what we expect for a distribution with the same degrees of freedom.
+
+As such, it is the ratio of the variable of interest effect to the individual differences in performance. If the F=ratio's value is less than 1, it represent a non-significant event and we accept the null hypothesis that there is only one population. If the F statistic is greater than 1, it indicates that there is some effect above and beyond the effect of individual differences in performance. To test for significance, we compare obtained F-ratio against maximum value one would expect to get by chance alone in an F-distribution with the same degrees of freedom. The p-value associated with F is probability that differences between groups could occur by chance if null-hypothesis is correct as such we're aiming for a low p-value if we're looking for evidence to support the alternative hypothesis. If our result is within the rejection region, it means that our f statistics is such that only 5% of samples from the same population for the variable of interest would produce the same T value, assuming two tailed significance levels of +/- 1.96. This is also known as a Type 1 error.
+
+ANOVA tests for one overall effect only (this makes it an omnibus test), so it can tell us if experimental manipulation was generally successful. It doesn’t provide specific information about which specific groups were affected. To determine this we need to perform post-hoc testing!
+
+```{r Import Data Avona, include=TRUE, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+# Parametric Difference testing with more than two groups
+From the preparation phase we had the Hypothesis:
+
+> Maternal educational achievement has a differential effect on student performance overall.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in the mean performance score for students whose mother's obtain different levels of education achievement.
+
+To do this difference test we have one independent/predictor/input variable that is considered a categorical variable. We will use the ordinal variable Medu representing mother's education (0 – none, 1 – primary education (4th grade), 2 – 5th to 9th grade, 3 – secondary education or 4 – higher education.). We have one continuous variable dependent/response/outcome variable which meets the criteria of being at least interval data. Our goal is to use the Independent samples AVONA test to tell us if there is a significant difference between these 5 groups. The null hypothesis is that there is no difference in performance. The alternative hypothesis is that there is a difference based on mothers education. This will be a one-way between groups Anova test with a significance level of .05. Observations are independent because they came from different people.
+
+The only remaining questions to answer before selecting the difference test to perform relate to Normality and Homoscedasticity and they are addressed below.
+
+
+## Step 1 - Assessment of normality
+If the variable of interest is normal then we can use ANOVA. The variable of interest being used to illustrate this methodology is Portuguese final grade, pG3 which has previously been established to follow the normal distribution once outliers have been removed.
+
+## Step 2 Generate Summary Statistics Reporting
+
+```{r Parametric Generate Summary Statistics Reporting}
+############
+# PART: Generate Summary Statistics Reporting
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sperf_medu_diff <- tbl_sperf_all %>%
+  filter(pG3 != 0) %>%
+  select(Medu, contains('pG3'))
+# -------------- Create summary statistics --------------- #
+tbl_sperf_medu_diff_stats <-
+  psych::describeBy(tbl_sperf_medu_diff,
+                    tbl_sperf_medu_diff$Medu,
+                    mat = TRUE)  %>%
+  filter(!is.nan(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sperf_medu_diff_stats %>%
+  select(-(median)) %>% # Removing invalid statistics for this data type.
+  kbl(caption = "Summary statistics for Grade (zero scores removed) by Mothers education level") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+## Step 2 Check for Homogeneity of Variance
+Homogeneity of variance means that the pattern in variance of the variable around the mean for each group is the same. To assess homogeneity we use the Lavene test. The Lavene test works on the basis that the variance between the two groups is the same. As such if we run the Bartlett's test and if we do not find a statistically significant (p value less than 0.025 for 95% significance level) result we can assume homogeneity of variance. The outcome of this test will determine what post-hoc test we will use.
+
+The below we see box plots and Bartlett test results for each group. The output for Bartlett’s test for Portuguese final grade are shown below for each variable groups. The result is non-significant for the exam scores (the value in the P-value column is more than .025). This indicates that the variances are not significantly different (i.e., they are similar and the homogeneity of variance assumption is tenable). We will use Tukey for our post hoc test.
+
+```{r Check for Homogeneity of Variance - bartlett, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Homoscedasticity
+############
+
+# -------------- Box Plot --------------- #
+# Just a little eye ball test fo variance and mean to cross check with Leven's test
+tbl_sperf_medu_diff %>%
+  gather(pG3, key = "var", value = "value") %>%
+  ggplot(aes(x = var, y = value, fill = value)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(
+    y = "Grades",
+    x = "Performance Variables",
+    title = "Box Plots to eye ball variance",
+    subtitle = "Difference testing: Mothers education"
+  ) + facet_wrap(~Medu)
+
+
+# -------------- Bartlett's test --------------- #
+# Conduct Bartlett's test for homogeneity of variance in library car - the null hypothesis is that variances in groups are equal so to
+# assume homogeneity we would expect probaility to not be statistically significant.
+result <- list()
+result[["pG1"]]                   <- stats::bartlett.test(pG3~ Medu, data=tbl_sperf_medu_diff)
+```
+
+## Step 3 Run the one way anova test
+Based on the analysis above it is safe to select a one way anova test to evaluate if different groups exist. For this post-hoc test we will assume the variance are and use Tukey
+
+When we compare the f-statistic obtained during the test, to the standard f we want to see if the value we get is so unusual, it is the tail regions of the distribution set at +/-0.025 (Significance level of 95%). If we find this we can conclude that, in comparison to all other mean variance differences the mean variance difference for each group under test is so unusual it has less probability of being down to random change and more probability of being as a result of our alternate hypothesis. In this event we can reject the null hypothesis as the likely explanation for the difference between the groups.
+
+
+```{r ANOVA part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: ANOVA
+############
+# -------------- Conduct the ANOVA --------------- #
+#Conduct ANOVA using the userfriendlyscience test oneway
+#In this case we can use Tukey as the post-hoc test option since variances in the groups are equal
+#If variances were not equal we would use Games-Howell
+userfriendlyscience::oneway(as.factor(tbl_sperf_medu_diff$Medu),y=tbl_sperf_medu_diff$pG3,posthoc='Tukey')
+## P-value < .001 so this is statistically significant result between groups.
+
+#use the aov function - same as one way but makes it easier to access values for reporting
+test_result <- stats::aov(Medu~pG3, data = tbl_sperf_medu_diff)
+
+#Get the F statistic into a variable to make reporting easier
+test_result_fstat<-summary(test_result)[[1]][["F value"]][[1]]
+#Get the p value into a variable to make reporting easier
+test_result_aovpvalue<-summary(test_result)[[1]][["Pr(>F)"]][[1]]
+
+#---------- Calculate Eta Squared Effect size ---------- #
+#In the report we are using the res2 variable to retrieve the degrees of freedom
+#and the eta_sq function from the sjstats package to calculate the effect
+test_result_aoveta<-sjstats::eta_sq(test_result)[2]
+
+```
+
+## Reporting the results with eta squared effect
+A one-way between-groups analysis of variance (ANOVA) was conducted to explore the impact of mother's education levels on student performance in Portuguese, as measured by standardised exams. Participants were divided into five groups according to their mother's educational achievement (Groups 0 - none, 1 – primary education (4th grade), 2 – 5th to 9th grade, 3 – secondary education or 4 – higher education.).
+
+There was a statistically significant difference at the p < .001 level in Portuguese scores for 3 groups: (F(4, `r round(test_result$df.residual,2)`)= `r round(test_result_fstat,2)`, p<0.001.
+Despite reaching statistical significance, the actual difference in mean scores between groups was quite small. The effect size, calculated using eta squared was (`r round(test_result_aoveta[[1]],2)`). Post-hoc comparisons using the Tukey HSD test indicated that the mean score for Group 4 (M=`r round(tbl_sperf_medu_diff_stats[5,]$mean,2)`, SD=`r round(tbl_sperf_medu_diff_stats[5,]$sd,2)`) was significantly different to that for Group 1 (M=`r round(tbl_sperf_medu_diff_stats[2,]$mean,2)`, SD=`r round(tbl_sperf_medu_diff_stats[2,]$sd,2)`) and also Group 2 (M=`r round(tbl_sperf_medu_diff_stats[3,]$mean,2)`, SD=`r round(tbl_sperf_medu_diff_stats[3,]$sd,2)`)
+
+
+# Comparing More than Two Groups Non Parametric
+If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we cannot use the one way Anova test to establish if there is a difference between groups. The Kruskal–Wallis test (Kruskal & Wallis, 1952;) is the non-parametric counterpart of the one-way independent ANOVA. The theory supporting it is similar to the Mann Whitney test, and it uses ranking data. The values for the variable are ranked for each of the groups and then the sums of the ranks are compared or used to calculate the difference. The test products a statistic which is kruskal, Wallis chi squared or H.
+
+From the preparation phase we had the Hypothesis:
+
+> Time spent travelling to school has a differential effect on student absence overall.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in the school attendance for students based on time travelled to school.
+
+To do this difference test we have one independent/predictor/input variable that is considered a categorical variable. We will use the ordinal variable traveltime representing home to school travel time (numeric: 1 – < 15 min., 2 – 15 to 30 min., 3 – 30 min. to 1 hour
+or 4 – > 1 hour). We have one continuous dependent/response/outcome variable absences which meets the criteria of being at least interval data. Absences has already been established as a non normally distributed variable. Our goal is to use the Kruskal–Wallis test to tell us if there is a significant difference between these 4 groups. The null hypothesis is that there is no difference in absenteeism level. The alternative hypothesis is that there is a difference based on time travelled to school. This will be a one-way between groups Anova test with a significance level of .05. Observations are independent because they came from different people.
+
+## Step 1 Check for Non-Normality of the Variables
+If the variable of interest is not normal then we cannot use ANOVA and must use a non parametric test. The variable of interest being used to illustrate this methodology is Portuguese absentee level, absences.m which has previously been established to not follow the normal distribution even when outliers have been removed due to skew.
+
+## Step 2 Generate Summary Statistics Reporting
+
+```{r Non Parametric - Generate Summary Statistics Reporting}
+############
+# PART: Generate Summary Statistics Reporting
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sabsence_traveltime_diff <- tbl_sperf_all %>%
+  select(traveltime.p, contains('absences.p'))
+# -------------- Create summary statistics --------------- #
+tbl_sabsence_traveltime_diff_stats <-
+  psych::describeBy(tbl_sabsence_traveltime_diff,
+                    tbl_sabsence_traveltime_diff$traveltime.p,
+                    mat = TRUE,
+                    IQR = TRUE)  %>%
+  filter(!is.nan(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sabsence_traveltime_diff_stats %>%
+  select(-c(mean, sd, trimmed, se)) %>% # Removing invalid statistics for this data type.
+  kbl(caption = "Summary statistics for Portuguese subejct Absences (zero scores removed) by student travel time") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## Step 3 Run the Kruskal-Wallis rank sum test
+Based on the analysis above it is safe to select a non parametric independent variable u-test to evaluate if two different groups exist. When we compare the u-statistic obtained during the test, to the standard distribution we want to see if the value we get is so unusual, it is the tail regions of the distribution set at +/-0.025 (Significance level of 95%). If we find this we can conclude that, in comparison to all other ranking differences the ranking difference for each group under test is so unusual it has less probability of being down to random change and more probability of being as a result of our alternate hypothesis. In this event we can reject the null hypothesis as the likely explanation for the difference between the two groups.
+
+```{r Kruskal-Wallis part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Kruskal-Wallis
+############
+# -------------- Conduct the Kruskal-Wallis --------------- #
+test_result <-
+        stats::kruskal.test(absences.p~traveltime.p,data=tbl_sabsence_traveltime_diff)
+
+# -------------- Conduct Post Hoc test --------------- #
+#Need library FSA to run the post-hoc tests
+test_result_post_hoc <- FSA::dunnTest(x=tbl_sabsence_traveltime_diff$absences.p, g=as.factor(tbl_sabsence_traveltime_diff$traveltime.p), method="bonferroni")
+print(test_result_post_hoc, dunn.test.results = TRUE)
+
+#---------- calculate the effect size eta squared -------------------- #
+test_result_effsize <- rstatix::kruskal_effsize(tbl_sabsence_traveltime_diff, absences.p~traveltime.p, ci = FALSE, conf.level = 0.95,
+  ci.type = "perc", nboot = 1000)#uses bootstrapping
+print(test_result_effsize)
+```
+
+## Reporting the results with eta squared effect
+A Kruskal-Wallis rank sum between-groups analysis test was conducted to explore the impact of home to school travel time on student absenteeism in Portuguese, as measured by standardised exams. Participants were divided into four groups according to their travel time (numeric: 1 – < 15 min., 2 – 15 to 30 min., 3 – 30 min. to 1 hour or 4 – > 1 hour)
+
+There was no statistically significant difference at the any significance level (P = 0.36). A very small difference was detected
+Despite reaching statistical significance, the actual difference in mean scores between groups was quite small. The effect size, calculated using eta squared was (`r test_result_effsize$effsize`). Post-hoc comparisons using the Dunn and Bonferroni and this confirmed there was no difference.
+
+Based on this analyse, insufficient evidences has been found to accept the alternative hypothesis, as such we will accept the null hypothesis that any differences between the two groups is due to systematic occurrences for the variable of interest.
+
+
+# Comparing nominal variables
+When we are comparing variables that are continuous to see if there is a relationship, that is correlation when we are comparing how different groups experience a concept that's represented by a continuous variable that will either be our bi-variate difference test, which is t=test or Mann whitney or for more multivariate difference it is AVONA and Kruskal-Wallis. However, when we have nominal variables, methods for comparison using either means or rankings doesn't make any sense. The method we use instead is frequency comparison between what we see versus what we would expect in our population. The theory supporting it is that if the two groups are the same in the population then the frequency of occurrence of the variable of interest will the same for both groups. If the two variables are correlated with each other than then the pattern for frequency of occurrence of one variable will be similar to the other. The null hypothesis is that there is no relationship (correlation) or that their is no difference (difference). 
+
+We test this using the the Chi-squared test and when we compare the chi squared statistic obtained during the test, to the standard chi-squired distributions we want to see if the value we get is so unusual, it is the tail region of the distribution set at 0.05 (Significance level of 95%).  The Chi-squared distribution which represents what we would expect to see in a distribution of a similar size if their was no difference. If we find this we can conclude that, in comparison to all other frequency of occurances differences the difference for each group under test is so unusual it has less probability of being down to random change and more probability of being as a result of our alternate hypothesis. In this event we can reject the null hypothesis as the likely explanation for the difference between the two groups.
+
+## Nominal difference using Chi-Square
+
+From the preparation phase we had the Hypothesis:
+
+> HA: There are differences between extra-curricular activities engagement for respondents who are male or female
+
+Using our student performance dataset we are going to investigate if there is a significant difference in extra-curricular activities engagement for students who are Male or Female. We have two binary categorical variables, student sex (sex) and after school activity participation (activities.p). Due to how the demographic survey was administered there are two variables in the dataset capturing after school activity participation, one collected during Maths class and the other collected during the Portuguesse class at different times, as such it is valid for the same student to have different responses to the question and their circumstances may have changed between surveys. An inspection of that data revealed that only 5 records contained difference response for the variable activities.p versus activities.m. For the purposes of illustrating Nominal difference evaluation using Chi-Square we will use activities.p as is.
+
+## Step 1: Generate summary statistics
+
+```{r Summary stats and Visualisation of categorical measurement statistics 1}
+
+############
+# PART: Generate summary statistics
+############
+
+# Create a subset dataframe with just the variables of interest.
+tbl_sactivity_sex_diff <- tbl_sperf_all %>%
+  select(sex, contains('activities.p'))
+# -------------- Create summary statistics --------------- #
+tbl_sactivity_sex_diff_stats <- tbl_sactivity_sex_diff %>%
+ summarytools::freq()
+
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sactivity_sex_diff %>%
+  ggplot(aes(x = sex))
+gs <- gs + labs(x = 'Student Sex')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["sex"]] <- gs
+
+gs <- tbl_sactivity_sex_diff %>%
+  ggplot(aes(x = activities.p))
+gs <- gs + labs(x = 'After school engagement')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activity"]] <- gs
+
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 2,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+
+## Step 2: Run Chi Square test
+
+```{r Chi Square Test part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Chi
+############
+
+# -------------- Conduct the Chi-Square --------------- #
+#Use the Crosstable function
+#CrossTable(predictor, outcome, fisher = TRUE, chisq = TRUE, expected = TRUE)
+gmodels::CrossTable(tbl_sactivity_sex_diff$sex, tbl_sactivity_sex_diff$activities.p, fisher = TRUE, chisq = TRUE, expected = TRUE, sresid = TRUE, format = "SPSS")
+
+#more simplistic way of doing Chi-Square
+
+#Create your contingency table
+contingency_table <-xtabs(~activities.p+sex, data=tbl_sactivity_sex_diff)
+
+ctest_test_result <-stats::chisq.test(contingency_table, correct=TRUE)#chi square test
+#correct=TRUE to get Yates correction needed for 2x2 table
+
+# -------------- Calculate the effect Size --------------- #
+ctest_test_result$chi_effphi <- sjstats::phi(contingency_table)
+ctest_test_result$chi_effcramer <- sjstats::cramer(contingency_table)
+
+print.listof(ctest_test_result)
+
+
+```
+## Reporting the results with effect size
+
+A Chi-Square test for independence (with Yates’ Continuity Correction) indicated a significant association between gender and reported participation in after school activity, χ2(1,n=382) = 4.34 , p < .05, phi = .11). As such we reject the null hypothesis and accept the alternative hypotheses that there is a differential effect in after school activity engagement between male and female students. The odds of attending after school activities where 1.56 times higher for males students compared to female students.
+
+
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Analyse"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 4/12/2020
+Objective: Analyse phase for repeated measures
+---
+
+# Repeated measures test for nominal variables.
+So far we have only looked at tests for independent groups, but as mentioned there is another test type for related samples and that is a repeated measures test. This is where we have the same grouping but we take two measurements, the first at time T1 and the second at time T2 where T2 > T1. If our data measurement level is at interval data and normally distributed then we can use paired samples t-test. If the data is not normally distributed or ordinal we will use a Wilcoxon test if our data is nominal with two groups we use McNemar's test, and lastly for multiple groups we use the Friedman Anova.
+
+McNemar's test is used to determine if there are differences on a binary dependent variable between two related groups. It can be considered to be similar to the paired-samples t-test, but for a binary nominal variable rather than a continuous scale variable. If we had more than two repeated measurements of the nominal variable, we could use Cochran's Q test.
+
+```{r Import Data Repeated Measures, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+
+## Repeated Measures Nominal difference using Chi-Square and McNemar
+
+As mentioned, students where asked twice about there engagement in after school activities with a time difference between each survey.
+
+> HA: There are differences between extra-curricular activities engagement for respondents between measurements.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in extra-curricular activities engagement for students between measurements.
+We have one binary categorical variables, after school activity participation measured twice (activities.p, activities.m) . Due to how the demographic survey was administered there are two variables in the dataset capturing after school activity participation, one collected during Maths class and the other collected during the Portuguesse class at different times, as such it is valid for the same student to have different responses to the question and their circumstances may have changed between surveys. We will use the McNemar test to determine whether the proportion of participants who participated in after school activities (as opposed to those who did not) was different when comparing the first survey to the second survey result. This will provide supporting evidence to justify accepting omitting differences between survey responses for the this variable in our predictive model. As such our goal is to not find a significance result. An inspection of that data revealed that only 5 records contained difference response for the variable activities.p versus activities.m. As such we do not expect to find a significant result, but have included this test for the purposes of illustrating Repeated measures Nominal difference evaluation using Chi-Square and McNemar's test.
+
+
+## Step 1: Generate summary statistics
+
+```{r Summary stats and nominal repeated measures 1}
+
+############
+# PART: Generate summary statistics
+############
+
+# Create a subset dataframe with just the variables of interest.
+tbl_sactivity_diff <- tbl_sperf_all %>%
+  select(contains('activities'))
+# -------------- Create summary statistics --------------- #
+tbl_sactivity_diff_stats <- tbl_sactivity_diff %>%
+ summarytools::freq()
+
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sactivity_diff %>%
+  ggplot(aes(x = activities.m))
+gs <- gs + labs(x = 'After school engagement Maths class survey')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities.m"]] <- gs
+
+gs <- tbl_sactivity_diff %>%
+  ggplot(aes(x = activities.p))
+gs <- gs + labs(x = 'After school engagement Portuguese class survey')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities.p"]] <- gs
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 2,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+## Step 2: Run McNemar's chi-squared test
+
+```{r McNemar, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: mcnemar = TRUE
+############
+
+# -------------- Conduct the Chi-Square with mcnemar = TRUE --------------- #
+#Use the Crosstable function
+#CrossTable(predictor, outcome, fisher = TRUE, chisq = TRUE, expected = TRUE, mcnemar = TRUE)
+gmodels::CrossTable(tbl_sactivity_diff$activities.m, tbl_sactivity_diff$activities.p, mcnemar = TRUE, expected = TRUE, sresid = TRUE, prop.chisq = FALSE, format = "SPSS")
+
+#more simplistic way of doing Chi-Square
+
+#Create your contingency table
+contingency_table <-xtabs(~activities.p+activities.m, data=tbl_sactivity_diff)
+
+ctest_test_result <-stats::mcnemar.test(contingency_table, correct=TRUE) #mcnemar
+#correct=TRUE to get Yates correction needed for 2x2 table
+
+# -------------- Calculate the effect Size --------------- #
+ctest_test_result$chi_effphi <- sjstats::phi(contingency_table)
+ctest_test_result$chi_effcramer <- sjstats::cramer(contingency_table)
+
+print.listof(ctest_test_result)
+
+
+```
+
+## Reporting the results with effect size
+
+A McNemar's chi-squared repeated measures test for difference (with Continuity Correction) indicated a no significant change in after school activity, χ2(1,n=382) = 0 , p = 1, phi = .97). As such we accept the null hypothesis and accept the reject the alternative hypotheses that there is a differential effect in after school activity engagement between repeated measures. The odds of attending after school activities where the same between measures for students.
+

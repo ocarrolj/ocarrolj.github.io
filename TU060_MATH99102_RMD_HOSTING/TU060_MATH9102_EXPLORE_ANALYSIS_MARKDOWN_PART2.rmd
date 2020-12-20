@@ -1,0 +1,1169 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio -  Explore and Analysis for Difference"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 30/11/2020
+Objective: Explore and Analysis for Difference
+---
+
+```{r global-options, include=FALSE}
+# https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6, fig.path = 'Figs/', echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, message=FALSE, warning=FALSE}
+# ********************************************************************
+#
+#   Setup Section
+#
+# ********************************************************************
+needed_packages <- c("tidyverse",
+                     "readxl",
+                     "lubridate",
+                     "jsonlite",
+                     "ggplot2",
+                     "gtools",
+                     "httr",
+                     "readr",
+                     "psych",
+                     "kableExtra",
+                     "cowplot",
+                     "summarytools",
+                     "corrplot",
+                     "FSA",
+                     "VIM",
+                     "userfriendlyscience",
+                     "car")
+# Extract not installed packages
+not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
+# Install not installed packages
+if (length(not_installed)) { install.packages(not_installed) }
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(psych) ## added for quick stat descriptions
+library(cowplot) ## added for quick stat descriptions
+library(Hmisc)
+library(summarytools)
+library(corrplot) ## correlation plots
+library(FSA)
+library(car) ##Levenes test
+library(VIM) ## missing data assessment
+library(userfriendlyscience)
+```
+
+# Introduction:
+The purpose of this chapter is to address all required concepts comprehensively and demonstrate coherent understanding of the ‘statistical analysis: explore and analyse’ phase, as it relate to evaluating different groups within our population, as covered during the TU060 MATH9102 Module.
+<p>
+
+In the previous chapter, which looked at correlation, we identified several variables as being appropriate for use in testing the hypothesis generated in the preparation phase. The justification for selection was based on assessing the normality of the variables and their correlation using the general linear statistical model. Records with missing data were investigated and cleaned from the dataset. In using correlations, we are trying to see if there is a consistent pattern between two variables: does one increase or decrease when the other increases? The other scenario we need to investigate is if there is a difference in how concepts are experienced by different groupings. For example, one of the hypotheses suggested a difference between the performance of male and female students. Before we can evaluate the nature of that difference, we must first test if, based on our sample data, these two cohorts represent separate populations in terms of our concept of interest. 
+<p>
+
+In this chapter we will continue the exploration and analysis and select appropriate statistical tests to evaluate the differential effects with specific reference to the Portuguese Student Performance dataset from Cortez and A. Silva (2008). 
+<p>
+
+### Import dataset
+There are two dataset that must be imported:
+
+* [sperformance-dataset.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/sperformance-dataset.csv).
+* [TU060_MATH9102_Student_variables_description.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/TU060_MATH9102_Student_variables_description.csv).
+
+```{r Import Data, include=TRUE, echo=TRUE}
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+
+# Hypothesis testing - Difference:
+Before we can build a predictive model, we need to work out which groupings to include in our hypothesis testing. We cannot include a grouping in our model if that grouping does not exist within our population. Our starting point is to answer the question: what differential groups exist within our sample and what is the effect size of the difference? This will provide the justification for group selection in hypothesis testing.
+<p>
+
+The choice of test we perform to Investigate if differential effects exist for different groups depends on the measurement level of the variable and the shape of the data.  If our data measurement level is at interval data and normally distributed then we can use the independent samples t-test,  provided the variables are independent. If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we must use a non-parametric test, such as the Mann-Whitney U-Test. 
+<p>
+
+The other type of test we have is a repeated measures test. This is where we have the same grouping but we take two measurements, the first at time T1 and the second at time T2, where T2 > T1. If our data measurement level is interval data and normally distributed then we can use the paired samples t-test. If the data is not normally distributed or is ordinal we can use a Wilcoxon test. 
+<p>
+
+In t-testing, the theory is that, for the variable of interest for the two groups we’re investigating, if they are from the same population then the mean and standard deviation will be the same. If we find that the mean and standard deviation are different with regards to our significance level, then we can assume the groups are from two different populations rather than one for the variable of interest. After 120 data observations the t-distribution becomes the z-distribution. 
+<p>
+
+At this point we can use t-distribution to calculate probability and evaluate the Null hypothesis that there is no difference in the mean between the two groups, versus the alternative hypothesis that there is a difference. If our result is within the rejection region, it means that our t statistics is such that only 5% of samples from the same population for the variable of interest would produce the same T value, assuming two tailed significance levels of +/- 1.96. This is also known as a Type 1 error.   
+
+
+### Assumptions of the independent samples t-test
+
+Because the t-test is parametric, it is based on the normal distribution. As such when selecting the parametric t-test to assess difference, the questions we need to answer are:
+
+* Is the variable of interest measured at least at the interval level? 
+* Is the sampling distribution normal for the variable of interest? 
+* Does the variance in each group have a similar shape, can we assume homoscedasticity? 
+* Are the observations independent in each group?
+
+The relationship between two groups is quantified by the t statistical measure.  From that, we can calculate the effect size, which is a measure of how different the groups are for the variable of interest. 
+
+
+
+### Assumptions of the Mann-Whitney u-test
+
+When selecting the non-parametric U-test to assess difference, the criteria are less exclusive:
+
+* Is the variable of interest measured at least at the ordinal level or non normal continuous? 
+* Are the observations independent in each group? 
+* Are our samples as random as possible and absent of bias where possible? 
+
+The relationship between two groups is quantified by the U statistic for the Mann Whitney test, or the W statistic in R as we are using the Wilcox implementation. From that, we can calculate the effect size, which is a measure of how different the groups are for the variable of interest based on relative rankings.  
+
+  
+ 
+### A note on Errors:
+A type 1 error would occur if we find that students’ performance in Portuguese and Math are different each to be from different groups when they are not. A type 2 error would occur if we find there is no difference when there really is one in the population. The theory is that the parametric tests make use of every value in our distribution so have a higher power and are more robust against type 2 errors as a result. The non parametric tests are weaker calculations because they use ranking or comparison to the median, which is also a form of ranking, and therefore are inherently less powerful and less accurate. The lower our power, the more likely it is that we will make a type 2 error and incorrectly accept the Null hypothesis when we shouldn't. 
+<p>
+ 
+If we have a small number of outliers, where small is determined by our significance level, then we can tolerate a level of accuracy to our alpha level and use parametric tests without significantly increasing the possibility of making an incorrect inference or interpretation of a hypothesis and we will get additional accuracy from using the parametric tests as opposed to non-parametric tests. The theory is that it is in general better to have the higher power of parametric testing over non-parametric if our data can be assumed to be approximately normal. The acceptable range is related to the domain the analysis is applicable to. 
+
+
+### A note on Heuristics:
+We will be using a number of heuristics to justify our assessment of differential effects.  A benchmark suggested by Cohen (1988) is to consider an effect size d as small (d = 0.2), medium (d = 0.5), or large (d = 0.8) for the independent samples t-test. 
+<p>
+
+For assessing normality of distribution for variables with outliers, Tabachnik and Fidell (2007), suggested the heuristic that if missing data represent less than 5% of the total and is missing in a random pattern from a large data set, almost any procedure for handling missing values yields similar results, including simply omitting the outliers. 
+
+
+# Parametric Difference testing
+
+From the preparation phase we had the Hypothesis:
+
+> Male and Female students will perform differently overall.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in the mean performance score for students who are Male or Female.
+To do this difference test, we have one independent/predictor/input variable that is considered a categorical variable. It is a nominal binary variable with two possible values, m or f, representing whether the observed student is male or female. We have one continuous dependent variable (grade in each subject) which meets the criteria of being at least interval data. Our goal is to use the Independent samples t-test to tell us if there is a significant difference between these two groups (male and female students). The null hypothesis is that there is no difference in performance between Male (m) and Female (f) students. The alternative hypothesis is that there is a difference between Male and Female students. This will be a two tailed test with a significance level of .005. Observations are independent because they came from different people.
+<p>
+
+The only remaining questions to answer before selecting which difference test to perform relate to Normality and Homoscedasticity and they are addressed below.
+
+
+## Step 1 Check for Normality of the Variables
+Because normally is important for the t test, we need to inspect whether our variables of interest are normally distributed. We validate the normality conditions by generating summary statistics, histograms and Q-Q Plots for each of the variables. We can quantify how far away from normal the data is by calculating the standard skew and kurtosis. If those are within acceptable bands (+/- 2.58 if our samples size is greater than 80 and we want a 99% cut off) we can assume normality. If not, we look at the actual values for the variable, convert them to z-scores and calculate the percentage of those scores that can be considered outliers. If this percentage is within acceptable limits (+/- 2.58 if our sample size is greater than 80 and we want a 99% cut off) then we can treat our data as approximately normal.
+<p>
+
+In this instance, as part of our data exploration phase we have already determined that all Performance variables in our dataset can be treated as normal once outliers have been removed. As such these steps are not repeated here but the summary statistics are shown for reference.
+
+
+```{r Parametric Check for Normality of the variables cleaned, echo = FALSE}
+############
+# PART: Normality
+############
+# Select only variables of interest
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
+  select(contains('mG'), contains('pG')) %>%
+  filter(mG1 != 0, 
+         mG2 != 0, 
+         mG3 != 0, 
+         pG1 != 0, 
+         pG2 != 0, 
+         pG3 != 0) # Filtering records with missing data.
+
+tbl_sperf_numerical_stats <- 
+  tbl_sperf_numerical_measurements %>% 
+  psych::describe(omit = TRUE, IQR = TRUE)
+
+#-------- Iterate through each variable -------#
+#Generate regular summary statistics - not as nice as psych package but gives p value and I need the data in this structure. 
+st <- pastecs::stat.desc(tbl_sperf_numerical_measurements, basic = F)
+tbl_sperf_numerical_stats_2 <- st %>% transpose()
+colnames(tbl_sperf_numerical_stats_2) <- rownames(st)
+rownames(tbl_sperf_numerical_stats_2) <- colnames(st)
+
+# Initialize vectors
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+variable_count <- nrow(tbl_sperf_numerical_stats_2)
+
+# Generate standard scores
+for (n in 1:variable_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats_2)[n]
+
+  tpskew               <- semTools::skew(tbl_sperf_numerical_measurements[[variable]])
+  tpkurt               <- semTools::kurtosis(tbl_sperf_numerical_measurements[[variable]])
+  std_skew[[variable]] <- tpskew[1] / tpskew[2]
+  std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+  z_score              <- abs(scale(tbl_sperf_numerical_measurements[[variable]]))
+  gt_196[[variable]]   <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+  gt_329[[variable]]   <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+
+}
+
+tbl_sperf_numerical_stats_2$std_skew <- std_skew
+tbl_sperf_numerical_stats_2$std_kurt <- std_kurt
+tbl_sperf_numerical_stats_2$gt_2sd <- gt_196
+tbl_sperf_numerical_stats_2$gt_3sd <- gt_329
+
+#-------- Pretty print my table -------#
+tbl_sperf_numerical_stats_2 %>%
+  kbl(caption = "Summary statistics for Performance (zero scores removed)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## Step 2 Check for Homogeneity of Variance
+Homogeneity of variance means that the pattern in variance of the variable around the mean for each group is the same. The t-test is a robust test and it does not require Homogeneity of variance between the two groups, however if we can assume homogeneity of variance we increase the power of the t-test. To assess homogeneity we use the Lavene test. The Lavene test works on the basis that the variance between the two groups is the same. As such if we run the Lavene test and we do not find a statistically significant result (p value less than 0.025 for 95% significance level) we can assume homogeneity of variance.
+<p>
+
+Below we see the summary statistics, box plots and Levene test results for each group. The output for the Levene test for each subject grade (using the median) are shown below for the two groups. The result is non-significant for the exam scores (the value in the Pr (>F) column is more than .05) regardless of whether we centre with the median or mean. This indicates that the variances are not significantly different (i.e., they are similar and the homogeneity of variance assumption is tenable).
+
+
+```{r Check for Homogeneity of Variance - Summary stats, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Homoscedasticity
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sperf_sex_diff <- tbl_sperf_all %>%
+  select(sex, contains('mG'), contains('pG')) %>%
+  filter(mG1 != 0, 
+         mG2 != 0,
+         mG3 != 0, 
+         pG1 != 0, 
+         pG2 != 0, 
+         pG3 != 0) # Filtering records with missing data.
+
+# -------------- Box Plot --------------- #
+# Just a little eye ball test fo variance and mean to cross check with Leven's test
+tbl_sperf_sex_diff %>%
+  gather(pG1, mG1, pG2, mG2, pG3, mG3, key = "var", value = "value") %>%
+  ggplot(aes(x = var, y = value, fill = sex)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(
+    y = "Grades",
+    x = "Performance Variables",
+    title = "Box Plots to eye ball variance",
+    subtitle = "Difference testing: Male and Female"
+  )
+
+# -------------- Create summary statistics --------------- #
+tbl_sperf_sex_diff_stats <-
+  psych::describeBy(tbl_sperf_sex_diff, tbl_sperf_sex_diff$sex, mat = TRUE) %>%
+  filter(!is.na(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sperf_sex_diff_stats %>%
+  kbl(caption = "Summary statistics for Performance (zero scores removed) by student Sex") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# -------------- Levene's test --------------- #
+# Conduct Levene's test for homogeneity of variance in library car - the null hypothesis is that variances in groups are equal so to
+# assume homogeneity we woudl expect probaility to not be statistically significant.
+# Part 1: Iterate through variables with median
+variable_count <- 7
+result <- list()
+for (n in 2:variable_count) {
+  variable <- colnames(tbl_sperf_sex_diff)[n]
+  result[[variable]]                   <-
+    leveneTest(
+      y = tbl_sperf_sex_diff[, n],
+      group = as.factor(tbl_sperf_sex_diff$sex),
+      center = median
+    )
+}
+
+#Pr(>F) is your probability - in this case it is not statistically significant for any variable so we can assume homogeneity.
+print.listof(result)
+
+# Part 2: Iterate through variables with mean this time.
+variable_count <- 7
+result <- list()
+for (n in 2:variable_count) {
+  variable <- colnames(tbl_sperf_sex_diff)[n]
+  result[[variable]]                   <-
+    leveneTest(
+      y = tbl_sperf_sex_diff[, n],
+      group = as.factor(tbl_sperf_sex_diff$sex),
+      center = mean
+    )
+}
+# Pr(>F) is your probability - in this case it is not statistically significant for any variable so we can assume homogeneity.
+# No difference in outcomes from using mean versus median, which is a good sign. 
+print.listof(result)
+```
+
+## Step 3 select and run the T-Test
+Based on the analysis above, it is appropriate to select a parametric independent samples t-test to evaluate if two different groups exist. For this t-test we will set the variance to be equal for each difference test as no statistically significant difference in variance was discovered in any of the Lavene tests run. 
+<p>
+
+When we compare the t-statistic obtained during the test to the standard t distribution, we can see if the value is so unusual that it would be in the tail regions of the distribution, set at +/-0.025 (Significance level of 95%). If we find that this is the case, we can conclude that, in comparison to all other mean differences, the mean difference for each group is so unusual it is less likely to be due to random chance and more likely to be as a result of our alternate hypothesis. In this event we can reject the null hypothesis as the likely explanation for the difference between the two groups. 
+
+
+```{r t-test part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: T-Test
+############
+# -------------- Conduct the t-test --------------- #
+#Conduct the t-test from package stats
+#In this case we can use the var.equal = TRUE option to specify equal variances and a pooled variance estimate
+variable_count <- 7
+tbl_test_result <- data.frame()
+tbl_test_effectsize <- data.frame()
+for (n in 2:variable_count) {
+  variable <- colnames(tbl_sperf_sex_diff)[n]
+  test_result                <-
+          stats::t.test(tbl_sperf_sex_diff[, n]~as.factor(tbl_sperf_sex_diff$sex), var.equal = TRUE) %>%
+          broom::tidy() %>% as.data.frame()
+
+  # Build output table
+  row.names(test_result) <- variable
+  tbl_test_result <- rbind(tbl_test_result,test_result)
+
+  #---------- Calculate Cohens D Effect size ---------- #
+  effcd <- round(effectsize::t_to_d(t = test_result$statistic, test_result$parameter),2)
+
+  #---------- Calculate Eta Squared Effect size ---------- #
+  #Eta squared calculation
+  effes <- round((test_result$statistic * test_result$statistic) / ((test_result$statistic * test_result$statistic
+  ) + (test_result$parameter)), 3)
+
+  # Build output table
+  tbl_merged_effectsize <- merge(effcd,effes)
+  row.names(tbl_merged_effectsize) <- variable
+  tbl_test_effectsize <- rbind(tbl_test_effectsize,tbl_merged_effectsize)
+
+}
+
+## tidy up column names
+colnames(tbl_test_result)[1] <- 'mean.diff.est'
+colnames(tbl_test_result)[2] <- paste('mean', levels(as.factor(tbl_sperf_sex_diff$sex))[1], sep = ".")
+colnames(tbl_test_result)[3] <- paste('mean', levels(as.factor(tbl_sperf_sex_diff$sex))[2], sep = ".")
+#P-value is your probability - in this case every resul was statiscally significant @ P < .05*
+
+# -------------- Pretty Print Test statistics --------------- #
+tbl_test_result %>%
+        kbl(caption = "Summary of T-Test Statistics for the Male and Female student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+# -------------- Pretty Print Test Effect size --------------- #
+tbl_test_effectsize %>%
+        kbl(caption = "Summary of T-Test Effectsize for the Male and Female student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+## Reporting Difference
+
+### Hypothesis test: mean performance score for students who are Male or Female
+
+A series of independent-samples t-tests were conducted to compare performance scores in Portuguese and Maths for respondents who are Male and those who are Female.
+ 
+* For Maths initial grade a statistically significant difference in the scores was found (M=10.83, SD= 3.20 for respondents who are Female, M= 11.76, SD= 3.22 for respondents who are Male), (t(337)= 2.66 , p < 0.05). Cohen's d also indicated a small effect size (0.29).
+ 
+* For Maths Intermediate grade a statistically significant difference in the scores was found (M=10.99, SD= 3.13 for respondents who are Female, M= 11.90, SD=3.19 for respondents who are Male), (t(337)= 2.65, p < 0.05). Cohen's d also indicated a small effect size (0.29).
+ 
+* For Maths final grade a statistically significant difference in the scores was found (M=11.16, SD= 3.23 for respondents who are Female, M= 12.10, SD=3.23 for respondents who are Male), (t(337)=2.66, p < 0.05). Cohen's d also indicated a small effect size (0.29).
+ 
+* For Portuguese initial grade a statistically significant difference in the scores was found (M=12.86705, SD= 2.295018 for respondents who are Female, M= 11.84, SD= 2.43 for respondents who are Male), (t(337)= 3.99 , p < 0.001). Cohen's d also indicated a small effect size (0.43).
+ 
+* For Portuguese Intermediate grade a statistically significant difference in the scores was found (M=12.94, SD= 2.25 for respondents who are Female, M= 11.98795, SD=2.456872 for respondents who are Male), (t(337)= 3.73 , p < 0.001). Cohen's d also indicated a small effect size (0.41).
+ 
+* For Portuguese final grade a statistically significant difference in the scores was found (M=13.32, SD= 2.31 for respondents who are Female, M= 12.30, SD=2.75 for respondents who are Male), (t(337)=3.71, p < 0.001). Cohen's d also indicated a small effect size (0.40).
+ 
+Given these results there is justification to reject the Null Hypothesis that differences between the two groups is random. There is justification to accept the Alternative Hypothesis that mean performance scores for students who are Male or Female will differ in the population.
+
+
+# Non Parametric Difference testing
+As mentioned earlier, the choice of difference test we perform to investigate if differential effects exist for groups depends on the measurement level of the variable and the shape of the data. If our data measurement is at an interval level and normally distributed then we can use the independent samples t-test provided the variables are independent. If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we use a non-parametric test, such as the Mann-Whitney U-Test. 
+<p>
+
+From the preparation phase we had the Hypothesis:
+
+
+> Male and Female students will have different levels of absenteeism overall.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in the ranked absentee scores for students who are Male or Female.
+<p>
+
+To do this difference test we have one independent/predictor/input variable that is considered a categorical variable. It is a nominal variable with two possible values, m or f. We have one continuous variable dependent/response/outcome variable this is the total number of absences, which meets the criteria of being at least ordinal data because it is skewed interval data. Our goal is to use the independent samples Mann-Whitney U-Test to tell us if there is a significant difference between these two groups. The null hypothesis is that there is no difference in performance between Male and Female students. The alternative hypothesis is that there is a difference between Male and Female students. Observations are independent because they came from different people.
+<p>
+ 
+The test works by looking to see if there are a similar number of high and low ranks in each group, so when absenteeism is ranked then we can say the null hypothesis holds and there is no difference between the groups. If there is a greater number in one group relative to the other then that would suggest there is a difference between the two groups.
+ 
+
+
+## Step 1 Check for Non-Normality of the Variables
+We validate the normality conditions by generating summary statistics, histograms and Q-Q Plots for each of the variables, and quantify how far away from normal the data is by calculating the standard skew and kurtosis. If those are within acceptable bands (+/- 2.58 if our samples size is greater than 80 and we want a 99% cut off) we can assume normality. If not we look at the actual values in the variable, convert them to z-scores and calculate the percentage of those scores that can be considered outliers. If this percentage is within acceptable limits (+/- 2.58 if our sample size is greater than 80 and we want a 99% cut off) then we can treat our data as approximately normal.
+<p>
+
+To illustrate the concept of assessing normality for non-normal data, we selected the absences variables for Portuguese and Maths from the sample dataset. The Normal Quantile Plot (Q-Q Plot) shows that most observations are off the reference line with curves in the distribution of observations for both subjects. As such, the variables are not approximately normal as we have large clusters and gaps affecting the shape of our distribution.
+<p>
+ 
+If we still had any doubts about normality, the next step is to quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Skewness for both variables exceeded our acceptable range with values of 32.26 absences from Maths and 17.41 for absences from Portuguese. 
+<p>
+
+In terms of quantifying the proportion of the data that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. Neither absences from Maths nor absences from Portuguese were within our acceptable range for the 99.7% significance level. Based on this assessment, none of the variables can be treated as normally distributed. This supports selecting the Mann-Whitney test over the independent samples t-test as independent samples t-test requires a normal sampling distribution. 
+
+```{r Non Parametric Check for Normality of the variables cleaned, echo = FALSE}
+############
+# PART: Check for Normality
+############
+# For illsutration just looking at Math.
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
+  select(contains('absence'))
+
+tbl_sperf_numerical_stats <-
+  tbl_sperf_numerical_measurements %>% psych::describe(omit = TRUE, IQR = TRUE)
+
+#-------- Iterate through eact variable -------#
+#Generate regular summary statistics - not as nice as psych package but gives p value
+st <-
+  pastecs::stat.desc(tbl_sperf_numerical_measurements, basic = F)
+tbl_sperf_numerical_stats_2 <- st %>% transpose()
+colnames(tbl_sperf_numerical_stats_2) <- rownames(st)
+rownames(tbl_sperf_numerical_stats_2) <- colnames(st)
+
+# Initialise vectors
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+variable_count <- nrow(tbl_sperf_numerical_stats_2)
+
+# Iterate through varibles
+for (n in 1:variable_count) {
+  variable <- row.names.data.frame(tbl_sperf_numerical_stats_2)[n]
+  
+  tpskew               <-
+    semTools::skew(tbl_sperf_numerical_measurements[[variable]])
+  tpkurt               <-
+    semTools::kurtosis(tbl_sperf_numerical_measurements[[variable]])
+  std_skew[[variable]] <- tpskew[1] / tpskew[2]
+  std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+  z_score              <-
+    abs(scale(tbl_sperf_numerical_measurements[[variable]]))
+  gt_196[[variable]]   <-
+    FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+  gt_329[[variable]]   <-
+    FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+  
+}
+
+tbl_sperf_numerical_stats_2$std_skew <- std_skew
+tbl_sperf_numerical_stats_2$std_kurt <- std_kurt
+tbl_sperf_numerical_stats_2$gt_2sd <- gt_196
+tbl_sperf_numerical_stats_2$gt_3sd <- gt_329
+
+# Pretty print
+tbl_sperf_numerical_stats_2 %>%
+  kbl(caption = "Summary statistics for Absences") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r Non Parametric Visualisation Histograms}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+num_diagram_count <- nrow(tbl_sperf_numerical_stats)
+plots <- list()
+for (n in 1:num_diagram_count) {
+  #
+  variable <- row.names.data.frame(tbl_sperf_numerical_stats)[n]
+  binwidth <- 2
+  gs       <- tbl_sperf_numerical_measurements %>% ggplot(aes_string(colnames(tbl_sperf_numerical_measurements)[n]))
+  gs       <- gs + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+  gs       <- gs + stat_function(fun = dnorm, color = "red", args = list(mean = tbl_sperf_numerical_stats$mean[n], sd = tbl_sperf_numerical_stats$sd[n]), na.rm = TRUE)
+  gs       <- gs + labs(x = variable)
+  gs       <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+  # Gather All the plots
+  plots[[names(tbl_sperf_numerical_measurements)[n]]] <- gs
+}
+
+plot_grid(plotlist = plots,
+          labels = "auto",
+          ncol = 2)
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+# For expedience only one Q-Q Plot included for each subject
+
+gs1 <-
+  tbl_sperf_numerical_measurements %>% ggplot(aes(sample = absences.m)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted",
+               color = "red",
+               size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Maths Absences", subtitle = "Plot of absences.m")
+
+gs2 <-
+  tbl_sperf_numerical_measurements %>% ggplot(aes(sample = absences.p)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted",
+               color = "red",
+               size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Portuguese Absences", subtitle = "Plot of absences.p")
+
+plot_grid(gs1, gs2, labels = "auto", ncol = 2)
+```
+
+## Step 2 Generate Summary Statistics Reporting
+
+```{r Non Parametric Generate Summary Statistics Reporting}
+############
+# PART: Generate Summary Statistics Reporting
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sabsence_sex_diff <- tbl_sperf_all %>%
+  select(sex, contains('absence'))
+# -------------- Create summary statistics --------------- #
+tbl_sabsence_sex_diff_stats <-
+  psych::describeBy(tbl_sabsence_sex_diff,
+                    tbl_sabsence_sex_diff$sex,
+                    mat = TRUE,
+                    IQR = TRUE)  %>%
+  filter(!is.nan(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sabsence_sex_diff_stats %>%
+ select( -c(mean, sd, trimmed, se)) %>% # Removing invalid statistics for this data type.
+  kbl(caption = "Summary statistics for Absences (zero scores removed) by student Sex") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r Non Parametric Generate Visualisation}
+############
+# PART: Visualisations
+############
+# -------------- Histogram --------------- #
+# Just a little eye ball test to check that variables aren't normal within groups.
+gs <- tbl_sabsence_sex_diff %>%
+  gather(absences.p, absences.m, key = "var", value = "value") %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 2,
+                 colour = "black",
+                 aes(y = ..density.., fill = ..count..)) +
+  theme_bw() +
+  labs(
+    y = "Proportion",
+    x = "Number of Absences by Group",
+    title = "School Absences by Subject and Sex",
+    subtitle = "Non-Parametric Difference testing: Male and Female"
+  ) +
+  facet_grid(var ~ sex)
+gs <- gs +
+  stat_function(
+    fun = dnorm,
+    color = "red",
+    args = list(
+      mean = mean(gs$data$value),
+      sd = sd(gs$data$value)
+    ),
+    na.rm = TRUE
+  ) +
+  facet_grid(var ~ sex)
+
+```
+
+## Step 3 Run the test
+Based on the analysis above, a non parametric independent variable u-test is selected to evaluate if two different groups exist. We compare the u-statistic obtained during the test to a standard distribution to see if the value we get is so unusual, it is the tail regions of the distribution set at +/-0.025 (Significance level of 95%). If we find this we can conclude that, in comparison to all other ranking differences the ranking difference for each group under test is so unusual it has less probability of being down to random change and more probability of being as a result of our alternate hypothesis. In this event, we reject the null hypothesis as the likely explanation for the difference between the two groups.
+
+```{r wilcox part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: wilcox
+############
+# -------------- Conduct the U-test --------------- #
+#Conduct the U-test from package stats
+variable_count <- 3
+tbl_test_result <- data.frame()
+tbl_test_effectsize <- data.frame()
+test_result_zscore <- list()
+test_result_reff <- list()
+for (n in 2:variable_count) {
+  variable <- colnames(tbl_sabsence_sex_diff)[n]
+  test_result                <-
+    stats::wilcox.test(tbl_sabsence_sex_diff[, n] ~ sex, data = tbl_sabsence_sex_diff) %>%
+    broom::tidy() %>% as.data.frame()
+  
+  #To calculate Z we can use the Wilcox test from the coin package
+  test_result_zscore[[variable]] <-
+    coin::wilcox_test(tbl_sabsence_sex_diff[, n] ~ as.factor(sex), data = tbl_sabsence_sex_diff)
+  
+  # Build output table
+  row.names(test_result) <- variable
+  tbl_test_result <- rbind(tbl_test_result, test_result)
+  
+}
+#---------- Calculate the R Effect size ---------- #
+test_result_reff[['absences.m']] <-
+  rstatix::wilcox_effsize(absences.m ~ sex, data = tbl_sabsence_sex_diff)
+test_result_reff[['absences.p']] <-
+  rstatix::wilcox_effsize(absences.p ~ sex, data = tbl_sabsence_sex_diff)
+# -------------- Pretty Print Test statistics --------------- #
+tbl_test_result %>%
+  kbl(caption = "Summary of U-Test Statistics for the Male and Female student Groups") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+print.listof(test_result_zscore)
+print.listof(test_result_reff)
+
+```
+
+## Reporting Difference
+### Hypothesis test: Absence levels for students who are Male or Female will differ in the population.
+
+A series of independent-samples t-tests were conducted to compare absenteeism in Portuguese and Maths for respondents who are Male and those who are Female.
+<p>
+
+* For Maths absence levels, no statistically significant difference in the level was found (Mdn=4, IQR= 7.0 for respondents who are Female, Mdn= 3, IQR= 8.0 for respondents who are Male), (U = 18341.0, z = .19, p = .91, r = 0.01).
+* For Portuguese absence levels, no statistically significant difference in the level was found (Mdn=2, IQR= 5.5 for respondents who are Female, Mdn= 2, IQR= 6.0 for respondents who are Male), (U = 18381.5, z = .19, p = .87, r = 0.01).
+<p>
+
+Given these results there is insufficient justification to accept the Hypothesis that absence levels for students who are Male or Female will differ in the population.
+
+
+# Missing Data:
+
+So far our approach to outliers, gaps and clusters in the sample data has been to make an assessment on whether our data is continuous scale data and whether it can be considered to follow the normal distribution. For outliers, we have looked at the percentage of our data that is outside the normal distribution, and have applied the heuristic from Tabachnik and Fidell (2007) to decide if the amount of those outliers is small enough not to affect our distribution.
+<p>
+
+Following this theory, if we have a small number of outliers, where small is determined by our significance level, then we can tolerate a level of accuracy to our alpha value (.05 in this instance) and use parametric tests without significantly increasing the possibility of making an incorrect inference or interpretation of a hypothesis. This is desirable because we get additional accuracy from using the parametric tests as opposed to non-parametric tests and reduced risk of making a Type 2 error.
+<p>
+
+Missing data can be considered to be an outlier. This is where we have a variable but we are missing a value for that variable in some records. It is common, particularly when dealing with data related to human beings, that not all variables will have values in all cases. In the Student performance dataset we have at least one zero grade value for 39 (11.3%) of students, predominantly Math scores. The purpose of this section is to take a deeper look at these variables in terms of their treatment as missing data. The following section outlines the process and criteria for making a decision about these variables, and reports back the findings we have made as well as any impact our choices may have had on the hypotheses testing conducted. 
+First, we must quantify the scale of missing data, and identify any patterns that may exist.
+
+
+## Visualise the missing data level and pattern
+We have 6 variables measuring student performance in Maths and Portuguese subjects. We can see the most common pattern is where all variables have data, and therefore missing data is not an issue. The next most common is where mG3, the final Maths grade, alone is missing (24 cases). This is followed by the case where both mG3 and mG2 are missing (13 cases), then by pG3 alone (3 cases), pG3 and mG3 combined (2 cases), and lastly 1 case where pG1 was missing. There were no records where all records were missing. At first glance there is no real pattern to this missing data other than the pattern that a record being missing for mG2 meant it was missing for mG3 also. 
+
+
+```{r Missing data check, echo=FALSE}
+############
+# PART: Visualise the missing data level and Pattern
+############
+# Select only variables of interest
+tbl_sperf_missing_data <- tbl_sperf_all %>% select(contains('mG'), contains('pG'))
+
+tbl_sperf_missing_data[tbl_sperf_missing_data == 0] <- NA
+# summary(tbl_sperf_missing_data) #Get our summary statistics - these are just for us not for publication
+
+#Create and inspect patterns of missingness
+res <- summary(VIM::aggr(tbl_sperf_missing_data, sortVar = TRUE, combined = TRUE, numbers = TRUE, bars = TRUE))$combinations
+
+#Output the most common combinations
+
+
+# -------------- Pretty Print Test statistics --------------- #
+head(res[rev(order(res[, 2])),]) %>%
+        kbl(caption = "Missing data combination statistics") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+
+# -------------- Graph of Maths --------------- #
+tbl_sperf_missing_data %>%
+        filter(is.na(mG3)) %>%
+        gather(mG1, mG2, key = "var", value = "Grade") %>%
+        ggplot(mapping = aes(x = Grade, fill = var, group = var)) +
+        geom_histogram(binwidth = 1, colour = "black", aes(y = ..density.., fill = ..count..)) +
+        scale_y_continuous(labels = scales::percent) +
+        scale_x_continuous(labels = scales::comma, limits = c(0, 15), breaks = seq(1:15)) +
+        theme_bw() +
+        labs(x = "Previous Grades Scores", y = "Total Transactions Per month", colour = 'year') +
+        facet_wrap(~var) +
+        scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+# -------------- Graph of Maths final graph versus prior grades--------------- #
+spineMiss(tbl_sperf_missing_data[, c("mG2", "mG3")])
+spineMiss(tbl_sperf_missing_data[, c("mG1", "mG3")])
+
+# -------------- Marix plot which looks at the distribution of missing values in the dataset --------------- #
+matrixplot(tbl_sperf_missing_data, sortby = ('mG1'))
+
+```
+
+## Reporting missing data
+
+Only mG3 is missing for a significant number of records. The remaining variables are all missing for less than 5% of the records. If we look at the relationship between missing final Maths scores and the scores the students achieve in initial and intermediate assessment we see that the data is potentially missing at random (MAR). This is the scenario where the distribution of missing values of a variable mG3 appear random but are related to the values of another variable(s), in this instance mG1 and mG2. Here we see that missing values mG3 correspond to previous low scores in the subject. Removing these variables from our dataset will reduce the representativeness of the data set for low performing students. The argument against keeping them is that conceptually a zero score could represent failure to sit the exam as opposed to students performance in the exam which is the concept we are trying to measure. As such there is a question of validity, which is whether a zero score for a grade actually measures what we set out to measure. If we had been part of the data collection process we would have stronger knowledge of how the dataset was compiled and better evidence to base our decision on.
+<p>
+
+Based on the analysis of missing data above our working assumption will be that removing the records with zero scores will not have a statistically significant impact on our outcomes, however when it comes to predictive modelling and inference we will run the model including and excluding the records with missing variables to see if it makes a difference.
+
+
+
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Analyse"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 2/12/2020
+Objective: Analyse phase for difference of more than two groups
+---
+
+# Difference testing with more than Two Groups - Parametric and non Parametric
+When testing for differences in more than two groups, the choice of test we perform depends on the measurement level of the variable and the shape of the data. If our data measurement level is at least interval data and normally distributed then we can use the parametric Analysis of variance (ANOVA) test for independent variables or a variant of the ANOVA test for repeated measures. If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we use a non parametric test such as Kruskal-wallis for independent samples or Freidman for repeated measures.
+<p>
+
+Similar to the t-test, the ANOVA test is based on the normal distribution and utilises the mean for each group, but differs in that it examines the variance in the mean within each group and inspects how that statistic relates to variation between the groups. Our starting point is to look at the overall mean for the variable of interest in our first calculation of the test statistic and then we look to see how different the groups means are from that.
+<p>
+
+In ANOVA testing, the theory is that for the multiple groups, if they are from the same population then the overall mean of the variable of interest will be very close to the mean for each group and the variation around the mean for each group will be similar. If we find that the group means and variance are different with regards to our significance level, then we can assume the groups are from different populations rather than one overall for the variable of interest. As such this is the same idea as used for the independent samples t test.
+<p>
+
+
+The output of ANOVA is the F-statistic. which is a ratio value and a measure of effect. It is similar to t-score since it compares the amount of systematic variance in the data to the amount of unsystematic variance. In other words, it compares what we see to what we expect for a distribution with the same degrees of freedom. If the F-statistics ratio’s value is less than 1, it represents a non-significant event and we accept the null hypothesis that there is only one population. If the F-statistic is greater than 1, it indicates that there is some effect above and beyond the effect of individual differences in performance. 
+<p>
+
+If we find an effect we now need to determine if it’s statically significant. To do this we compare our obtained F-statistic against the maximum value one would expect to get by chance alone in a standard F-distribution with the same degrees of freedom. The p-value associated with the F-statistic is the probability that differences between groups could occur by chance if the null-hypothesis is correct. As such we are aiming for a low p-value if we are looking for evidence to support the alternative hypothesis. If our result is within the rejection region, it means that our F-statistic is such that only 5% of samples from the same population for the variable of interest would produce the same F value, assuming two tailed significance levels of +/- 1.96. This is also known as a Type 1 error.
+<p>
+
+ANOVA tests for one overall effect only (this makes it an omnibus test), so it can tell us if a collection of groups had an effect but It doesn’t provide specific information about which specific groups were affected. To determine this we need to perform post-hoc testing!
+
+
+```{r Import Data Avona, include=TRUE, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+## Parametric Difference testing with more than two groups
+From the preparation phase we had the Hypothesis:
+
+> Maternal educational achievement has a differential effect on student performance overall.
+
+
+Using our student performance dataset we are going to investigate if there is a significant difference in the mean performance score for students whose mother’s obtain different levels of education achievement.
+<p>
+
+To do this test, we require one independent/predictor/input variable that is considered a categorical variable. We will use the ordinal variable Medu representing mother’s education (0 – none, 1 – primary education (4th grade), 2 – 5th to 9th grade, 3 – secondary education or 4 – higher education). We have one continuous variable (student grade) which meets the criteria of being at least interval data. Our goal is to use the Independent samples ANOVA test to tell us if there is a significant difference between based on Mothers education, binned into 5 groups. The null hypothesis is that there is no difference in performance, and the alternative hypothesis is that there is a difference based on mothers' education. This will be a one-way between groups ANOVA test with a significance level of .05. Observations are independent because they came from different people.Before selecting the difference test to perform, we address the issues of Normality and Homoscedasticity.
+
+
+### Step 1 - Assessment of normality
+If the variable of interest is normal then we can use ANOVA. The variable of interest being used to illustrate this methodology is Portuguese final grade, pG3 which has previously been established to follow the normal distribution once outliers have been removed.
+
+
+### Step 2 Generate Summary Statistics Reporting
+
+```{r Parametric Generate Summary Statistics Reporting}
+############
+# PART: Generate Summary Statistics Reporting
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sperf_medu_diff <- tbl_sperf_all %>%
+  filter(pG3 != 0) %>%
+  select(Medu, contains('pG3'))
+# -------------- Create summary statistics --------------- #
+tbl_sperf_medu_diff_stats <-
+  psych::describeBy(tbl_sperf_medu_diff,
+                    tbl_sperf_medu_diff$Medu,
+                    mat = TRUE)  %>%
+  filter(!is.nan(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sperf_medu_diff_stats %>%
+  select(-(median)) %>% # Removing invalid statistics for this data type.
+  kbl(caption = "Summary statistics for Grade (zero scores removed) by Mothers education level") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 3 Check for Homogeneity of Variance
+Homogeneity of variance means that the pattern in variance of the variable around the mean for each group is the same. To assess homogeneity we use the Bartlett test. The Bartlett test works on the basis that the variance between the two groups is the same. As such if we run the Bartlett’s test and if we do not find a statistically significant (p value less than 0.025 for 95% significance level) result we can assume homogeneity of variance. The outcome of this test will determine what post-hoc test we will use.
+<p>
+
+The below we see box plots and Bartlett test results for each group. The output for Bartlett’s test for Portuguese final grade is shown below for each group. The result is non-significant for the exam scores (the value in the P-value column is more than .025). This indicates that the variances are not significantly different (i.e., they are similar and the homogeneity of variance assumption is tenable). We will use Tukey for our post hoc test.
+
+```{r Check for Homogeneity of Variance - bartlett, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Homoscedasticity
+############
+
+# -------------- Box Plot --------------- #
+# Just a little eye ball test fo variance and mean to cross check with Leven's test
+tbl_sperf_medu_diff %>%
+  gather(pG3, key = "var", value = "value") %>%
+  ggplot(aes(x = var, y = value, fill = value)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(
+    y = "Grades",
+    x = "Performance Variables",
+    title = "Box Plots to eye ball variance",
+    subtitle = "Difference testing: Mothers education"
+  ) + facet_wrap(~Medu)
+
+
+# -------------- Bartlett's test --------------- #
+# Conduct Bartlett's test for homogeneity of variance in library car - the null hypothesis is that variances in groups are equal so to
+# assume homogeneity we would expect probaility to not be statistically significant.
+result <- list()
+result[["pG1"]]                   <- stats::bartlett.test(pG3~ Medu, data=tbl_sperf_medu_diff)
+```
+
+### Step 4 Run the one way anova test
+Based on the analysis above it is safe to select a one way anova test to evaluate if different groups exist. For this post-hoc test we will assume the variance are and use Tukey to determine which group has the largest effect.
+ 
+When we compare the F-statistic obtained during the test to the standard F distribution, we want to see if our value is in the tail regions of the standard distribution set at +/-0.025 (Significance level of 95%). If we find this, we can conclude that, in comparison to all other mean variance differences the mean variance difference for each group under test is so unusual it has less probability of being down to random change and more probability of being as a result of our alternate hypothesis. In this event we can reject the null hypothesis as the likely explanation for the difference between the groups.
+
+
+```{r ANOVA part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: ANOVA
+############
+# -------------- Conduct the ANOVA --------------- #
+#Conduct ANOVA using the userfriendlyscience test oneway
+#In this case we can use Tukey as the post-hoc test option since variances in the groups are equal
+#If variances were not equal we would use Games-Howell
+userfriendlyscience::oneway(x = tbl_sperf_medu_diff$Medu,y=tbl_sperf_medu_diff$pG3,posthoc='Tukey')
+## P-value < .001 so this is statistically significant result between groups.
+
+#use the aov function - same as one way but makes it easier to access values for reporting
+test_result <- stats::aov(pG3~Medu, data = tbl_sperf_medu_diff)
+
+#Get the F statistic into a variable to make reporting easier
+test_result_fstat<-summary(test_result)[[1]][["F value"]][[1]]
+#Get the p value into a variable to make reporting easier
+test_result_aovpvalue<-summary(test_result)[[1]][["Pr(>F)"]][[1]]
+
+#---------- Calculate Eta Squared Effect size ---------- #
+#In the report we are using the res2 variable to retrieve the degrees of freedom
+#and the eta_sq function from the sjstats package to calculate the effect
+test_result_aoveta<-sjstats::eta_sq(test_result)[2]
+
+```
+
+### Reporting the results with eta squared effect
+A one-way between-groups analysis of variance (ANOVA) was conducted to explore the impact of mother’s education levels on student performance in Portuguese, as measured by standardised exams final grade. Participants were divided into five groups according to their mother’s educational achievement (0 - none, 1 – primary education (4th grade), 2 – 5th to 9th grade, 3 – secondary education or 4 – higher education.).
+<p>
+
+There was a statistically significant difference at the p < .001 level in Portuguese scores for 3 groups: (F(4, `r round(test_result$df.residual,2)`)= `r round(test_result_fstat,2)`, p< .001.Despite reaching statistical significance, the actual difference in mean scores between groups was quite small. The effect size, calculated using eta squared was (`r round(test_result_aoveta[[1]],2)`). Post-hoc comparisons using the Tukey HSD test indicated that the mean score for Group 4 (M=`r round(tbl_sperf_medu_diff_stats[5,]$mean,2)`, SD=`r round(tbl_sperf_medu_diff_stats[5,]$sd,2)`) was significantly different to that for Group 1 (M=`r round(tbl_sperf_medu_diff_stats[2,]$mean,2)`, SD=`r round(tbl_sperf_medu_diff_stats[2,]$sd,2)`) and also Group 2 (M=`r round(tbl_sperf_medu_diff_stats[3,]$mean,2)`, SD=`r round(tbl_sperf_medu_diff_stats[3,]$sd,2)`). 
+<p>
+
+Based on this analysis we can assume there that mother's educational level has a differential effect on student performance. The higher the educational level obtained, the more statistically significant the result. 
+
+
+## Non Parametric Difference testing with more than two groups
+If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we cannot use the one way Anova test to establish if there is a difference between groups. The Kruskal–Wallis test (Kruskal & Wallis, 1952;) is the non-parametric counterpart of the one-way independent ANOVA. The theory supporting it is similar to the Mann Whitney test, and it uses ranking data. The values for the variable are ranked for each of the groups and then the sums of the ranks are used to calculate the difference. The test produces a statistic which is referred to as the Kruskal-Wallis chi squared or the H-statistic. 
+
+From the preparation phase we had the Hypothesis:
+
+> Time spent travelling to school has a differential effect on student absence overall.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in the school attendance for students based on time travelled to school.
+<p>
+
+To do this difference test, we require one independent variable that is considered a categorical variable. We will use the ordinal variable traveltime representing home to school travel time (numeric: 1 – < 15 min., 2 – 15 to 30 min., 3 – 30 min. to 1 hour or 4 – > 1 hour). We have one continuous dependent variable (absences) which meets the criteria of being at least interval data. Absences have already been established as being non-normally distributed. Our goal is to use the Kruskal–Wallis test to tell us if there is a significant difference between these 4 groups. The null hypothesis is that there is no difference in absenteeism level. The alternative hypothesis is that there is a difference based on time travelled to school. This will be a one-way between-groups ANOVA test with a significance level of .05. Observations are independent because they came from different people.
+<p>
+
+### Step 1 Check for Non-Normality of the Variables
+If the variable of interest is not normal then we cannot use ANOVA and must use a non parametric test. The variable of interest being used to illustrate this methodology is Portuguese absentee level, absences.p, which has previously been established to not follow the normal distribution even when outliers have been removed.
+<p>
+
+### Step 2 Generate Summary Statistics Reporting
+
+```{r Non Parametric - Generate Summary Statistics Reporting}
+############
+# PART: Generate Summary Statistics Reporting
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sabsence_traveltime_diff <- tbl_sperf_all %>%
+  select(traveltime.p, contains('absences.p'))
+# -------------- Create summary statistics --------------- #
+tbl_sabsence_traveltime_diff_stats <-
+  psych::describeBy(tbl_sabsence_traveltime_diff,
+                    tbl_sabsence_traveltime_diff$traveltime.p,
+                    mat = TRUE,
+                    IQR = TRUE)  %>%
+  filter(!is.nan(skew)) # removes categorical variables.
+
+# Pretty print table
+tbl_sabsence_traveltime_diff_stats %>%
+  select(-c(mean, sd, trimmed, se)) %>% # Removing invalid statistics for this data type.
+  kbl(caption = "Summary statistics for Portuguese subejct Absences (zero scores removed) by student travel time") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 3 Run the Kruskal-Wallis rank sum test
+Based on the analysis above, it is reasonable to select a non-parametric independent variable u-test to evaluate if different groups exist within the data. The test provides a u statistic, which can be compared against a standard distribution. If our u statistic is in the tail regions of the distribution set at +/-0.025 (Significance level of 95%), we can conclude that, in comparison to all other ranking differences, the ranking difference for each group under test has less probability of being down to random chance and more probability of being as a result of our alternate hypothesis. In this event we can reject the null hypothesis as the likely explanation for the difference between the two groups.
+
+```{r Kruskal-Wallis part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Kruskal-Wallis
+############
+# -------------- Conduct the Kruskal-Wallis --------------- #
+test_result <-
+        stats::kruskal.test(absences.p~traveltime.p,data=tbl_sabsence_traveltime_diff)
+
+# -------------- Conduct Post Hoc test --------------- #
+#Need library FSA to run the post-hoc tests
+test_result_post_hoc <- FSA::dunnTest(x=tbl_sabsence_traveltime_diff$absences.p, g=as.factor(tbl_sabsence_traveltime_diff$traveltime.p), method="bonferroni")
+print(test_result_post_hoc, dunn.test.results = TRUE)
+
+#---------- calculate the effect size eta squared -------------------- #
+test_result_effsize <- rstatix::kruskal_effsize(tbl_sabsence_traveltime_diff, absences.p~traveltime.p, ci = FALSE, conf.level = 0.95,
+  ci.type = "perc", nboot = 1000)#uses bootstrapping
+print(test_result_effsize)
+```
+
+### Reporting the results with eta squared effect
+A Kruskal-Wallis rank sum between-groups analysis test was conducted to explore the impact of home-to-school travel time on student absenteeism in Portuguese. Participants were divided into four groups according to their travel time (numeric: 1 – < 15 min., 2 – 15 to 30 min., 3 – 30 min. to 1 hour or 4 – > 1 hour).
+<p>
+
+There was no statistically significant difference at any significance level (P = 0.36). The actual difference in mean scores between groups was quite small. The effect size, calculated using eta squared was (`r test_result_effsize$effsize`). Post-hoc testing was conducted using Dunn and Bonferroni and this also confirmed there was no difference.
+<p>
+
+Based on this analysis, insufficient evidence has been found to accept the alternative hypothesis, as such we will accept the null hypothesis that any differences between the groups is due to random occurrence.
+<p>
+
+# Comparing nominal variables
+When we have nominal variables, methods for comparison using either means or rankings will not produce sensible results. The methods we use instead are based on frequency comparison between what we see versus what we would expect in our population. The theory supporting it is that if the two groups are from the same population, then the frequency of occurrence of the variable of interest will be the same for both groups. For correlations, if the two variables are correlated with each other then the pattern for frequency of occurrence of one variable will be similar to the other. The null hypothesis is that there is no relationship (correlation) or that there is no difference (difference).
+<p>
+
+We test if there is a difference effect for nominal variables using the the Chi-squared test, and when we compare the Chi-squared statistic obtained during the test to the standard Chi-squared distributions we can see if the value we get is in the tail region of the distribution set at 0.05 (Significance level of 95%). If we find this to be the case, we can conclude that the difference for each group under test is so unusual it is unlikely to be due to random chance and more likely being as a result of our alternate hypothesis.
+
+
+## Nominal difference using Chi-Square
+
+We have the Hypothesis:
+
+> HA: There are differences between extra-curricular activities engagement for respondents who are male or female
+
+Using our student performance dataset we investigate if there is a significant difference in extra-curricular activities engagement for students who are male and those who are female. We have two binary categorical variables: student sex (sex) and after school activity participation (activities.p). A variable measuring after school activity appears twice in our dataset because it was collected twice, once in each class. For the purposes of illustrating nominal difference evaluation using Chi-Square we will use activities.p as our variable measuring after school activity, but we later investigate if there was significant difference between the repeated measures of this variable. 
+
+
+### Step 1: Generate summary statistics
+
+```{r Summary stats and Visualisation of categorical measurement statistics 1}
+
+############
+# PART: Generate summary statistics
+############
+
+# Create a subset dataframe with just the variables of interest.
+tbl_sactivity_sex_diff <- tbl_sperf_all %>%
+  select(sex, contains('activities.p'))
+# -------------- Create summary statistics --------------- #
+tbl_sactivity_sex_diff_stats <- tbl_sactivity_sex_diff %>%
+ summarytools::freq()
+
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sactivity_sex_diff %>%
+  ggplot(aes(x = sex))
+gs <- gs + labs(x = 'Student Sex')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["sex"]] <- gs
+
+gs <- tbl_sactivity_sex_diff %>%
+  ggplot(aes(x = activities.p))
+gs <- gs + labs(x = 'After school engagement')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activity"]] <- gs
+
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 2,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+
+### Step 2: Run Chi Square test
+
+```{r Chi Square Test part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Chi
+############
+
+# -------------- Conduct the Chi-Square --------------- #
+#Use the Crosstable function
+#CrossTable(predictor, outcome, fisher = TRUE, chisq = TRUE, expected = TRUE)
+gmodels::CrossTable(tbl_sactivity_sex_diff$sex, tbl_sactivity_sex_diff$activities.p, fisher = TRUE, chisq = TRUE, expected = TRUE, sresid = TRUE, format = "SPSS")
+
+#more simplistic way of doing Chi-Square
+
+#Create your contingency table
+contingency_table <-xtabs(~activities.p+sex, data=tbl_sactivity_sex_diff)
+
+ctest_test_result <-stats::chisq.test(contingency_table, correct=TRUE)#chi square test
+#correct=TRUE to get Yates correction needed for 2x2 table
+
+# -------------- Calculate the effect Size --------------- #
+ctest_test_result$chi_effphi <- sjstats::phi(contingency_table)
+ctest_test_result$chi_effcramer <- sjstats::cramer(contingency_table)
+
+print.listof(ctest_test_result)
+
+
+```
+### Reporting the results with effect size
+
+A Chi-Square test for independence (with Yates’ Continuity Correction) indicated a significant association between gender and reported participation in after school activity, χ2(1,n=382) = 4.34 , p < .05, phi = .11). As such we reject the null hypothesis and accept the alternative hypotheses that there is a difference in after school activity engagement between male and female students. The odds of attending after school activities were 1.56 times higher for male students compared to female students.
+
+
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Analyse"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 4/12/2020
+Objective: Analyse phase for repeated measures
+---
+
+## Repeated measures test for nominal variables.
+So far we have only looked at tests for independent groups, but as mentioned there is another test type for related samples and that is a repeated measures test. This is where we have the same grouping but we take two measurements, the first at time T1 and the second at time T2 where T2 > T1. If our data measurement level is at interval data and normally distributed then we can use paired samples t-test. If the data is not normally distributed or ordinal we will use a Wilcoxon test if our data is nominal with two groups we use McNemar's test, and lastly for multiple groups we use the Friedman Anova.
+
+McNemar's test is used to determine if there are differences on a binary dependent variable between two related groups. It can be considered to be similar to the paired-samples t-test, but for a binary nominal variable rather than a continuous scale variable. If we had more than two repeated measurements of the nominal variable, we could use Cochran's Q test.
+
+```{r Import Data Repeated Measures, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+
+### Repeated Measures Nominal difference using Chi-Square and McNemar
+
+As mentioned previously, students were asked twice about their engagement in after school activities, with a time difference between each survey. Due to how the demographic survey was administered, there are two variables in the dataset capturing after school activity participation: one collected during Maths class and the other collected during the Portuguesse class at different times. As such, it is valid for the same student to have different responses to the question and their circumstances may have changed between surveys. An inspection of that data revealed that only 5 records contained different responses for the variable activities.p versus activities.m. 
+
+> HA: There are differences between extra-curricular activities engagement for respondents between measurements.
+
+extra-curricular activities engagement for students between measurements.
+We have one binary categorical variable: after school activity participation, measured twice (activities.p, activities.m), which meets our requirements to have at least one dichotomous variable. We have two related groups (students) and we have before-after matched pair evaluations. The null hypothesis is that there is no difference before and after, while the alternative hypothesis is that there is. To our knowledge, no treatment happened between repeated measures, so our expectation is to find no difference between the two groups for this variable and any variation between them is due to systematic differences.
+<p>
+
+We will use the McNemar test to determine whether the proportion of participants who participated in after school activities (as opposed to those who did not) was different when comparing the first survey to the second survey result. This will provide supporting evidence to justify accepting the omitting of differences between survey responses for this variable in our predictive model. While we do not expect to find a significant result, we have included this test for the purposes of illustrating repeated measures nominal difference evaluation using Chi-Square and McNemar's test.
+
+
+### Step 1: Generate summary statistics
+
+```{r Summary stats and nominal repeated measures 1}
+
+############
+# PART: Generate summary statistics
+############
+
+# Create a subset dataframe with just the variables of interest.
+tbl_sactivity_diff <- tbl_sperf_all %>%
+  select(contains('activities'))
+# -------------- Create summary statistics --------------- #
+tbl_sactivity_diff_stats <- tbl_sactivity_diff %>%
+ summarytools::freq()
+
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sactivity_diff %>%
+  ggplot(aes(x = activities.m))
+gs <- gs + labs(x = 'After school engagement Maths class survey')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities.m"]] <- gs
+
+gs <- tbl_sactivity_diff %>%
+  ggplot(aes(x = activities.p))
+gs <- gs + labs(x = 'After school engagement Portuguese class survey')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities.p"]] <- gs
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 2,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+### Step 2: Run McNemar's chi-squared test
+
+```{r McNemar, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: mcnemar = TRUE
+############
+
+# -------------- Conduct the Chi-Square with mcnemar = TRUE --------------- #
+#Use the Crosstable function
+#CrossTable(predictor, outcome, fisher = TRUE, chisq = TRUE, expected = TRUE, mcnemar = TRUE)
+gmodels::CrossTable(tbl_sactivity_diff$activities.m, tbl_sactivity_diff$activities.p, mcnemar = TRUE, expected = TRUE, sresid = TRUE, prop.chisq = FALSE, format = "SPSS")
+
+#more simplistic way of doing Chi-Square
+
+#Create your contingency table
+contingency_table <-xtabs(~activities.p+activities.m, data=tbl_sactivity_diff)
+
+ctest_test_result <-stats::mcnemar.test(contingency_table, correct=TRUE) #mcnemar
+#correct=TRUE to get Yates correction needed for 2x2 table
+
+# -------------- Calculate the effect Size --------------- #
+ctest_test_result$chi_effphi <- sjstats::phi(contingency_table)
+ctest_test_result$chi_effcramer <- sjstats::cramer(contingency_table)
+
+print.listof(ctest_test_result)
+
+
+```
+
+### Reporting the results with effect size
+
+A McNemar's chi-squared repeated measures test for difference (with Continuity Correction) indicated a no significant change in after school activity, χ2(1,n=382) = 0 , p = 1, phi = .97). As such we accept the null hypothesis and reject the alternative hypotheses that there is a difference in after school activity engagement between repeated measures. The odds of attending after school activities were the same between measures.
+
+
+# References:
+
+* Cortez and A. Silva. “Using Data Mining to Predict Secondary School Student Performance.” In A. Brito and J. Teixeira Eds., Proceedings of 5th FUture BUsiness TEChnology Conference (FUBUTEC 2008) pp. 5-12, Porto, Portugal, April, 2008, EUROSIS, ISBN 978-9077381-39-7. (https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf)
+ 
+* Cohen, J. (1988). Set Correlation and Contingency Tables. Applied Psychological Measurement, 12(4), 425–434. https://doi.org/10.1177/014662168801200410
+ 
+* George, Darren & Mallery, Paul. (2003). SPSS for Windows Step-by-Step: A Simple Guide and Reference, 14.0 update (7th Edition). http://lst-iiep.iiep-unesco.org/cgi-bin/wwwi32.exe/[in=epidoc1.in]/?t2000=026564/(100).
+ 
+* Tabachnick, B. G., Fidell, L. S., & Ullman, J. B. (2007). Using multivariate statistics (Vol. 5, pp. 481-498). Boston, MA: Pearson. 

@@ -1,0 +1,408 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Explore and Analysis for Correlation"
+author: "Joseph O'Carroll"
+date: "28/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 21/11/2020
+Objective: Explore and Analysis phase for Correlation
+---
+
+```{r global-options, include=FALSE}
+# https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6, fig.path = 'Figs/', echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, message=FALSE, warning=FALSE}
+# ********************************************************************
+#
+#   Setup Section
+#
+# ********************************************************************
+needed_packages <- c("tidyverse", "readxl", "lubridate", "jsonlite", "ggplot2", "gtools", "httr", "readr", "psych", "kableExtra", "cowplot", "summarytools", "corrplot", "FSA")
+# Extract not installed packages
+not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
+# Install not installed packages
+if (length(not_installed)) { install.packages(not_installed) }
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(psych) ## added for quick stat descriptions
+library(cowplot) ## added for quick stat descriptions
+library(Hmisc)
+library(summarytools)
+library(corrplot) ## correlation plots
+library(FSA)
+
+```
+
+# Introduction:
+The purpose of this section is to address comprehensively all required concepts and demonstrate coherent understanding of the statistical analysis exploration phase, as covered during the TU060 MATH9102 Module. In the preparation phase we came up with a question that needed to be answered and generated a number of hypotheses that could be tested through statistical analysis. In this phase we will look to explore data that has already been collected and identify candidate variables for testing our hypotheses. The steps for hypotheses testing are:
+<p>
+* Determine whether variables are related to one another.
+* Investigate if differential effects exist for different groups.
+* Provide statistical evidence that justifies the inclusion of these variables in a predictive model.
+
+<p>
+The first step is to collect data to see whether our hypotheses are accurate. To do this, one or more variables need to be identified and appropriate statistical measurements need to be calculated, as set out in the following steps:
+
+<p>
+* Selection, with justification, of the appropriate variables to investigate the theory identified in the preparation phase.
+* Description of statistical measures associated with variables under consideration.
+* Selection of appropriate assessments/tests to investigate issues with statistical measures.
+* Interpretation of findings and generation appropriate conclusions.
+
+<p>
+*Note* This section will only look at determining whether variables are related to one another through correlation as a justification for inclusion in a predictive model. In the next section we will provide exploration and analyse to determine if differential effects exist for different groups and provide statistical evidence that justifies causal relationships. 
+
+### Import dataset
+There are two dataset that must be imported:
+
+* [sperformance-dataset.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/sperformance-dataset.csv).
+* [TU060_MATH9102_Student_variables_description.csv](https://github.com/ocarrolj/ocarrolj.github.io/blob/main/TU060_MATH99102_RMD_HOSTING/TU060_MATH9102_Student_variables_description.csv).
+
+```{r Import Data, include=TRUE, echo=TRUE}
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+
+# Hypothesis testing - Correlation:
+A general description of all variables in the dataset was provided as part of the preparation phase. Our goal here is to accurately summarize and describe the data, but before we can build a predictive model we need to work out what predictor variables to include in our hypothesis testing. We cannot include all variables in our tests because it would be difficult to see which variables truly influence our outcomes. Our starting point for the exploration is to answer the question: what type of co-variation occurs between variables? This will provide the justification for variable selection in hypothesis testing. 
+
+In the general linear statistical model, the theory is that the concepts of interest, as measured by their variables, are related to each other in a linear fashion. This means that when one variable increases the other increases or decreases proportionally. The null hypothesis is that any patterns in the data are random and the alternative hypothesis is that the variables have a linear relationship. Using the general linear statistical model, we use the equation of a line as our model of the pattern in the relationship between the two variables (Bi-variant correlation). For assessing co-variant correlation, the questions we need to answer for each pair of variables are:
+
+* Can the relationship between the two variables be modeled as a straight line?
+* What is the direction of the co-variation (positive or negative)?
+* What is the strength of the co-variation (weak, moderate, or strong)?
+* What is the statistical significance (likelihood the relationship we observe is occurring due to chance)?
+
+The relationship between two variables is quantified by a statistical measure called the correlation coefficint (-1 to +1). And from that, we can calculate the co-variance, which is how much of the variation in each variable is common to both. The direction and strength of the correlation is measured by a slope of the line.
+The model contains an error term, which gives the variation observed in one variable that is not explained by variation in the predictor variable. 
+
+A type 1 error would occur if we find that students’ performance in Portuguese and Math are related when they are not and a type 2 error would occur if we find there is no relationship, when there really is one in the population.
+
+
+### A note on Heuristics: 
+We will be using a number of heuristics to justify our assessment of normality and correlation. For correlation we will use Cohen’s effect size heuristics. According to Cohen (1988) an absolute value of r of 0.1 is classified as small, an absolute value of 0.3 is classified as medium and of 0.5 is classified as large.
+
+For skewnesss and kurtosis standardised score we will use George, D., & Mallery, M. (2003) heuristics. Which states that a Standardised scores (value/std.error) for skewness (and kurtosis) between +/-2 (1.96 rounded) are considered acceptable in order to prove normal univariate distribution.
+
+For assessing normality of distribution for variables with outliers, Tabachnik and Fidell (2007), suggested the heuristic If missing data represent less than 5% of the total and is missing in a random pattern from a large data set, almost any procedure for handling missing values yields similar results, including simply omitting the outliers. 
+
+
+## Correlation testing - Past Performance and Future Performance
+From the preparation phase we had the Hypothesis:
+
+> Students who perform well as part of initial assessment in subjects will perform better overall.
+
+In terms of testing for correlation, the null hypothesis is that there is no relationship between past performance and future student performance. The alternative hypothesis is that there is a relationship between these two variables.
+
+For each of the two subjects we have we have two potential predictor variables which are Grade 1 and 2, and one outcome variable, Grade 3. As such we will conduct a total of four tests for correlation.
+
+
+### Step 1 Check for Normality of the Variables
+One of the tests for correlation is the Pearson Correlation. This requires that the variables be normally distributed and the relationship linear. We validate the normality conditions by generating summary statistics, histograms and Q-Q Plots for each of the variables. The process to validate the normality condition, is to generate summary statistics, histograms and Q-Q Plots for each of the variables. We'd most likely discover the variables are not ideally normal so we will need to quantify how far away from normal the data is by calculating the standard skew and kurtosis. If those are within acceptable bands (+/- 2.58 if our samples size is greater than 80 and we want a 99% cut off) we can assume normality. If not we need to look at the actual values in the variable, convert them to z-scores and calculate the percentage of those scores that can be considered outliers, if this percentage is within acceptable limits (+/- 2.58 if our samples size is greater than 80 and we want a 99% cut off) then we can go a head and treat our data as approximately normal. 
+
+To that end, for each variable, we have completed the following steps:
+
+* Generated plots
+  + Histogram with normal curve showing
+  + Q-Q Plot
+* Generated Summary statistics
+* Reviewed the statistical measures and plots to see how far away from normal the sample data is.
+* Generate standardised scores for skew and kurtosis and compare to acceptable range.
+* Generate standardised z-scores for variables and compare to acceptable range.
+* Reported the correct statistics for this data based on an assessment of normality
+
+```{r Check for Normality of the variables (not cleaned) }
+############
+# PART: Normality
+############
+# For illsutration just looking at Math.
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>% select(contains('mG'), contains('pG'))
+
+tbl_sperf_numerical_stats <- tbl_sperf_numerical_measurements %>% psych::describe(omit = TRUE, IQR = TRUE)
+
+tbl_sperf_numerical_stats %>%
+  kbl(caption = "Summary statistics for Performance (not cleaned)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+############
+# PART: Visualisation
+############
+# Plot single variable
+num_diagram_count <- nrow(tbl_sperf_numerical_stats)
+plots <- list()
+for (n in 1:num_diagram_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats)[n]
+  binwidth                                <- 1
+  gs                                      <- tbl_sperf_numerical_measurements %>% ggplot(aes_string(colnames(tbl_sperf_numerical_measurements)[n]))
+  gs                                      <- gs + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+  gs                                      <- gs + stat_function(fun = dnorm, color = "red", args = list(mean = tbl_sperf_numerical_stats$mean[n], sd = tbl_sperf_numerical_stats$sd[n]), na.rm = TRUE)
+  gs                                      <- gs + labs(x = variable)
+  gs                                      <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+  # Gather All the plots
+  plots[[names(tbl_sperf_numerical_measurements)[n]]] <- gs }
+
+plot_grid(plotlist = plots, labels = "auto", ncol = 3)
+
+```
+
+Any outliers, skew, or kurtosis needs to be investigated and explained. We can see above that there appears to be an issue with no grades being reported for some students. Not all student records contain grades 1 through 3. Some records have grades 1 and 2, but no final grade, others are missing grades 1 or 2 but have a final grade.
+
+The reference paper highlighted that student performance is being manually recorded using a paper-based filing system and this might be a clerical error. In a later sections we deep dive into the missing data and observe that this doesn't explain the missing data, and as the missing data is not random. For illustration purposes we will assume a zero grade is invalid and we will then regenerate our summary statistics and graphs on a cleaned dataset. 
+
+```{r Check for Normality of the variables cleaned, echo = TRUE}
+############
+# PART: Normality
+############
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
+  select(contains('mG'), contains('pG')) %>%
+  filter(mG1 != 0, mG2 != 0, mG3 != 0, pG1 != 0, pG2 != 0, pG3 != 0) # Filtering records with missing data.
+
+tbl_sperf_numerical_stats <- tbl_sperf_numerical_measurements %>% psych::describe(omit = TRUE, IQR = TRUE)
+
+#-------- Iterate through eact variable -------#
+#Generate regular summary statistics - not as nice as psych package but gives p value
+st <- pastecs::stat.desc(tbl_sperf_numerical_measurements, basic = F)
+tbl_sperf_numerical_stats_2 <- st %>% transpose()
+colnames(tbl_sperf_numerical_stats_2) <- rownames(st)
+rownames(tbl_sperf_numerical_stats_2) <- colnames(st)
+
+# Initialise vectors
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+variable_count <- nrow(tbl_sperf_numerical_stats_2)
+
+# Iterate through variables
+for (n in 1:variable_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats_2)[n]
+
+  tpskew               <- semTools::skew(tbl_sperf_numerical_measurements[[variable]])
+  tpkurt               <- semTools::kurtosis(tbl_sperf_numerical_measurements[[variable]])
+  std_skew[[variable]] <- tpskew[1] / tpskew[2]
+  std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+  z_score              <- abs(scale(tbl_sperf_numerical_measurements[[variable]]))
+  gt_196[[variable]]   <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+  gt_329[[variable]]   <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+
+}
+
+tbl_sperf_numerical_stats_2$std_skew <- std_skew
+tbl_sperf_numerical_stats_2$std_kurt <- std_kurt
+tbl_sperf_numerical_stats_2$gt_2sd <- gt_196
+tbl_sperf_numerical_stats_2$gt_3sd <- gt_329
+
+# Pretty print 
+tbl_sperf_numerical_stats_2 %>%
+  kbl(caption = "Summary statistics for Performance (zero scores removed)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r Hidden check, echo=FALSE,results='hide'}
+## Hidden - Included to cross check with table.
+#Generate regular summary statistics - lots of packages offer mechanisms to do this
+pastecs::stat.desc(tbl_sperf_numerical_measurements$pG3, basic = F)
+
+#We can make our decision based on the standardised score for skew and kurtosis
+#We divide the skew statistic by the standard error to get the standardised score
+#This will tell us if we have a problem
+tpskew <- semTools::skew(tbl_sperf_numerical_measurements$pG3)
+tpkurt <- semTools::kurtosis(tbl_sperf_numerical_measurements$pG3)
+tpskew[1] / tpskew[2]
+tpkurt[1] / tpkurt[2]
+
+#and by calculating the percentage of standardised scores for the variable itself that are outside our acceptable range
+#this will tell us how big a problem we have
+# Calculate the percentage of standardised scores that are greated than 1.96
+# the perc function which is part of the FSA package which calculate the percentage that are within a range - you can look for greater than "gt", greater than or equal "geq", "gt", less than or equal "leq",  or less than "lt"),
+# scale is a function that creates z scores
+zpG3 <- abs(scale(tbl_sperf_numerical_measurements$pG3))
+
+gt_196 <- FSA::perc(as.numeric(zpG3), 1.96, "gt")
+gt_196 <- FSA::perc(as.numeric(zpG3), 3.29, "gt")
+
+```
+
+```{r Visualisation Histograms}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+num_diagram_count <- nrow(tbl_sperf_numerical_stats)
+plots <- list()
+for (n in 1:num_diagram_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats)[n]
+  binwidth                                <- 1
+  gs                                      <- tbl_sperf_numerical_measurements %>% ggplot(aes_string(colnames(tbl_sperf_numerical_measurements)[n]))
+  gs                                      <- gs + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+  gs                                      <- gs + stat_function(fun = dnorm, color = "red", args = list(mean = tbl_sperf_numerical_stats$mean[n], sd = tbl_sperf_numerical_stats$sd[n]), na.rm = TRUE)
+  gs                                      <- gs + labs(x = variable)
+  gs                                      <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+  # Gather All the plots
+  plots[[names(tbl_sperf_numerical_measurements)[n]]] <- gs }
+
+plot_grid(plotlist = plots, labels = "auto", ncol = 3)
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+# For expedience only one Q-Q Plot included for each subject
+gs1 <- tbl_sperf_numerical_measurements %>% ggplot(aes(sample = mG3)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Maths final Grade", subtitle = "Plot of mG3")
+
+gs2 <- tbl_sperf_numerical_measurements %>% ggplot(aes(sample = pG3)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Portuguese final Grade", subtitle = "Plot of pG3")
+
+plot_grid(gs1, gs2, labels = "auto", ncol = 2)
+
+```
+
+#### Assessing Portuguese and Maths final grade Distribution – Do they fit the normal distribution
+To illustrate the concept of assessing normality we selected the grades for Portuguese and Maths form the sample dataset. The Normal Quantile Plot (Q-Q Plot) shows that most observations are lying on or around the reference line with more observations towards the middle and less towards either end. As such, the variables are not ideally normal as we have some outliers and gaps affecting the shape of our distribution. 
+
+<p>
+Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution.
+Skewness for pG2 is not within an acceptable range so we need to look into this further by exploring outliers: how many of them there are or whether we can transform it to become more normal.
+
+<p>
+In terms of quantifying the proportion of the data that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. No variable exceeded our acceptable range for outside the 99.7% significance level. The variables mG2 and pG3 fell outside the 95% significance level but as our number of examples exceeds 80 we assume we can accept the 99.7 significance level. The pG2 variable is within our acceptable range, so we can assume the excess skewness is not an issue for accepting normality of this variable and pG3 was within our acceptance range for standardised skew.
+
+<p>
+Based on this assessment, all performance variables can be treated as normally distributed once missing data outliers have been removed.
+
+
+### Step 2 Check for Linearity of Co Variance
+
+Pearson Correlation requires there to be a linear relationship between the two variables, as Pearson uses the equation of a line to model the relationship. We validate this condition through inspection of a scatter plot, which should resemble a straight line rather than a curved line. For linearity we want the values to be evenly spaced around the line in a rectangular space. Below we have graphed the predictor/explanatory variable on the X axis and response/outcome variable on the Y axis. 
+
+<p>
+After cleaning the dataset for missing values, as explained above, the scatter plots were generated for each variable relationship we want to test. All of the scatterplots show a uniform distribution of values above and below the reference line with few outliers, and as such we can assume homoscedasticity. Based on this inspection, all grade relationships of interest can be treated as linear once missing data outliers have been removed.
+
+<p>
+```{r Check for Linearity: of the variables, include=TRUE, echo=TRUE}
+
+############
+# PART: Visualisation
+############
+
+# Initial Math Grade (mG1)
+plots <- list()
+gs <- tbl_sperf_numerical_measurements %>% ggplot2::ggplot(aes(x = mG1, y = mG3))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Initial Math Grade (mG1)", y = "Final Math Grade (mG3)")
+plots[["mG1 <-> mG3"]] <- gs
+
+# Second Math Grade (mG2)
+gs <- tbl_sperf_numerical_measurements %>% ggplot2::ggplot(aes(x = mG2, y = mG3))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Second Math Grade (mG2)", y = "Final Math Grade (mG3)")
+plots[["mG2 <-> mG3"]] <- gs
+
+gs <- tbl_sperf_numerical_measurements %>% ggplot2::ggplot(aes(x = pG1, y = pG3))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Initial portuguese Grade (pG1)", y = "Final portuguese Grade (pG3)")
+plots[["pG1 <-> pG3"]] <- gs
+
+# Second Math Grade (mG2)
+gs <- tbl_sperf_numerical_measurements %>% ggplot2::ggplot(aes(x = pG2, y = pG3))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Second portuguese Grade (pG2)", y = "Final portuguese Grade (pG3)")
+
+plots[["pG2 <-> pG3 "]] <- gs
+plot_grid(plotlist = plots, labels = "auto", ncol = 2)
+
+############
+# PART: Linearity of Co-variant relationship
+############
+#Pearson Correlation
+### mG1 correlated to mG3
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_numerical_measurements$mG1, tbl_sperf_numerical_measurements$mG3, method = 'pearson')
+show(tbl_correlation_stats)
+
+### mG2 correlated to mG3
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_numerical_measurements$mG2, tbl_sperf_numerical_measurements$mG3, method = 'pearson')
+show(tbl_correlation_stats)
+
+### pG1 correlated to pG3
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_numerical_measurements$pG1, tbl_sperf_numerical_measurements$pG3, method = 'pearson')
+show(tbl_correlation_stats)
+
+### pG2 correlated to pG3
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_numerical_measurements$pG2, tbl_sperf_numerical_measurements$pG3, method = 'pearson')
+show(tbl_correlation_stats)
+
+```
+
+#### Just for Fun - Correlation Matrix for all Performance Variables
+Just for fun I also generated the correlation coefficient for all grade variables at the same time. This can be seen below. 
+```{r Correlation matrix for all, echo=TRUE}
+### Correlation matrix for all
+correlation_matrix <- rcorr(as.matrix(tbl_sperf_numerical_measurements))
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+title <- "Correlation matrix for all performance variables"
+gs <- corrplot(correlation_matrix$r, method = "color", col = col(200), type = "upper", order = "hclust", addCoef.col = "black",              # Add coefficient of correlation
+               tl.col                       = "black", tl.srt = 45,                                                                          #Text label color and rotation
+               # Combine with significance
+               p.mat                        = correlation_matrix$p, sig.level = 0.01, insig = "blank",
+               # hide correlation coefficient on the principal diagonal
+               diag                         = FALSE, title = title, mar = c(0, 0, 2, 0) ) # http://stackoverflow.com/a/14754408/54964)
+```
+
+## Reporting Correlation
+
+### Hypothesis test: relationship between Initial grade and Final grade
+
+The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) was investigated using a Pearson Correlation. A strong positive correlation was found (r =-.896, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between initial math grade and final math grade.
+
+
+The relationship between initial grade in Portuguese (pG1 taken from school reports) and final Portuguese grade (pG3 taken from school reports ) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.866, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between initial Portuguese grade and final Portuguese grade.
+
+
+### Hypothesis test: relationship between Intermediate grade and Final grade
+
+The relationship between intermediate grade in Maths (mG2 taken from school reports) and final Maths grade (mG3 taken from school reports ) was investigated using a Pearson Correlation. A strong positive correlation was found (r =-.966, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between intermediate math grade and final math grade.
+
+
+The relationship between intermediate grade in Portuguese (pG2 taken from school reports) and final Portuguese grade (pG3 taken from school reports ) was investigated using a Pearson correlation. A strong positive correlation was found (r =-.92, n=337, p<.001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between intermediate Portuguese grade and final Portuguese grade.
+
+
+# References:
+
+* Cortez and A. Silva. “Using Data Mining to Predict Secondary School Student Performance.” In A. Brito and J. Teixeira Eds., Proceedings of 5th FUture BUsiness TEChnology Conference (FUBUTEC 2008) pp. 5-12, Porto, Portugal, April, 2008, EUROSIS, ISBN 978-9077381-39-7. (https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf)
+ 
+* Cohen, J. (1988). Set Correlation and Contingency Tables. Applied Psychological Measurement, 12(4), 425–434. https://doi.org/10.1177/014662168801200410
+ 
+* George, Darren & Mallery, Paul. (2003). SPSS for Windows Step-by-Step: A Simple Guide and Reference, 14.0 update (7th Edition). http://lst-iiep.iiep-unesco.org/cgi-bin/wwwi32.exe/[in=epidoc1.in]/?t2000=026564/(100).
+ 
+* Tabachnick, B. G., Fidell, L. S., & Ullman, J. B. (2007). Using multivariate statistics (Vol. 5, pp. 481-498). Boston, MA: Pearson. 
+

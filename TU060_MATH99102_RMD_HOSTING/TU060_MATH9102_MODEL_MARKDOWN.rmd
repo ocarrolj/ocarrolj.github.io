@@ -1,0 +1,577 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Model"
+author: "Joseph O'Carroll"
+date: "04/12/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 04/12/2020
+Objective: Analyse phase for statistical Modelling
+---
+
+```{r global-options, include=FALSE}
+# https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6, fig.path = 'Figs/', echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, message=FALSE, warning=FALSE}
+# ********************************************************************
+#
+#   Setup Section
+#
+# ********************************************************************
+needed_packages <- c("tidyverse",
+                     "readxl",
+                     "lubridate",
+                     "jsonlite",
+                     "ggplot2",
+                     "gtools",
+                     "httr",
+                     "readr",
+                     "psych",
+                     "kableExtra",
+                     "cowplot",
+                     "summarytools",
+                     "corrplot",
+                     "FSA",
+                     "VIM",
+                     "stargazer",
+                     "car",
+                     "foreign",  "Epi", "arm", "DescTools", "stargazer", "lmtest",  "car", "generalhoslem", "regclass")
+# Extract not installed packages
+not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
+# Install not installed packages
+if (length(not_installed)) { install.packages(not_installed) }
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(psych) ## added for quick stat descriptions
+library(cowplot) ## added for quick stat descriptions
+library(Hmisc)
+library(summarytools)
+library(corrplot) ## correlation plots
+library(FSA)
+library(car) ##Levenes test
+library(VIM) ## missing data assessment
+library(stargazer) ## Regression output
+```
+
+# Introduction:
+
+Before we can build a model using a predictor we need strong statistical as well as theoretical support. If we're saying as part of our hypothesis that there is a relationship between two concepts, then we need to establish a) if the relationship is statistically likely to exist, and b) how strong that relationship is. We do this that with correlation testing. If as part of our hypothesis we are saying that a given concept is experienced differently for different groups in our population, then we would have to establish how much evidence we have to say that there is a difference in the experience of this concept for the different groups. We do this through different tests. Exploring, gathering and analysing the supporting statistical evidence for the inclusion of predictor variables in predictive models was the propose of the explore and analyse phase. The purpose of this phase is to actual build and execute the predictive models having already established justification for the selection of predictor variables and hypothesis.
+<p>
+
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Model"
+author: "Joseph O'Carroll"
+date: "04/12/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 04/12/2020
+Objective: Analyse phase for statistical Modelling - Simple Linear Regression
+---
+
+
+# Linear Regression
+Linear regression, at its most fundamental, is a hypothetical model between two variables and we use the equation of a line as our model equation. We model units of change in our outcome variable, and the goal is to determine how much each unit of change in one predictor contributes to units of change to in the outcome. Our assumption is that we will have a uniform pattern when we're looking at the average change.
+
+We will then quantify how good our model is by comparing our linear model to the mean and see how much extra explanation of the variance in the response variable we get. To do this we square the difference in each point of our observed data to the mean and sum the result to get the total sum of squares as a measure of variability between the scores and the mean (SSt). We also get the total sum of squares from the observed data to the model of a line as a measure of variability between the scores and the regression mode (SSr). The difference between the two is how much variability is accounted for by the model. Running an analysis of variance (ANOVA) produces F-statistic, which is a ratio value. This compares the amount of systematic variance in the data to the amount of unsystematic variance. In other words it compares what we see to what we expect for a distribution with the same degrees of freedom. Through a comparison to standard F-distribution we can determine if our model produces a statistically significant result.
+
+
+
+## Simple Linear Regression of student performance
+To illustrate this methodology we will make use of the student performance data set to build a model to predict final student grade on the basis of initial assessment.
+
+> HA: Students who perform well as part of initial assessment in subjects will perform better overall.
+
+```{r Import Data Simple Linear Regression, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+library(stats)
+library(car) ##Levenes test
+library(stargazer)
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('./TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+
+
+tbl_sperf_sex_diff <- tbl_sperf_all %>%
+  select(contains('mG'), contains('pG'), sex, Medu) %>%
+  filter(mG1 != 0, mG2 != 0, mG3 != 0, pG1 != 0, pG2 != 0, pG3 != 0) # Filtering records with missing data.
+```
+### Step 1: Investigate normality
+Because simple linear regression is based on the equation for a line, our first step would be a test for normality of our continuous scale data. As part of the exploration phase we established that all performance variables in the dataset can be assumed to be approximately normally distributed, and this analysis is not repeated here. The summary stats included for convenience of reporting.
+
+```{r Linear Model Check for Normality of the variables cleaned, echo = FALSE}
+############
+# PART: Normality
+############
+
+tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
+  select(contains('mG'), contains('pG')) %>%
+  filter(mG1 != 0, mG2 != 0, mG3 != 0, pG1 != 0, pG2 != 0, pG3 != 0) # Filtering records with missing data.
+
+tbl_sperf_numerical_stats <- tbl_sperf_numerical_measurements %>% psych::describe(omit = TRUE)
+
+#-------- Iterate through eact variable -------#
+#Generate regular summary statistics - not as nice as psych package but gives p value
+st <- pastecs::stat.desc(tbl_sperf_numerical_measurements, basic = F)
+tbl_sperf_numerical_stats_2 <- st %>% transpose()
+colnames(tbl_sperf_numerical_stats_2) <- rownames(st)
+rownames(tbl_sperf_numerical_stats_2) <- colnames(st)
+
+# Initialise vectors
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+variable_count <- nrow(tbl_sperf_numerical_stats_2)
+
+# Iterate through variables
+for (n in 1:variable_count) { variable <- row.names.data.frame(tbl_sperf_numerical_stats_2)[n]
+
+  tpskew               <- semTools::skew(tbl_sperf_numerical_measurements[[variable]])
+  tpkurt               <- semTools::kurtosis(tbl_sperf_numerical_measurements[[variable]])
+  std_skew[[variable]] <- tpskew[1] / tpskew[2]
+  std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+  z_score              <- abs(scale(tbl_sperf_numerical_measurements[[variable]]))
+  gt_196[[variable]]   <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+  gt_329[[variable]]   <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+
+}
+
+tbl_sperf_numerical_stats_2$std_skew <- std_skew
+tbl_sperf_numerical_stats_2$std_kurt <- std_kurt
+tbl_sperf_numerical_stats_2$gt_2sd <- gt_196
+tbl_sperf_numerical_stats_2$gt_3sd <- gt_329
+
+# Pretty print
+tbl_sperf_numerical_stats_2 %>%
+  select(-(median)) %>%
+  kbl(caption = "Summary statistics for Performance (zero scores removed)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 2: Investigate relationship between predictor and response variable.
+As part of the exploration phase we established through Peason Correlation that there was a strong, statistically significant (P < .001), positive relationship between Initial grade in a subject and final grade in that subject. We also established same for intermediate grade and final grade. This analysis is not repeated here.
+
+### Step 3: Run Simple Linear Regression
+Given the assumptions of normality and that a strong positive relationship exists it is safe to use the students performance dataset to illutrate the Simply Linear regression predictive modelling technique.
+
+*Note:* This is equivalent to doing a Pearson correlation again and is included for illustration
+
+```{r LM Regression, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Linear Regression
+############
+
+
+# -------------- Linear Regression Math Grade 1 as a predictor for Math Grade 3 --------------- #
+reg_result_model_lm <-lm(tbl_sperf_numerical_measurements$mG3~tbl_sperf_numerical_measurements$mG1)
+
+
+# -------------- Determine how good our model is versus using the mean --------------- #
+anova(reg_result_model_lm) ## Get sums of squares of variability
+summary(reg_result_model_lm)
+# lm.beta::lm.beta(reg_result_model_lm) Not needed as units are the same
+stargazer(reg_result_model_lm, type="text")
+
+#print.listof(reg_result_model_lm)
+
+
+```
+### Report Simple Linear Regression
+The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) was modelled using a simple linear model.  A strong positive correlation was found (R2 =-.802, n=337, p<.01). This matches our early results from Pearson Correlation. Our AVONA test to evaluate goodness of fit found a statistically significant result (p < 0.001). The model has an R-squared value of .802, indicating that initial grade contributes 80% to final grade in the population. For every 1 unit change in the initial grade in maths, it contributes 0.901 units of change to the final student grade in the population. Therefore there is good justification for using regression to look at prediction. This analysis supports the use of simple linear regression as a model to predict student final performance on the basis of initial grade.
+
+## Multiple Linear Regression of student performance
+Simple linear Regression is a model to predict the value of one variable from another. Multiple Regression is a natural extension of this model and is used to predict an outcome variable using multiple predictor variables, each of which contributes partially to the outcome. It is a hypothetical model of the relationship between several variables. What we are looking to determine is how much collectively does the set of predictors contribute to the outcome variable on average and then also how much do individual predictors contribute on average. When we use categorical variables as predictors, effectively what we are looking for is a differential effect in the outcomes variable as a result of being in one category or another.
+
+> HA: Students who perform well as part of initial assessment in subjects will perform better overall and there is a different between male and female students
+
+For our predictors we will use initial grade and whether a student is male or female.
+
+### Step 1: Investigate differential effects
+We have already as part of explore and analysis phase established there is a differential effect between male and female students for performance. That analysis is not repeated here but we can assume the variables of interest meet the criteria for Multiple linear Regression.
+
+### Step 2: Run Simple Linear Regression
+Given the assumptions of normality and that a strong positive relationship exists it is safe to use the students performance dataset to illustrate the Simply Linear regression predictive modeling technique.
+
+```{r Multipsle Regression 1, warning = FALSE, echo=TRUE, include=TRUE}
+
+tbl_sperf_sex_diff_stats <- tbl_sperf_sex_diff %>% psych::describe(omit = TRUE)
+
+############
+# PART: Multiple Linear Regression
+############
+
+# -------------- Regression Math Grade 1 as a predictor for Math Grade 3 and sex--------------- #
+reg_result_model_multiple_lm <-lm(tbl_sperf_sex_diff$mG3~tbl_sperf_sex_diff$mG1+as.integer(tbl_sperf_sex_diff$sex=='M')) #Force female to be baseline.
+
+
+# -------------- Determine how good our model is versus using the mean --------------- #
+anova(reg_result_model_multiple_lm) ## Get sums of squares of variability
+summary(reg_result_model_multiple_lm)
+stargazer(reg_result_model_lm, reg_result_model_multiple_lm, type="text")
+#Note: R automatically recodes categorical to be dummy variable 0 = reference (boy), 1 category of interest (girl)
+
+```
+### Report Multiple Linear Regression
+The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) for male and female students was modelled using a multiple linear model.here was a statistically significant difference at the p < .001 level in Maths final grade scores for male and female students: (F(2, 337)= 1,364.78, p<0.001. When we take into account the overall contribution from the initial Maths grade a statistically significant result was not found for sex as a predictor. There is a no change in the contribution of maths initial grade to maths final grade outcome compared to the simple linear model which did not account for sex. Our model is still explaining 80% of the variation on average in the outcome variable, the same as the simple linear model.
+
+This result of the multiple linear regression above raises the question of interaction effects. If student is getting a differential effect for final maths grade based on sex, was that student also experiencing a differential effect for the initial grade? The concept here is that there is some relationship between predictors which needs to be accounted for in our model, and we use interaction terms to do so.
+
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Model"
+author: "Joseph O'Carroll"
+date: "04/12/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 04/12/2020
+Objective: Analyse phase for statistical Modelling - Linear Regression - Interactive terms.
+---
+
+# Dummy variables and Interaction Effects - Categorical Predictive Variables
+Many variables we are interested in using as predictors are categorical. In the above example we used a categorical variable (sex) as a predictor but did not explain it's treatment. Because categorical variables have no scale it makes no sense to think of the effect of a unit of increase in these as it would for a continuous variable. What we want to see is if there is a different in outcome for a record belonging to one category versus another and also how much of the variantion in the outcome can be explained by belonging to a category. To do this we transform the categorical variable into a series of dummy variables which indicate whether a particular record has a specific characteristic represented by the dummy variable. Dummy variables also be referred to as indicator variables or switches. When we include a dummy variable in our model we get interception point for the model and a different best fit equation. In this way we can have different predictive models for different groups. For dummy variables we recode to 0 (reference/baseline category) and 1 (category of interest). We must have previously shown a dummy variable has a differential effect on the outcome variable through difference testing in order to include it in our predictive model.
+
+Models built with dummy variables assumes that the gap between groups is constant but we may may find there is an interception point for the models representing each group. For example in our example set we might find that on average male students are better during initial assessment but the trend narrows or even reverses for the final grade. To capture this effect in our predictive model we use interaction terms which change the slop or gradient of our model. We generate interaction terms by multiplying our dummy category variable by our continuous scale variable and adding this term or our model. Our predictive model should include both the dummy variable and interactive term.
+
+## Illustrative example of Interaction affects
+Using our student performance dataset we will illustrate interaction affects by building progressively more complex examples.
+
+```{r Multipsle Regression 2 - Interactive terms, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Create switches and interaction terms
+############
+
+tbl_sperf_sex_diff$int_sex_male <- tbl_sperf_sex_diff$mG1*as.integer(tbl_sperf_sex_diff$sex=='M')
+tbl_sperf_sex_diff$int_sex_female <- tbl_sperf_sex_diff$mG1*as.integer(tbl_sperf_sex_diff$sex=='F')
+
+tbl_sperf_sex_diff$medu_0 <- as.integer(tbl_sperf_sex_diff$Medu == 0)
+tbl_sperf_sex_diff$medu_1 <- as.integer(tbl_sperf_sex_diff$Medu == 1)
+tbl_sperf_sex_diff$medu_2 <- as.integer(tbl_sperf_sex_diff$Medu == 2)
+tbl_sperf_sex_diff$medu_3 <- as.integer(tbl_sperf_sex_diff$Medu == 3)
+tbl_sperf_sex_diff$medu_4 <- as.integer(tbl_sperf_sex_diff$Medu == 4)
+## Stats
+tbl_sperf_sex_diff_stats <- tbl_sperf_sex_diff %>% psych::describe(omit = TRUE)
+
+```
+### First Model mG3 predicted by mG1
+Our first model is a simple linear regression of final Math grade predicted by initial Math grade.
+```{r int_model_1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Demonstrate application of interaction terms
+############
+#------------ First Model: mG3 predicted by mG1 -----------#
+model1<-lm(tbl_sperf_sex_diff$mG3~tbl_sperf_sex_diff$mG1)
+
+## Pretty Print
+stargazer::stargazer(model1, type="text") #Tidy output of all the required stats
+```
+
+
+```{r model1 visualisation,echo=TRUE, include=TRUE}
+#------------ First Model: mG3 predicted by mG1 -----------#
+equation1 <- function(x){coef(model1)[2]*x+coef(model1)[1]}
+ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color=sex))+geom_point()+
+        stat_function(fun=equation1,geom="line",color=scales::hue_pal()(2)[1])
+```
+
+### Second Model mG3 predicted by mG1 using sex as a switch
+Our second model is a multi variable linear regression of with final Math grade predicted by initial Math grade and student sex. We transform sex into a dummy/switch variable, male will be treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Furthermore we no longer assume contant performance difference between male and female students. We use an interaction terms which change the gradient of our model for female students. 
+
+```{r int_model_2, warning = FALSE, echo=TRUE, include=TRUE}
+#------------ Second Model: mG3 predicted by mG1 using sex as a dummy variable -----------#
+model2 <- lm(tbl_sperf_sex_diff$mG3~tbl_sperf_sex_diff$mG1+as.integer(tbl_sperf_sex_diff$sex=='F')) # Male baseline
+
+## Pretty Print
+stargazer::stargazer(model2, type="text") #Tidy output of all the required stats
+stargazer::stargazer(model1, model2, type="text") #Quick model comparison
+```
+
+```{r model2 versus model1 visualisation, warning = FALSE, echo=TRUE, include=TRUE}
+#------------ Second Model: mG3 predicted by mG1 using sex as a dummy variable -----------#
+equation1_male <- function(x){coef(model1)[2]*x+coef(model1)[1]}
+equation1_female <- function(x){coef(model2)[2]*x+coef(model2)[1] + coef(model2)[3]}
+ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color=sex))+geom_point()+
+        stat_function(fun=equation1_male,geom="line",color=scales::hue_pal()(2)[1]) +
+        stat_function(fun=equation1_female,geom="line",color=scales::hue_pal()(2)[2])
+
+```
+
+### Third Model mG3 predicted by mG1 using sex as an interaction term
+Our third model is a multi variable linear regression of with final Math grade predicted by initial Math grade and student sex. We transform sex into a interactive variable, male will be treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Both the switch and the interaction variable are included because the switch variable determines the inception point of the model with the Y axis (the starting point).  
+
+```{r int_model_3, warning = FALSE, echo=TRUE, include=TRUE}
+#------------ Third Model: mG3 predicted by mG1 using sex as an interaction variable -----------#
+model3 <- lm(tbl_sperf_sex_diff$mG3 ~ tbl_sperf_sex_diff$mG1 +
+  as.integer(tbl_sperf_sex_diff$sex == 'F') +
+  tbl_sperf_sex_diff$int_sex_female
+) # Male baseline
+
+## Pretty Print
+stargazer::stargazer(model3, type = "text") #Tidy output of all the required stats
+stargazer::stargazer(model3, model2, type = "text") #Quick model comparison
+```
+```{r model3 versus model2 visualisation}
+#------------ Third Model: mG3 predicted by mG1 using sex as an interaction variable -----------#
+equation2_male <- function(x){coef(model2)[2]*x+coef(model2)[1]}
+equation2_female <- function(x){coef(model3)[2]*x+coef(model3)[1] + coef(model3)[3] + coef(model3)[4]}
+ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color=sex))+geom_point()+
+        stat_function(fun=equation1_female,geom="line",color=scales::hue_pal()(2)[1]) +
+        stat_function(fun=equation2_female,geom="line",color=scales::hue_pal()(2)[2])
+
+```
+
+### Double checking association
+To confirm we hadn't made an error, we reconfirmed our understanding of the associations for the variables. This is not strictly required but included for convience. 
+
+#### Look at zero order correlations
+
+```{r recheck, warning = FALSE, echo=TRUE, include=TRUE}
+
+#Get zero order correlations as well to fully explore the effect
+cor.test(tbl_sperf_sex_diff$mG1, tbl_sperf_sex_diff$mG3)
+```
+
+#### Look at differences in experience of concepts for respondents for different gender
+
+```{r recheck 2, warning = FALSE, echo=TRUE, include=TRUE}
+#Look at differences in scores for gender
+#Conduct Levene's test for homogeneity of variance in library car
+#---------- mG1 ~ Sex Differential Effect  ---------- #
+leveneTest(mG1 ~ sex, data=tbl_sperf_sex_diff)
+test_result <- stats::t.test(mG1~sex,var.equal=TRUE,data=tbl_sperf_sex_diff)#Variances are not equal
+test_result[["effcd"]] <- round(effectsize::t_to_d(t = test_result$statistic, test_result$parameter),2)
+print(test_result)
+print(test_result[["effcd"]])
+
+#---------- mG3 ~ Sex Differential Effect  ---------- #
+leveneTest(mG3 ~ sex, data=tbl_sperf_sex_diff)
+test_result <- stats::t.test(mG3 ~ sex,var.equal=TRUE,data=tbl_sperf_sex_diff)#Variances are not equal
+test_result[["effcd"]] <- round(effectsize::t_to_d(t = test_result$statistic, test_result$parameter),2)
+
+print(test_result)
+print(test_result[["effcd"]])
+```
+### Reporting Switchs and Interactive effects for variable; sex
+The interaction affects between initial grade in Maths (mG1 taken from school reports) and sex was modeled using a multiple linear model. Being female was not found to be a statistically significant ( P = 0.580 ) predictor of final performance. The interaction effect of being female and initial grade was also not found to be significant (P = 0.05). We saw how the inclusion of the switches or dummy variables had the consequence of giving us two lines of best fit (one for male and one for female students) that have differing intercepts. We also how how the inclusion of interactive variables gave us a slightly different gradient. 
+
+## Linear Regression with Interaction effects and more than two categories
+From our explore and analysis phase we established an association for mother’s education (Medu) and student performance and we found the strongest association for students with mothers who obtained the highest level of education.
+
+### Fourth Model mG3 predicted by mG1 using sex as an interaction term
+Our forth model is a multi variable linear regression with final Math grade predicted by initial Math grade, student sex and mother's educational achievement. We transform sex into a interactive variable, male was treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Mothers education have five possible values and this is transformed into 4 switching variables. The lowest educational level (Medu = 0) is taken as the reference category. 
+
+
+```{r int_model_4, warning = FALSE, echo=TRUE, include=TRUE}
+#------------ Fourth Model: mG3 predicted by mG1 using sex as an interaction variable and mothers education as a switch -----------#
+model4 <- lm(tbl_sperf_sex_diff$mG3 ~ tbl_sperf_sex_diff$mG1 +
+  as.integer(tbl_sperf_sex_diff$sex == 'F') +
+  tbl_sperf_sex_diff$medu_4 +
+  tbl_sperf_sex_diff$medu_1 +
+  tbl_sperf_sex_diff$medu_2 +
+  tbl_sperf_sex_diff$medu_3 ) # lowest eduaction baseline, male baseline
+
+## Pretty Print
+stargazer::stargazer(model4, type = "text") #Tidy output of all the required stats
+stargazer::stargazer(model4, model3, type = "text") #Quick model comparison
+```
+
+```{r model4 versus model3 visualisation}
+#------------ Forth Model: mG3 predicted by mG1 using sex and mothers education switch variable -----------#
+# Predicted mG3 = 2.527 + 0.878*mG1 - 0.45*female -0.977*medu_1 -0.809*medu_2 -0.667*medu_3 -0.730*medu_4
+equation4_female <- function(x){coef(model4)[2]*x+coef(model4)[1] + coef(model4)[3]}
+equation4_female_medu4 <- function(x){coef(model4)[2]*x+coef(model4)[1] + coef(model4)[4]}
+equation4_female_medu1 <- function(x){coef(model4)[2]*x+coef(model4)[1] + coef(model4)[5]}
+equation4_female_medu2 <- function(x){coef(model4)[2]*x+coef(model4)[1] + coef(model4)[6]}
+equation7_female_medu2 <- function(x){coef(model4)[2]*x+coef(model4)[1] + coef(model4)[7]}
+ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color= tbl_sperf_sex_diff$medu_4==1))+geom_point()+
+        stat_function(fun=equation4_female,geom="line",color=scales::hue_pal()(2)[1]) +
+        stat_function(fun=equation4_female_medu4,geom="line",color=scales::hue_pal()(2)[2]) + theme_bw()
+
+```
+
+### Report Interactive effects for Medu and Sex
+
+A Multiple linear predictive model of final maths grade was built using initial grade in Maths (mG1 taken from school reports), sex and Mothers education. When we take into account the overall contribution from the initial Maths grade a statistically significant result was not found for sex nor mothers education as predictors. We saw how the inclusion of the Mother education switch term had the consequence of giving us two lines of best fit (one for female students with mothers who have higher education and one for female students who didn't) that have differing intercepts as well as differing gradients or slopes. The above analysis supports not including Mothers education in a predictive set with initial grade.
+
+## Assumptions for Linear Regression
+There are a number of assumptions unpinning the usage of the Linear model for regression. For every one unit of change in the independent variable there will be a consistent and uniform change in the dependent variable. This allows us to use the equation of a ling to model the association between predictor variables and outcome variables. Before we build our model we need to validate our assumptions regarding associations. If we are asserting a relationship we need to investigate if there is any evidence of a relationship using correlation and make a decision based on the results (strength, direction etc). If we are asserting a differential effect for different groups. We need to investigate if there is any difference using either the appropriate test and make a decision based on the result
+
+Using linear regression as a predictive model requires that a straight line to be a good model. How well a straight line serves as a model is determined by the residuals.
+ We want the residuals to follow the a normal distribution because that minimizes the opportunity for error to emerge just because the data is skewed. We want constant error variance because non constant would pull our outcome in particular directions and increase our changes of a type 1 error. An outlier is considered anything that's particularly large. A leverage point is something that's far away from the mean. And anything that's considered an influential observation is something that changes the slope of the line. If we have a particularly large value, this will be in our data as an outlier, it is likely that we'll have a particularly large residual in our regression model. And then it will pull the data in a particular direction, and therefore it will pull the prediction in a particular direction.
+
+### Step 1: Determine our outliers in terms of residuals
+The first thing we need to do is identify our outliers in terms of our residuals. It maybe okay for us to delete those outliers. If we find outliers that are particularly significant, we can choose to delete them and we will repeat the regression without those cases included. The danger here is that something that wasn't an outlier may become an outlier, it may be that we have to retain it because it's a particularly important case in our data set. It's a good idea to do a robustness test and run your data analysis twice to determine how susceptible our model is to your assumptions. To do this we run the regression data analysis twice, once with and once without the outliers. This risk here is bias, so an increased possibility of type one error due to a reduction in power.
+
+Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Residuals for model 1: mG1 as a predictor of mG3, are within an acceptable range so. We looked into this further by exploring outliers: how many of them there are or whether we can transform it to become more normal.
+
+In terms of quantifying the proportion of the residual that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. No variable exceeded our acceptable range for outside the 95% significance level. Based on this assessment, residual skewness due to outliers is not an issue and residuals can be treated as normally distributed.
+
+An analysis of standard residuals was carried out, which showed that the data contained no additional outliers once zero scores had been removed. (Std. Residual Min = -3.61, Std. Residual Max = 3.59).”
+
+
+```{r MLR Assess Linearity, warning = FALSE, echo=TRUE, include=TRUE}
+###########
+# Part: Model
+###########
+#------------ Second Model: mG3 predicted by mG1 using sex as a dummy variable -----------#
+model2 <- lm(tbl_sperf_sex_diff$mG3~tbl_sperf_sex_diff$mG1+as.integer(tbl_sperf_sex_diff$sex=='F')) # Female baseline
+############
+# PART: check
+############
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+#--------------- Check for percentage outliers ---------------#
+variable <- "model2_stats"
+st <- as.data.frame(pastecs::stat.desc(model2$residuals, basic = F))
+model2_stats <- st %>% transpose()
+colnames(model2_stats) <- rownames(st)
+rownames(model2_stats) <-('Model 2: Residuals')
+
+## Build standard statistics
+tpskew <- semTools::skew(model2$residuals)
+tpkurt <- semTools::kurtosis(model2$residuals)
+std_skew[[variable]] <- tpskew[1] / tpskew[2]
+std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+z_score <- abs(scale(model1$residuals))
+gt_196[[variable]] <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+gt_329[[variable]] <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+
+## Build output
+model2_stats$std_skew <- std_skew
+model2_stats$std_kurt <- std_kurt
+model2_stats$gt_2sd <- gt_196
+model2_stats$gt_3sd <- gt_329
+
+#-------- Pretty print my table -------#
+model2_stats %>%
+  kbl(caption = "Summary statistics for Residuals - mG3 predicted by mG1 - sex as a dummy variable (zero scores removed)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+
+```{r Visualisation Histograms for residuals, echo=TRUE, include=TRUE}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+
+binwidth <- .5
+gs1 <- model2 %>% ggplot(aes(x = model2$residuals))
+gs1 <- gs1 + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+gs1 <- gs1 + stat_function(fun = dnorm, color = "red", args = list(mean = model2_stats$mean, sd = model2_stats$std.dev), na.rm = TRUE)
+gs1 <- gs1 + labs(x = "Model 1: mG3 predicted by mG1 Residuals")
+gs1 <- gs1 + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+
+gs2 <- model2 %>% ggplot(aes(sample = model2$residuals)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Model 2 Residuals", subtitle = "mG1 as predictor of mG3 dummy sex")
+
+
+plot_grid(gs1, gs2, labels = "auto", ncol = 2)
+```
+
+#### Influential Outliers
+
+```{r Influential outliers, echo=TRUE, include=TRUE}
+
+#--------------- Influential Outliers - Cook's distance ---------------#
+cooksd<-sort(cooks.distance(model2))
+# plot Cook's distance
+plot(cooksd, pch="*", cex=2, main="Influential Obs by Cooks distance")
+abline(h = 4*mean(cooksd, na.rm=T), col="red")  # add cutoff line
+text(x = seq_along(cooksd) +1, y =cooksd, labels =ifelse(cooksd>4*mean(cooksd, na.rm =T), names(cooksd), ""), col ="red")  # add labels
+
+#--------------- find rows related to influential observations ---------------#
+influential <- as.numeric(names(cooksd)[(cooksd > 4*mean(cooksd, na.rm=T))])  # influential row numbers
+stem(influential)
+head(tbl_sperf_sex_diff[influential, ])  # influential observations.
+head(tbl_sperf_sex_diff[influential, ]$mG3)  # influential observations - look at the values of mG3
+head(tbl_sperf_sex_diff[influential, ]$mG1)  # influential observations - look at the values of mG1
+
+car::outlierTest(model2) # Bonferonni p-value for most extreme obs - Are there any cases where the outcome variable has an unusual variable for its predictor values?
+car::leveragePlots(model2) # leverage plots
+
+```
+
+### Step 2: Check residuals for Constant Variation or error (Homoscedasticity)
+Sometimes we get called heteroscedasticity in terms of error variance. This is when we see a different variation as one level of value compared to at a higher level values for the outcome. In a well-fitting regression model the variation around the line is constant along the line (Homoscedasticity). If we have heteroscedasticity, it's not okay to use multiple linear regression, even if there is strong coefficients and statistical significance, because that introduces the possibility of a type one error as well.
+
+The data also met the assumption of non-zero variances (Initial Maths grade Variance = 10.49,, sex=0.25)
+
+```{r, echo=TRUE, include=TRUE}
+plot(model2, 1)
+plot(model2, 3)
+#The first plot is the chart of residuals vs fitted values, in the second plot the standardised residuals are on the Y axis. If there is absolutely no heteroscedastity, you should see a completely random, equal distribution of points throughout the range of X axis and a flat red line. We reall want to see that there is no pattern in the residuals and that they are equally spread around the y = 0 line - the dashed line.
+#n our case, as you can notice the red line is slightly distorted in the middle on plot 1 but is not a big problem. Looking at the second plot we can see that while it is a problem it is not huge. Only a concern if there are definite patterns.
+
+#Create a QQ plotqqPlot(model, main="QQ Plot") #qq plot for studentized resid
+car::qqPlot(model2, main = "QQ Plot") #qq plot for studentized resid
+
+var_mg1 <- var(as.numeric(tbl_sperf_sex_diff$mG1, rm.na = TRUE)) %>% round(2)
+var_sex <- var(as.numeric(tbl_sperf_sex_diff$sex=='M', rm.na = TRUE)) %>% round(2)
+```
+
+
+### Step 3: Check for Collinearity
+Occurs when two or more independent variables contain strongly redundant information. If variables are collinear then it means there is not enough distinct information in these variables for MLR to operate and they are essentially measuring the same thing. The problem is that this concept could end up over represented in our model. A correlation coefficient above 0.8 suggests collinearity might be present. If it is we need to analyse your variables in separate regression equations and then examine how they operate together
+
+Tests to see if the model 2 met the assumption of collinearity indicated that multicollinearity was not a concern (Sex, Tolerance = .98, VIF = 1.02; Initial Maths grade, Tolerance = 0.98, VIF = 102.)
+
+
+```{r, echo=TRUE, include=TRUE}
+#Calculate Collinearity
+vifmodel<-car::vif(model2)
+vifmodel
+#Calculate tolerance
+1/vifmodel
+```
+### Step 4: Check for Causality
+To assert causality we need to assume association, time order and non spuriousness. Statistical methods can justify association assumptions of association but not time order, that depends on our conceptual framework. We control for spuriousness by introducing controlling measures into our predictive model.
+
+## Reporting MLR - Model 2
+For expedience I've only reported on model 2. A multiple regression analysis was conducted to determine if a student's score for maths final grade and sex could predict a student’s final academic achievement.
+<p>
+In order to include the sex in the regression model it was recorded into a single dummy variable (0 for male, 1 for female).
+<p>
+Examination of the histogram, normal P-P plot of standardised residuals and the scatterplot of the dependent variable, initial maths grade, and standardised residuals showed that the some outliers existed even after removing the zero score records we deemed invalid earlier. However, examination of the standardised residuals showed that none could be considered to have undue influence (95% within limits of -1.96 to plus 1.96 and none with Cook’s distance >1 as outlined in Field (2013).
+<p>
+Examination for multicollinearity showed that the tolerance and variance influence factor measures were within acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008). The scatterplot of standardised residuals showed that the data met the assumptions of homogeneity of variance and linearity. The data also meets the assumption of non-zero variances of the predictors.
+
+
+
+
+

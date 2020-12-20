@@ -1,0 +1,479 @@
+---
+title: "R Notebook"
+author: ocarrolj
+date: 05/12/2020
+output: html_notebook
+---
+
+```{r global-options, include=FALSE}
+# https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+knitr::opts_chunk$set(fig.width=12, fig.height=10, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r Import Data Simple Linear Regression, echo=FALSE, include=FALSE}
+library(Epi)#ROC Curve
+library(DescTools)#Pseudo Rsquare statistics
+library(stargazer)
+library(foreign)#read SPSS file.
+library(arm)#for invlogit calculating predicted probabilities
+library(lmtest)#Simple calculation of Chi-square for model
+library(car)#Needed to test for colinearity of predictors
+library(generalhoslem)#Needed to test assumption of linearity
+library("regclass")#For confusion matrix
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+library(stats)
+library(car) ##Levenes test
+library(stargazer)
+library(summarytools)
+library(nnet)#Multinomial regression
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('./sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('./TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+
+```
+
+# Logistic Regression
+In linear regression our outcome variable is continuous that is predicted from one or more continuous or categorical predictor variables. If the outcomes we are interested in is categorical in nature we cannot use linear regression as there is no linear relationship between predictor and outcomes variables. To predict categorical outcomes we use logistic regression. If the outcome variable has exactly two values, for example predicting pass or fail for a student, it is called binary logistic regression, and when the outcome has more than two categories it is called multi-nominal logistic regression. The output from a logistic regression is not an estimated value but rather a probability that the given input belongs to a certain category or not. Because we're looking at probability, we choose one category values as the category of interest. The event we're interested in is the event where that category occurs. The reference event is when the event of interest doesn't occur and we are interested in the probability of the event of interest occurring versus the probability of it not occurring.
+
+## Binary Logistic Regression
+To illustrate this methodology we will make use of the student performance data set to build a model to predict if students sat the final maths examination on the basis of gender.
+
+> HA: Gender is a factor in determining if a student will sit the final maths examination
+
+Our outcome variable is the probability of a student is male or female given that they did not sit the exam. As such we give zero to the "no" category, which is our reference category and 1 to our category of interest which is 'Yes' they did sit the exam. For our predictor we used Sex with values Male and Female.
+
+Note: We're building a model with one predictor to illustrate our understanding of how logistic regression works. The starting point is a simple logistic regression, which we will build upon. We gain no new insights from this over and above a difference test.
+
+```{r}
+############
+# PART: Add new binary category sat maths yes or no
+############
+
+tbl_sperf_sex_medu_diff <- tbl_sperf_all %>%
+  select(contains('mG'), sex, Medu,Fedu)
+
+tbl_sperf_sex_medu_diff$sat_maths <-  as.integer((tbl_sperf_sex_medu_diff$mG3 != 0)) ## Zero to the no category
+tbl_sperf_sex_medu_diff$pedu_paired <- ' Neither parent with a level 5 qualification'
+tbl_sperf_sex_medu_diff[tbl_sperf_sex_medu_diff$Medu == 3 | tbl_sperf_sex_medu_diff$Fedu ==3 ,'pedu_paired'] <- ' At least one parent with a level 5 qualification'
+tbl_sperf_sex_medu_diff[tbl_sperf_sex_medu_diff$Medu == 4 | tbl_sperf_sex_medu_diff$Fedu ==4 ,'pedu_paired'] <- ' At least one parent with a higer degree'
+```
+
+
+### Step 1: Run Simple Logistic Regression
+
+```{r buildmodel1}
+############
+# PART: Run Simple Logistic Regression
+############
+#Make sure categorical data is used as factors
+#-------------------- Build Model ------------------#
+logmodel1 <- glm(tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex , data = tbl_sperf_sex_medu_diff, na.action = na.exclude, family = binomial(link=logit))
+
+#Full summary of the model
+summary(logmodel1)
+
+#Chi-square plus significance
+lmtest::lrtest(logmodel1)
+
+```
+
+The Pr(>|z|) column shows the two-tailed p-values testing the null hypothesis that the coefficient is equal to zero (i.e. no significant effect). The usual cut-off value is 0.05. From this model it appears that sex does not have a significant effect on the log-odds ratio of the outcome variable, weather or not a student sat the final maths exam. The estimate column shows how much of a contribution or predictor makes to the outcomes. The results indicated that when sex is male the expected change in the log odds is .3221 an increase in comparison of being female, however we know the result is not statistically significant (p = 0.328).
+
+### Step 2: Calculate odds ratio and probability
+
+To calculate the odds ratio, which is an indication of the change in odds result from a unit change in the predictor, we take the exponential of the co-efficients. We see the odds of sitting the maths exam is 7.6 to 1 and that ratio increases by 1.38 to 8.99 to 1 if a student is Male. From this we can see the probability of sitting the final maths exam when female is .88 and when male is 0.91.
+
+```{r predictorsmodel1}
+############
+# PART: Odds ratio and probability
+############
+
+#-------------- Exponentiate the co-efficients --------------#
+#exp(coefficients(logmodel1))
+## odds ratios and 95% CI
+co_efficients <- cbind(Estimate=round(coef(logmodel1),4), Odds_ratio=round(exp(coef(logmodel1)),4)) %>% data.frame()
+
+#-------------- Probability of sitting math when female --------------#
+#arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*0) #YES this is the same as just having the 1st co-efficient in the equation
+#-------------- Probability of sitting math yes when male --------------#
+#arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*1)
+
+co_efficients[,'Probability'] <- rbind(Female = arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*0)[[1]], Male = arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*1)[[1]]) %>% data.frame()
+
+# Pretty print
+co_efficients %>%
+  kbl(caption = "Summary of co-efficients") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 3: Check goodness of fit of the model over the baseline model
+In linear regression we check goodness of fit by comparing our results to the results we would have gotten using the mean as the baseline model. For logistic regression an omnibus test of model is used to check that the new model (with explanatory variables included) is an improvement over the baseline model which is a sum of frequencies of occurrence of each category. We use chi-square tests to see if there is a significant difference between the baseline model (null) and the model we have created.
+
+Below we can see our model is not statistically significant (Pr(>Chisq) = 0.3447), which means it cannot be assumed to be a better predictor than the baseline model. This was not surprising since our predictor variable (sex) was shown to not be statistically significant.
+
+```{r Compare to the baseline}
+############
+# PART: Compare to the baseline
+############
+#-------------- Chi-square plus significance ----------------#
+lrtest_result <- lmtest::lrtest(logmodel1)
+# Pretty print
+lrtest_result %>%
+  kbl(caption = "Summary statistics for regression compared to baselien model") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Step 4: Determine usefulness
+We can get a pseudo R squared value to determine how useful the model is. From linear regression we understood the R2 was a measure of how much of the outcome variable was explained by the predictor variable. Cox and Snell R2 and Nagelkerke R2 are pseudo R2 statistics we can generate. From this we see that student sex explains between 0.2% and 0.48% of whether a student will sit the final maths exam or not, but we need to keep in mind the result was not statistically significant.
+
+```{r R squared calculation}
+#----------Pseudo Rsquared---------------#
+Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel1, which="CoxSnell"),4),
+Nagelkerke = round(DescTools::PseudoR2(logmodel1, which="Nagelkerke"),4))
+rownames(Pseudo.r2) <- 'R-Squared'
+
+# Pretty print
+Pseudo.r2 %>%
+  kbl(caption = "Summary of Pseudo R-Squared values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 5: Sensitivity Analysis and Summary Stats.
+We need to understand how well the classification is working. The two main measures of sensitivity and specificity. Sensitivity is measuring the proportion of true positives that were correctly identified by the model (correctly identified that a student sat the exam) and specificity is the proportion of true negatives (predicted to be negative and where negative). We does this using a ROC chart. Below we can see that our true positive rate is 49.0% and our true negative rate is 59.0%. The positive predictive values is the percentage of case classified by our model correctly (students who where predicted to sit the exam and did plus students who where predicted not to sit the exam and didn't). The negative predictive values is 1 - the positive. To use the ROC curve to quantify the performance of a classifier use the Area Under the Curve (AUC). We hve an AUC of .54 which is considered weak.
+
+
+```{r roc charts}
+#Output the sensitivity, specificity, and ROC plot
+Epi::ROC(form=tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex, plot="ROC")
+
+```
+
+### Step 6: Check the assumption of linearity of independent variables
+We only have one predictor so we don't need to check for collinearity. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statistically significant we are ok.
+
+```{r checkassumptionsmodel1}
+generalhoslem::logitgof(tbl_sperf_sex_medu_diff$sat_maths, fitted(logmodel1))
+```
+### Reporting Binary Logistic Regression
+A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex. Our outcome variable is the probability of a student sitting the final Maths exam given their gender. As such we give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used sex with values Male and Female. Being Male was not found to be a statistically significant ( P = .348 ) predictor of in a student will or not not sit the examination. Female Students have an odd ratio of 7.60 to 1 to sit the exam while Male student odds where 1.38 higher which corresponds to a probability of .88 and .91 respectively. R2 = .0023 (Cox-Snell), .0048 (Nagelkerke), Pr (>Chisq) = .34.
+
+```{r reporting blr}
+#Summary of the model with co-efficients
+stargazer(logmodel1, type="text")
+```
+
+## Extra: Extending the model to include Parent's Education.
+Similar to Linear regression we can extend logistic regression to include multiple predictors. Our goal is to explore if we can predict if a student will sit the final Maths exam on the basic of their parents education. We introduced a new categorical variable representing the highest educational achievement of either parent. We have 3 levels, at least one parent with a higher degree, at least one parent with a level 5 qualification (secondary school) and neither parent with a level 5 qualification. At least one parent with a higher degree was taken as the baseline reference category.
+
+### Step 1: Run General Logistic Regression
+We find that the overall model is not statistically significant (Pr(>Chisq) = .077) but the category "Neither parent with a level 5 qualification" is statistically significant at the P <0.05 significances level.
+
+```{r buildmodel2}
+############
+# PART: Run General Logistic Regression with 2 predictors
+############
+#-------------------- Build Model ------------------#
+logmodel2 <- glm(sat_maths ~ sex+pedu_paired, data = tbl_sperf_sex_medu_diff, na.action = na.exclude, family = binomial(link=logit))
+
+#Full summary of the model
+summary(logmodel2)
+
+#Chi-square plus significance
+lmtest::lrtest(logmodel2)
+
+```
+
+### Step 2: Calculate odds ratio and probability
+Student sex remained a statistically insignificant variable. The only level of parental educational achievement that was significant was if neither parent had a level 5 education.
+
+```{r predictorsmodel2}
+############
+# PART: Odds ratio and probability
+############
+
+#-------------- Exponentiate the co-efficients --------------#
+#exp(coefficients(logmodel2))
+## odds ratios and 95% CI
+model2_co_efficients <- cbind(Estimate=round(coef(logmodel2),4), Odds_ratio=round(exp(coef(logmodel2)),4)) %>% data.frame()
+
+
+model2_probability <- rbind(
+  #1. Probability of sitting exam when female and at least one parent has a degree
+  Female = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*0)[[1]],
+  #2. Probability of sitting exam when male and at least one parent has a degree
+  Male = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*1)[[1]],
+  #3. Probability of sitting exam when female when at least one parent has a level 5
+  Female_level5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*0 +coef(logmodel2)[3]*1+coef(logmodel2)[4]*0),
+  #4. Probability of sitting exam when male when at least one parent has a level 5
+  Male_level5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*1 +coef(logmodel2)[3]*1+coef(logmodel2)[4]*0),
+  #5.Probability of sitting exam  female when neither parent has an A level
+  Female_nolevel5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*0 +coef(logmodel2)[3]*0+coef(logmodel2)[4]*1),
+    #6.Probability of answering yes when male when neither parent has an A level
+    Male_nolevel5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*1 +coef(logmodel2)[3]*0+coef(logmodel2)[4]*1)
+) %>% data.frame()
+
+# Pretty print
+model2_co_efficients %>%
+  kbl(caption = "Summary of co-efficients") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+model2_probability %>% round(2) %>%
+  kbl(caption = "Summary of co-efficients probabilities") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+confusion_matrix(logmodel2) %>%
+  kbl(caption = "Confusion Matrix") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 3: Check goodness of fit of the model over the baseline model
+```{r Compare to the baseline model 2}
+############
+# PART: Compare to the baseline
+############
+#-------------- Chi-square plus significance ----------------#
+lrtest_result <- lmtest::lrtest(logmodel2)
+# Pretty print
+lrtest_result %>%
+  kbl(caption = "Summary statistics for regression compared to baselien model") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 4: Determine usefulness
+The Pseudo R squared statistics show that our extended model explains between 1.78% and 3.69% of the variation in the outcome variable. This is consistent with our findings above.
+
+```{r R squared calculation model 2}
+#----------Pseudo Rsquared---------------#
+Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel2, which="CoxSnell"),4),
+Nagelkerke = round(DescTools::PseudoR2(logmodel2, which="Nagelkerke"),4))
+rownames(Pseudo.r2) <- 'R-Squared'
+
+# Pretty print
+Pseudo.r2 %>%
+  kbl(caption = "Summary of Pseudo R-Squared values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 5: Sensitivity Analysis and Summary Stats.
+When we compared the performance of the model using sensitivity analysis. The AUC has increase to 0.61 compared to the first model which had an AUC of .51, but both models are considered weak.
+
+```{r roc charts model 2}
+#Output the sensitivity, specificity, and ROC plot
+Epi::ROC(form=tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex+tbl_sperf_sex_medu_diff$pedu_paired, plot="ROC")
+
+```
+
+### Step 6: Check the assumption of linearity of independent variables
+We have two predictor so we need to check for collinearity. Conceptually student sex and parental educational achievement should not be collinear, but the step is included for illustration. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statistically significant we are ok.
+
+```{r checkassumptionsmodel2}
+generalhoslem::logitgof(tbl_sperf_sex_medu_diff$sat_maths, fitted(logmodel2))
+
+#Collinearity
+vifmodel<-car::vif(logmodel2)#You can ignore the warning messages, GVIF^(1/(2*Df)) is the value of interest
+vifmodel
+#Tolerance
+1/vifmodel
+```
+
+### Reporting Binary Logistic Regression with two Predictors
+A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex and parental educational achievement. Our outcome variable is the probability of a student sitting the final maths exam given their gender and their parents highest educational achievement. We give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used sex with values Male and Female. For Parental education we had 3 levels, At least one parent with a level 5 qualification, At least one parent with a higher degree and neither parent with a level 5 qualification. At least one parent with a higher degree was our reference category. Neither parent having a level 5 education was shown to be statistically significant (P < .05). Being Male was still not found to be a statistically significant ( P = .43 ) predictor of if a student will or not not sit the examination. Female Students have an odd ratio of 10.68 to 1 to sit the exam while Male student odds where 1.31 higher which corresponds to a probability of .91 and .93 respectively. The lowest probability of sitting the Maths exam was Female students for which neither parent has a level 5 education. R2 = .0178 (Cox-Snell), .00369 (Nagelkerke), Pr (>Chisq) = .077.
+
+
+## Multinomial logistic regression
+We can also use logistic regression to predict if a case will be a member of more than two categories. To illustrate this methodology we will make use of the student performance data set to build a model to predict based student alcohol consumption on the basis of performance.
+
+> HA: Subject performance, failures, and absences are good predictors of student tendency to consume alcohol
+
+### Step 1: Quick summary of the data
+A general guideline is that we need at minimum of 10 cases with the least frequent outcome for each independent variable in our model. A quick look at the data shows we meet this requirement. We need approximately 200 records based on this guideline.
+
+
+```{r model3 import}
+############
+# PART: Add new binary category sat maths yes or no
+############
+
+tbl_sperf_family_alc <- tbl_sperf_all %>%
+  select(Dalc.p, Walc.p ,health.p,absences.p, famrel.p, Pstatus, famsize,mG3,pG3,failures.p, activities.p)
+
+
+tbl_sperf_family_alc$Walc.p <- factor(tbl_sperf_family_alc$Walc.p)
+tbl_sperf_family_alc$famrel.p <- factor(tbl_sperf_family_alc$famrel.p)
+tbl_sperf_family_alc$Dalc.p  <- factor(tbl_sperf_family_alc$Dalc.p)
+
+freq(tbl_sperf_family_alc$Walc.p) %>%
+  kbl(caption = "Summary of Weekend Alchol Consumption (Walc.p)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+tbl_sperf_family_alc$failures.p %>% psych::describe() %>% as.data.frame() %>% select(-c(mean, sd, vars, trimmed)) %>%
+  kbl(caption = "Summary of Student Failures (failures.p)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+tbl_sperf_family_alc$absences.p %>% psych::describe() %>% as.data.frame() %>% select(-c(mean, sd, vars, trimmed)) %>%
+  kbl(caption = "Summary of Student Absences (absences.p)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 2: Run Multi-nominal Logistic Regression
+
+```{r build combinartions3}
+############
+# PART: Build combination
+############
+#Walc.p is the level of alcohol consumption (a categorical variable with four values)
+# absences.p, is a continuous variable
+# pG3 is a continuous variable
+# famrel.p is a categorical variable 5 values.
+with(tbl_sperf_family_alc, table(famrel.p, Walc.p))
+with(tbl_sperf_family_alc, do.call(rbind, tapply(pG3, Walc.p, function(x) c(M = mean(x), SD = sd(x)))))
+with(tbl_sperf_family_alc, do.call(rbind, tapply(pG3, absences.p, function(x) c(M = mean(x), SD = sd(x)))))
+```
+
+```{r build model3}
+############
+# PART: Run Multinominal logistic regression with 2 predictors
+############
+#-------------------- Build Model ------------------#
+#Because Walc.p has four levels we need to indicate which level is our reference
+#We will be comparing the alcohol consumption levels.
+tbl_sperf_family_alc$Walc.p<-relevel(tbl_sperf_family_alc$Walc.p, ref = "1")
+
+#We create the model using multinom from nnet package
+logmodel3 <- multinom(Walc.p ~ absences.p + pG3, data = tbl_sperf_family_alc)
+summary(logmodel3)
+
+#multinom package does not include p-value calculation for the regression coefficients, so we calculate p-values using Wald tests (here z-tests).
+z <- summary(logmodel3)$coefficients/summary(logmodel3)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+p  %>%
+  kbl(caption = "Summary of Predictor Probability Pr(>|z|) ") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+#Chi-square plus significance
+lmtest::lrtest(logmodel3)
+```
+
+### Step 2: Calculate odds ratio and probability
+The relative odds ratio for a one-unit increase in Portuguese final grade is .9492 for being a level 2 alcohol consumer (Likelihood is decreasing) versus level 1. The relative odds ratio for a one-unit increase in Portuguese absences is 1.045 for being a level 2 alcohol consumer (Likelihood is decreasing) versus level 1.
+
+```{r predictorsmodel3}
+############
+# PART: Odds ratio and probability
+############
+
+#-------------- Exponentiate the co-efficients --------------#
+#exp(coefficients(logmodel3))
+## odds ratios
+model3_co_efficients <- cbind(Odds_ratio=round(exp(coef(logmodel3)),4)) %>% data.frame()
+
+# Pretty print
+model3_co_efficients %>%
+  kbl(caption = "Summary of co-efficients (Odds Ratios)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+#-------------- Probabilitities--------------#
+#You can calculate predicted probabilities for each of our outcome levels using the fitted function
+pp <- fitted(logmodel3)
+#pp %>%
+#  kbl(caption = "Summary of co-efficients (Odds Ratios)") %>%
+#  kable_styling(bootstrap_options = c("striped", "hover"))
+
+#If we want to examine the changes in predicted probability associated with one of our two variables, we can create small datasets varying one variable while holding the other constant. We will first do this holding write at its mean and examining the predicted probabilities for each level of ses.
+dabsences <- data.frame(absences.p  = tbl_sperf_family_alc$absences.p, pG3 = mean(tbl_sperf_family_alc$pG3))
+#predict(logmodel3, newdata = dabsences, "probs")
+
+#We can also use the predicted probabilities is to look at the averaged predicted probabilities for different values of the continuous predictor variable write within each level of ses.
+
+#for every level of absences we want a pG3 Range. Total is 20*6 = 66
+dwrite <- data.frame(absences.p = rep(c(0:20), 21), pG3 = rep(c(0:20), 21))
+
+## store the predicted probabilities for each value of ses and write
+pp.write <- cbind(dwrite, predict(logmodel3, newdata = dwrite, type = "probs", se = TRUE))
+
+## calculate the mean probabilities within each level of ses
+#by(pp.write[, 3:5], pp.write$absences.p, colMeans)
+
+#Using the predictions we generated for the pp.write object above, we can plot the predicted probabilities against the writing score by the level of ses for different levels of the outcome variable.
+
+lpp <- reshape2::melt(pp.write, id.vars = c("absences.p", "pG3"), value.name = "probability")
+
+head(lpp)  # view first few rows
+
+## plot predicted probabilities across write values for each level of ses
+## facetted by program type
+ggplot(lpp, aes(x = pG3, y = probability)) +
+  geom_point(aes(colour =  absences.p)) +
+  facet_grid(variable ~ ., scales = "free") +
+  theme_bw()
+```
+
+### Step 4: Check goodness of fit of the model over the baseline model
+Below we can see our model is not statistically significant (Pr(>Chisq) < .001), which means it can be assumed to be better than the baseline.
+
+```{r Compare to the baseline model 3}
+############
+# PART: Compare to the baseline
+############
+#-------------- Chi-square plus significance ----------------#
+lrtest_result <- lmtest::lrtest(logmodel3)
+# Pretty print
+lrtest_result %>%
+  kbl(caption = "Summary statistics for regression compared to baselien model") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Step 5: Determine usefulness
+The Pseudo R squared statistics show that our extended model explains between 6.93% and 7.31% of the variation in the outcome variable. This is consistent with our findings above.
+
+```{r R squared calculation model 3}
+#----------Pseudo Rsquared---------------#
+Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel3, which="CoxSnell"),4),
+Nagelkerke = round(DescTools::PseudoR2(logmodel3, which="Nagelkerke"),4))
+rownames(Pseudo.r2) <- 'R-Squared'
+
+# Pretty print
+Pseudo.r2 %>%
+  kbl(caption = "Summary of Pseudo R-Squared values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Step 6: Check the assumption of linearity of independent variables
+We checked the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test and found it was not statistically significant so we are ok. Multicollinearity analysis showed that the tolerance and variance influence factor measures were not within acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008). As such we may have problems with collinearity.
+```{r check assumptiosn model 3}
+#Check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statsitically significant we are ok
+generalhoslem::logitgof(tbl_sperf_family_alc$Walc.p, fitted(logmodel3))
+
+#Collinearity
+vifmodel<-car::vif(logmodel3)#You can ignore the warning messages, GVIF^(1/(2*Df)) is the value of interest
+#Tolerance
+cbind(data.frame(VIF.Tolerance = 1/vifmodel),vifmodel) %>%
+  kbl(caption = "Multi colinearity Tolerance") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+### Reporting Multinominal Logistic Regression
+A Multinominal logistic regression model was built of student Alcohol consumption as predicted by student performance and absenteeism. Our outcome variable is the probability of a student have each of the alcohol consumption levels given their performance and absenteeism rates. Our reference outcome category was level 1, very low consumption. For our predictor we used student performance and absence level in Portuguese. The model was statistically significant (Pr(>Chisq) = .001 ) and explains between 6.93% and 7.31% of the variation in the output variable. The level of colinearity between predictors was outside the acceptable range however.
+
+
+```{r}
+stargazer(logmodel3, type="text")
+```
+

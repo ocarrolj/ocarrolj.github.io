@@ -1,0 +1,120 @@
+---
+title: "TU060 - Math 9102 – PSI - Portfolio - Analyse"
+author: "Joseph O'Carroll"
+date: "30/11/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 4/12/2020
+Objective: Analyse phase for repeated measures
+---
+
+# Repeated measures test for nominal variables.
+So far we have only looked at tests for independent groups, but as mentioned there is another test type for related samples and that is a repeated measures test. This is where we have the same grouping but we take two measurements, the first at time T1 and the second at time T2 where T2 > T1. If our data measurement level is at interval data and normally distributed then we can use paired samples t-test. If the data is not normally distributed or ordinal we will use a Wilcoxon test if our data is nominal with two groups we use McNemar's test, and lastly for multiple groups we use the Friedman Anova.
+
+McNemar's test is used to determine if there are differences on a binary dependent variable between two related groups. It can be considered to be similar to the paired-samples t-test, but for a binary nominal variable rather than a continuous scale variable. If we had more than two repeated measurements of the nominal variable, we could use Cochran's Q test.
+
+```{r Import Data Repeated Measures, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(cowplot)
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+tbl_sperf_all <- read.csv('sperformance-dataset.csv', header = TRUE)
+names(tbl_sperf_all)[1] <- 'School' # Fix issue with the name of first field.
+
+# Dateset 2 : Import sperformance-dataset variable description, created by me
+tbl_sperf_description_all <- read.csv('TU060_MATH9102_Student_variables_description.csv', header = TRUE)
+```
+
+## Repeated Measures Nominal difference using Chi-Square and McNemar
+
+As mentioned, students where asked twice about there engagement in after school activities with a time difference between each survey.
+
+> HA: There are differences between extra-curricular activities engagement for respondents between measurements.
+
+Using our student performance dataset we are going to investigate if there is a significant difference in extra-curricular activities engagement for students between measurements.
+We have one binary categorical variables, after school activity participation measured twice (activities.p, activities.m) . Due to how the demographic survey was administered there are two variables in the dataset capturing after school activity participation, one collected during Maths class and the other collected during the Portuguesse class at different times, as such it is valid for the same student to have different responses to the question and their circumstances may have changed between surveys. We will use the McNemar test to determine whether the proportion of participants who participated in after school activities (as opposed to those who did not) was different when comparing the first survey to the second survey result. This will provide supporting evidence to justify accepting omitting differences between survey responses for the this variable in our predictive model. As such our goal is to not find a significance result. An inspection of that data revealed that only 5 records contained difference response for the variable activities.p versus activities.m. As such we do not expect to find a significant result, but have included this test for the purposes of illustrating Repeated measures Nominal difference evaluation using Chi-Square and McNemar's test.
+
+
+## Step 1: Generate summary statistics
+
+```{r Summary stats and nominal repeated measures 1}
+
+############
+# PART: Generate summary statistics
+############
+
+# Create a subset dataframe with just the variables of interest.
+tbl_sactivity_diff <- tbl_sperf_all %>%
+  select(contains('activities'))
+# -------------- Create summary statistics --------------- #
+tbl_sactivity_diff_stats <- tbl_sactivity_diff %>%
+ summarytools::freq()
+
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sactivity_diff %>%
+  ggplot(aes(x = activities.m))
+gs <- gs + labs(x = 'After school engagement Maths class survey')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities.m"]] <- gs
+
+gs <- tbl_sactivity_diff %>%
+  ggplot(aes(x = activities.p))
+gs <- gs + labs(x = 'After school engagement Portuguese class survey')
+gs <- gs + geom_bar( colour = "black", aes(y = ..prop.., group =1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["activities.p"]] <- gs
+
+plot_grid(plotlist = plots,
+          labels   = "auto",
+          ncol = 2,
+          align = 'h', hjust = -1.0, vjust = 2, label_size=7
+)
+
+```
+## Step 2: Run McNemar's chi-squared test
+
+```{r McNemar, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: mcnemar = TRUE
+############
+
+# -------------- Conduct the Chi-Square with mcnemar = TRUE --------------- #
+#Use the Crosstable function
+#CrossTable(predictor, outcome, fisher = TRUE, chisq = TRUE, expected = TRUE, mcnemar = TRUE)
+gmodels::CrossTable(tbl_sactivity_diff$activities.m, tbl_sactivity_diff$activities.p, mcnemar = TRUE, expected = TRUE, sresid = TRUE, prop.chisq = FALSE, format = "SPSS")
+
+#more simplistic way of doing Chi-Square
+
+#Create your contingency table
+contingency_table <-xtabs(~activities.p+activities.m, data=tbl_sactivity_diff)
+
+ctest_test_result <-stats::mcnemar.test(contingency_table, correct=TRUE) #mcnemar
+#correct=TRUE to get Yates correction needed for 2x2 table
+
+# -------------- Calculate the effect Size --------------- #
+ctest_test_result$chi_effphi <- sjstats::phi(contingency_table)
+ctest_test_result$chi_effcramer <- sjstats::cramer(contingency_table)
+
+print.listof(ctest_test_result)
+
+
+```
+
+## Reporting the results with effect size
+
+A McNemar's chi-squared repeated measures test for difference (with Continuity Correction) indicated a no significant change in after school activity, χ2(1,n=382) = 0 , p = 1, phi = .97). As such we accept the null hypothesis and accept the reject the alternative hypotheses that there is a differential effect in after school activity engagement between repeated measures. The odds of attending after school activities where the same between measures for students.
