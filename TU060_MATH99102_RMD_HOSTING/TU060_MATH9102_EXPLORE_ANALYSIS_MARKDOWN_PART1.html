@@ -1881,14 +1881,17 @@ summary {
 <h1>Introduction:</h1>
 The purpose of this section is to address comprehensively all required concepts and demonstrate coherent understanding of the statistical analysis exploration phase, as covered during the TU060 MATH9102 Module. In the preparation phase we came up with a question that needed to be answered and generated a number of hypotheses that could be tested through statistical analysis. In this phase we will look to explore data that has already been collected and identify candidate variables for testing our hypotheses. The steps for hypotheses testing are:
 <p>
+</p>
 <ul>
 <li>Determine whether variables are related to one another.</li>
 <li>Investigate if differential effects exist for different groups.</li>
 <li>Provide statistical evidence that justifies the inclusion of these variables in a predictive model.</li>
 </ul>
 <p>
+</p>
 <p>The first step is to collect data to see whether our hypotheses are accurate. To do this, one or more variables need to be identified and appropriate statistical measurements need to be calculated, as set out in the following steps:</p>
 <p>
+</p>
 <ul>
 <li>Selection, with justification, of the appropriate variables to investigate the theory identified in the preparation phase.</li>
 <li>Description of statistical measures associated with variables under consideration.</li>
@@ -1896,6 +1899,7 @@ The purpose of this section is to address comprehensively all required concepts 
 <li>Interpretation of findings and generation appropriate conclusions.</li>
 </ul>
 <p>
+</p>
 <p><em>Note</em> This section will only look at determining whether variables are related to one another through correlation as a justification for inclusion in a predictive model. In the next section we will provide exploration and analyse to determine if differential effects exist for different groups and provide statistical evidence that justifies causal relationships.</p>
 <div id="import-dataset" class="section level3">
 <h3>Import dataset</h3>
@@ -2621,10 +2625,13 @@ pG3
 <h4>Assessing Portuguese and Maths final grade Distribution – Do they fit the normal distribution</h4>
 <p>To illustrate the concept of assessing normality we selected the grades for Portuguese and Maths form the sample dataset. The Normal Quantile Plot (Q-Q Plot) shows that most observations are lying on or around the reference line with more observations towards the middle and less towards either end. As such, the variables are not ideally normal as we have some outliers and gaps affecting the shape of our distribution.</p>
 <p>
+</p>
 <p>Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Skewness for pG2 is not within an acceptable range so we need to look into this further by exploring outliers: how many of them there are or whether we can transform it to become more normal.</p>
 <p>
+</p>
 <p>In terms of quantifying the proportion of the data that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. No variable exceeded our acceptable range for outside the 99.7% significance level. The variables mG2 and pG3 fell outside the 95% significance level but as our number of examples exceeds 80 we assume we can accept the 99.7 significance level. The pG2 variable is within our acceptable range, so we can assume the excess skewness is not an issue for accepting normality of this variable and pG3 was within our acceptance range for standardised skew.</p>
 <p>
+</p>
 <p>Based on this assessment, all performance variables can be treated as normally distributed once missing data outliers have been removed.</p>
 </div>
 </div>
@@ -2632,8 +2639,10 @@ pG3
 <h3>Step 2 Check for Linearity of Co Variance</h3>
 <p>Pearson Correlation requires there to be a linear relationship between the two variables, as Pearson uses the equation of a line to model the relationship. We validate this condition through inspection of a scatter plot, which should resemble a straight line rather than a curved line. For linearity we want the values to be evenly spaced around the line in a rectangular space. Below we have graphed the predictor/explanatory variable on the X axis and response/outcome variable on the Y axis.</p>
 <p>
+</p>
 <p>After cleaning the dataset for missing values, as explained above, the scatter plots were generated for each variable relationship we want to test. All of the scatterplots show a uniform distribution of values above and below the reference line with few outliers, and as such we can assume homoscedasticity. Based on this inspection, all grade relationships of interest can be treated as linear once missing data outliers have been removed.</p>
 <p>
+</p>
 <pre class="r"><code>############
 # PART: Visualisation
 ############

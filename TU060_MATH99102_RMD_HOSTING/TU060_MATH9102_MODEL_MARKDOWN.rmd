@@ -1,19 +1,19 @@
 ---
 title: "TU060 - Math 9102 – PSI - Portfolio - Model"
 author: "Joseph O'Carroll"
-date: "04/12/2020"
+date: "20/12/2020"
 output:
   html_document:
     df_print: paged
 Student Number: C03001130
 Created by: Joseph O'Carroll
 Created on: 04/12/2020
-Objective: Analyse phase for statistical Modelling
+Objective: Modeling phase for statistical Modelling
 ---
 
 ```{r global-options, include=FALSE}
 # https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
-knitr::opts_chunk$set(fig.width = 10, fig.height = 6, fig.path = 'Figs/', echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6, echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -44,55 +44,16 @@ needed_packages <- c("tidyverse",
 not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
 # Install not installed packages
 if (length(not_installed)) { install.packages(not_installed) }
-library(tidyverse)
-library(readxl)
-library(ggplot2)
-library(data.table)
-library(knitr)
-library(kableExtra)
-library(psych) ## added for quick stat descriptions
-library(cowplot) ## added for quick stat descriptions
-library(Hmisc)
-library(summarytools)
-library(corrplot) ## correlation plots
-library(FSA)
-library(car) ##Levenes test
-library(VIM) ## missing data assessment
-library(stargazer) ## Regression output
-```
-
-# Introduction:
-
-Before we can build a model using a predictor we need strong statistical as well as theoretical support. If we're saying as part of our hypothesis that there is a relationship between two concepts, then we need to establish a) if the relationship is statistically likely to exist, and b) how strong that relationship is. We do this that with correlation testing. If as part of our hypothesis we are saying that a given concept is experienced differently for different groups in our population, then we would have to establish how much evidence we have to say that there is a difference in the experience of this concept for the different groups. We do this through different tests. Exploring, gathering and analysing the supporting statistical evidence for the inclusion of predictor variables in predictive models was the propose of the explore and analyse phase. The purpose of this phase is to actual build and execute the predictive models having already established justification for the selection of predictor variables and hypothesis.
-<p>
-
----
-title: "TU060 - Math 9102 – PSI - Portfolio - Model"
-author: "Joseph O'Carroll"
-date: "04/12/2020"
-output:
-  html_document:
-    df_print: paged
-Student Number: C03001130
-Created by: Joseph O'Carroll
-Created on: 04/12/2020
-Objective: Analyse phase for statistical Modelling - Simple Linear Regression
----
-
-
-# Linear Regression
-Linear regression, at its most fundamental, is a hypothetical model between two variables and we use the equation of a line as our model equation. We model units of change in our outcome variable, and the goal is to determine how much each unit of change in one predictor contributes to units of change to in the outcome. Our assumption is that we will have a uniform pattern when we're looking at the average change.
-
-We will then quantify how good our model is by comparing our linear model to the mean and see how much extra explanation of the variance in the response variable we get. To do this we square the difference in each point of our observed data to the mean and sum the result to get the total sum of squares as a measure of variability between the scores and the mean (SSt). We also get the total sum of squares from the observed data to the model of a line as a measure of variability between the scores and the regression mode (SSr). The difference between the two is how much variability is accounted for by the model. Running an analysis of variance (ANOVA) produces F-statistic, which is a ratio value. This compares the amount of systematic variance in the data to the amount of unsystematic variance. In other words it compares what we see to what we expect for a distribution with the same degrees of freedom. Through a comparison to standard F-distribution we can determine if our model produces a statistically significant result.
-
-
-
-## Simple Linear Regression of student performance
-To illustrate this methodology we will make use of the student performance data set to build a model to predict final student grade on the basis of initial assessment.
-
-> HA: Students who perform well as part of initial assessment in subjects will perform better overall.
-
-```{r Import Data Simple Linear Regression, echo=FALSE, include=FALSE}
+library(semTools)
+library(Epi)#ROC Curve
+library(DescTools)#Pseudo Rsquare statistics
+library(stargazer)
+library(foreign)#read SPSS file.
+library(arm)#for invlogit calculating predicted probabilities
+library(lmtest)#Simple calculation of Chi-square for model
+library(car)#Needed to test for colinearity of predictors
+library(generalhoslem)#Needed to test assumption of linearity
+library("regclass")#For confusion matrix
 library(tidyverse)
 library(readxl)
 library(ggplot2)
@@ -103,6 +64,42 @@ library(cowplot)
 library(stats)
 library(car) ##Levenes test
 library(stargazer)
+library(summarytools)
+library(nnet)#
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(knitr)
+library(kableExtra)
+library(psych) ## added for quick stat descriptions
+library(cowplot) ## added for quick stat descriptions
+library(Hmisc)
+library(summarytools)
+library(stats)
+library(car) ##Levenes test
+library(stargazer)
+
+```
+
+# Introduction:
+
+Before we can build a model using a predictor we need strong statistical as well as theoretical support. If we assert as part of our hypothesis that there is a relationship between two concepts, then we need to establish a) if the relationship is statistically likely to exist, and b) how strong that relationship is. We do this using correlation testing. If as part of our hypothesis we are saying that a given concept is experienced differently for different groups in our population, then we would have to establish statistical evidence to say that there is a difference in the experience of this concept for the different groups. We do this using different tests. Exploring, gathering and analysing the supporting statistical evidence for the inclusion of predictor variables in predictive models was the purpose of the explore and analyse phase. The purpose of this phase is to build and execute the predictive models, having already established justification for the selection of predictor variables and the hypothesis.
+<p></p>
+
+
+# Linear Regression
+Linear regression, at its most fundamental, is a hypothetical model between two variables, using the equation of a line as our model equation. We model units of change in our outcome variable, and attempt to determine how much each unit of change in one predictor contributes to that change. Our assumption is that we will have a uniform pattern when we’re looking at the average change.
+<p></p>
+We can quantify how good our model is by comparing our linear model to the most basic reference model (the mean) to see how much extra explanation of the variance in the outcome variable we get. To do this, we square the difference in each point of our observed data to the mean and sum the result to get the total sum of squares as a measure of variability between the scores and the mean (SSt). We also get the total sum of squares from the observed data to the model of a line as a measure of variability between the scores and the regression mode (SSr). The difference between the two is how much variability is accounted for by the model. Running an analysis of variance (ANOVA) produces an F-statistic, which is a ratio value. This compares the amount of systematic variance in the data to the amount of unsystematic variance. In other words it compares what we see to what we expect for a distribution with the same degrees of freedom. Through a comparison to standard F-distribution we can determine if our model produces a statistically significant result.
+
+
+## Simple Linear Regression of student performance
+To illustrate this methodology we will make use of the student performance data set to build a model to predict final student grade on the basis of initial assessment.
+
+> HA: Students who perform well as part of initial assessment in subjects will perform better overall.
+
+```{r Import Data Simple Linear Regression, echo=FALSE, include=FALSE}
 ############
 # PART: Import data
 ############
@@ -118,8 +115,8 @@ tbl_sperf_sex_diff <- tbl_sperf_all %>%
   select(contains('mG'), contains('pG'), sex, Medu) %>%
   filter(mG1 != 0, mG2 != 0, mG3 != 0, pG1 != 0, pG2 != 0, pG3 != 0) # Filtering records with missing data.
 ```
-### Step 1: Investigate normality
-Because simple linear regression is based on the equation for a line, our first step would be a test for normality of our continuous scale data. As part of the exploration phase we established that all performance variables in the dataset can be assumed to be approximately normally distributed, and this analysis is not repeated here. The summary stats included for convenience of reporting.
+### Step 1: Investigate Normality
+Because simple linear regression is based on the equation for a line, our first step would be a test for normality of our continuous scale data. As part of the exploration phase we established that all performance variables in the dataset can be assumed to be approximately normally distributed, and this analysis is not repeated here. The summary stats are included for convenience of reporting.
 
 ```{r Linear Model Check for Normality of the variables cleaned, echo = FALSE}
 ############
@@ -172,10 +169,10 @@ tbl_sperf_numerical_stats_2 %>%
 ```
 
 ### Step 2: Investigate relationship between predictor and response variable.
-As part of the exploration phase we established through Peason Correlation that there was a strong, statistically significant (P < .001), positive relationship between Initial grade in a subject and final grade in that subject. We also established same for intermediate grade and final grade. This analysis is not repeated here.
+As part of the exploration phase, we established through Peason Correlation that there was a strong, statistically significant (P < .001), and positive relationship between Initial grade in a subject and final grade in that subject. We also established the same for intermediate grade and final grade. This analysis is not repeated here.
 
 ### Step 3: Run Simple Linear Regression
-Given the assumptions of normality and that a strong positive relationship exists it is safe to use the students performance dataset to illutrate the Simply Linear regression predictive modelling technique.
+Given the assumptions of normality and that a strong positive relationship exists it is safe to use the students performance dataset to illustrate the Simple Linear regression predictive modelling technique.
 
 *Note:* This is equivalent to doing a Pearson correlation again and is included for illustration
 
@@ -183,34 +180,28 @@ Given the assumptions of normality and that a strong positive relationship exist
 ############
 # PART: Linear Regression
 ############
-
-
 # -------------- Linear Regression Math Grade 1 as a predictor for Math Grade 3 --------------- #
 reg_result_model_lm <-lm(tbl_sperf_numerical_measurements$mG3~tbl_sperf_numerical_measurements$mG1)
-
 
 # -------------- Determine how good our model is versus using the mean --------------- #
 anova(reg_result_model_lm) ## Get sums of squares of variability
 summary(reg_result_model_lm)
-# lm.beta::lm.beta(reg_result_model_lm) Not needed as units are the same
+# lm.beta::lm.beta(reg_result_model_lm) Not needed as units are the same for predictor and outcome
 stargazer(reg_result_model_lm, type="text")
-
-#print.listof(reg_result_model_lm)
-
 
 ```
 ### Report Simple Linear Regression
-The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) was modelled using a simple linear model.  A strong positive correlation was found (R2 =-.802, n=337, p<.01). This matches our early results from Pearson Correlation. Our AVONA test to evaluate goodness of fit found a statistically significant result (p < 0.001). The model has an R-squared value of .802, indicating that initial grade contributes 80% to final grade in the population. For every 1 unit change in the initial grade in maths, it contributes 0.901 units of change to the final student grade in the population. Therefore there is good justification for using regression to look at prediction. This analysis supports the use of simple linear regression as a model to predict student final performance on the basis of initial grade.
+The relationship between initial grade in Maths (mG1, taken from school reports) and final Maths grade (mG3, taken from school reports) was modelled using a simple linear model. A strong positive correlation was found (R2 =-.802, n=337, p<.01). This matches our early results from Pearson Correlation. Our AVONA test to evaluate goodness of fit found a statistically significant result (p < 0.001). The model has an R-squared value of .802, indicating that initial grade contributes 80% to final grade in the population. For every 1 unit change in the initial grade in maths, it contributes 0.901 units of change to the final student grade in the population. Therefore there is good justification for using regression to look at prediction. This analysis supports the use of simple linear regression as a model to predict student final performance on the basis of initial grade.
 
 ## Multiple Linear Regression of student performance
-Simple linear Regression is a model to predict the value of one variable from another. Multiple Regression is a natural extension of this model and is used to predict an outcome variable using multiple predictor variables, each of which contributes partially to the outcome. It is a hypothetical model of the relationship between several variables. What we are looking to determine is how much collectively does the set of predictors contribute to the outcome variable on average and then also how much do individual predictors contribute on average. When we use categorical variables as predictors, effectively what we are looking for is a differential effect in the outcomes variable as a result of being in one category or another.
+Simple linear Regression is a model to predict the value of one variable from another. Multiple Regression is a natural extension of this model and is used to predict an outcome variable using multiple predictor variables, each of which contributes partially to the outcome. We are looking to determine how much collectively does the set of predictors contribute to the outcome variable on average and additionally, how much do each of the individual predictors contribute on average. When we use categorical variables as predictors, effectively what we are looking for is a differential effect in the outcomes variable as a result of being in one category or another.
 
 > HA: Students who perform well as part of initial assessment in subjects will perform better overall and there is a different between male and female students
 
 For our predictors we will use initial grade and whether a student is male or female.
 
 ### Step 1: Investigate differential effects
-We have already as part of explore and analysis phase established there is a differential effect between male and female students for performance. That analysis is not repeated here but we can assume the variables of interest meet the criteria for Multiple linear Regression.
+We have already as part of the explore and analysis phase established there is a differential effect between male and female students for performance. That analysis is not repeated here but we can assume the variables of interest meet the criteria for Multiple linear Regression..
 
 ### Step 2: Run Simple Linear Regression
 Given the assumptions of normality and that a strong positive relationship exists it is safe to use the students performance dataset to illustrate the Simply Linear regression predictive modeling technique.
@@ -235,30 +226,23 @@ stargazer(reg_result_model_lm, reg_result_model_multiple_lm, type="text")
 
 ```
 ### Report Multiple Linear Regression
-The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) for male and female students was modelled using a multiple linear model.here was a statistically significant difference at the p < .001 level in Maths final grade scores for male and female students: (F(2, 337)= 1,364.78, p<0.001. When we take into account the overall contribution from the initial Maths grade a statistically significant result was not found for sex as a predictor. There is a no change in the contribution of maths initial grade to maths final grade outcome compared to the simple linear model which did not account for sex. Our model is still explaining 80% of the variation on average in the outcome variable, the same as the simple linear model.
+The relationship between initial grade in Maths (mG1 taken from school reports) and final Maths grade (mG3 taken from school reports) for male and female students was modelled using a multiple linear model. There was a statistically significant difference at the p < .001 level in Maths final grade scores for male and female students: (F(2, 337)= 1,364.78, p<0.001). When we take into account the overall contribution from the initial Maths grade a statistically significant result was not found for sex as a predictor. There is a no change in the contribution of maths initial grade to maths final grade outcome compared to the simple linear model which did not account for sex. Our model is still explaining 80% of the variation on average in the outcome variable, the same as the simple linear model.
+<p></p>
 
-This result of the multiple linear regression above raises the question of interaction effects. If student is getting a differential effect for final maths grade based on sex, was that student also experiencing a differential effect for the initial grade? The concept here is that there is some relationship between predictors which needs to be accounted for in our model, and we use interaction terms to do so.
+This result of the multiple linear regression raises the question of interaction effects. If a student is getting a differential effect for final maths grade based on sex, was that student also experiencing a differential effect for the initial grade? The concept here is that there is some relationship between predictors which needs to be accounted for in our model, and we use interaction terms to do so.
 
----
-title: "TU060 - Math 9102 – PSI - Portfolio - Model"
-author: "Joseph O'Carroll"
-date: "04/12/2020"
-output:
-  html_document:
-    df_print: paged
-Student Number: C03001130
-Created by: Joseph O'Carroll
-Created on: 04/12/2020
-Objective: Analyse phase for statistical Modelling - Linear Regression - Interactive terms.
----
 
 # Dummy variables and Interaction Effects - Categorical Predictive Variables
-Many variables we are interested in using as predictors are categorical. In the above example we used a categorical variable (sex) as a predictor but did not explain it's treatment. Because categorical variables have no scale it makes no sense to think of the effect of a unit of increase in these as it would for a continuous variable. What we want to see is if there is a different in outcome for a record belonging to one category versus another and also how much of the variantion in the outcome can be explained by belonging to a category. To do this we transform the categorical variable into a series of dummy variables which indicate whether a particular record has a specific characteristic represented by the dummy variable. Dummy variables also be referred to as indicator variables or switches. When we include a dummy variable in our model we get interception point for the model and a different best fit equation. In this way we can have different predictive models for different groups. For dummy variables we recode to 0 (reference/baseline category) and 1 (category of interest). We must have previously shown a dummy variable has a differential effect on the outcome variable through difference testing in order to include it in our predictive model.
+Many variables we are interested in using as predictors are categorical. In the above example we used a categorical variable (sex) as a predictor but did not explain it’s treatment. Because categorical variables have no scale, it makes no sense to think of the effect of a unit of increase in these as it would for a continuous variable. What we want to see is if there is a difference in outcome for a record belonging to one category versus another and how much of the variation in the outcome can be explained by belonging to a category. To do this, we transform the categorical variable into a series of dummy variables which indicate whether a particular record has a specific characteristic represented by the dummy variable. Dummy variables are also referred to as indicator variables or switches.
+<p></p>
 
-Models built with dummy variables assumes that the gap between groups is constant but we may may find there is an interception point for the models representing each group. For example in our example set we might find that on average male students are better during initial assessment but the trend narrows or even reverses for the final grade. To capture this effect in our predictive model we use interaction terms which change the slop or gradient of our model. We generate interaction terms by multiplying our dummy category variable by our continuous scale variable and adding this term or our model. Our predictive model should include both the dummy variable and interactive term.
+When we include a dummy variable in our model we get a new interception point with the Y axis and a new line of best fit for the model.. In this way we can have different predictive models for different groups. For dummy variables, we recode each category variable to 0 (reference/baseline category) and 1 (category of interest). We must have previously shown a dummy variable has a differential effect on the outcome variable through difference testing in order to include it in our predictive model.
+<p></p>
+
+Models built with dummy variables assume that the gap between groups (lines of best fit)  is constant, but we may find there is an intersection point for the lines representing each group in our model. For example, in our data set we might find that on average male students are better during initial assessment, but the trend narrows or even reverses for the final grade. To capture this effect in our predictive model we use interaction terms which change the slope of our model. We generate interaction terms by multiplying our dummy category variable by our continuous scale predictor variable and adding this term to our model. Our predictive model should include both the dummy variable and interaction term.
 
 ## Illustrative example of Interaction affects
-Using our student performance dataset we will illustrate interaction affects by building progressively more complex examples.
+Using our student performance dataset we will illustrate interaction effects by building progressively more complex examples.
 
 ```{r Multipsle Regression 2 - Interactive terms, warning = FALSE, echo=TRUE, include=TRUE}
 ############
@@ -275,8 +259,8 @@ tbl_sperf_sex_diff$medu_3 <- as.integer(tbl_sperf_sex_diff$Medu == 3)
 tbl_sperf_sex_diff$medu_4 <- as.integer(tbl_sperf_sex_diff$Medu == 4)
 ## Stats
 tbl_sperf_sex_diff_stats <- tbl_sperf_sex_diff %>% psych::describe(omit = TRUE)
-
 ```
+
 ### First Model mG3 predicted by mG1
 Our first model is a simple linear regression of final Math grade predicted by initial Math grade.
 ```{r int_model_1, warning = FALSE, echo=TRUE, include=TRUE}
@@ -290,7 +274,6 @@ model1<-lm(tbl_sperf_sex_diff$mG3~tbl_sperf_sex_diff$mG1)
 stargazer::stargazer(model1, type="text") #Tidy output of all the required stats
 ```
 
-
 ```{r model1 visualisation,echo=TRUE, include=TRUE}
 #------------ First Model: mG3 predicted by mG1 -----------#
 equation1 <- function(x){coef(model1)[2]*x+coef(model1)[1]}
@@ -299,7 +282,7 @@ ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color=sex))+geom_point()+
 ```
 
 ### Second Model mG3 predicted by mG1 using sex as a switch
-Our second model is a multi variable linear regression of with final Math grade predicted by initial Math grade and student sex. We transform sex into a dummy/switch variable, male will be treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Furthermore we no longer assume contant performance difference between male and female students. We use an interaction terms which change the gradient of our model for female students. 
+Our second model is a multi variable linear regression of with final Math grade predicted by initial Math grade and student sex. We transform sex into a dummy/switch variable where male will be treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, females a value of 1. Furthermore, we no longer assume constant performance differences between male and female students. We use interaction terms which change the gradient of our model for female students.
 
 ```{r int_model_2, warning = FALSE, echo=TRUE, include=TRUE}
 #------------ Second Model: mG3 predicted by mG1 using sex as a dummy variable -----------#
@@ -321,7 +304,7 @@ ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color=sex))+geom_point()+
 ```
 
 ### Third Model mG3 predicted by mG1 using sex as an interaction term
-Our third model is a multi variable linear regression of with final Math grade predicted by initial Math grade and student sex. We transform sex into a interactive variable, male will be treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Both the switch and the interaction variable are included because the switch variable determines the inception point of the model with the Y axis (the starting point).  
+Our third model is a multi variable linear regression of final Math grade predicted by initial Math grade and student sex. We transform sex into a interactive variable, where male will be treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Both the switch and the interaction variable are included because the switch variable determines the inception point of the model with the Y axis (the starting point).
 
 ```{r int_model_3, warning = FALSE, echo=TRUE, include=TRUE}
 #------------ Third Model: mG3 predicted by mG1 using sex as an interaction variable -----------#
@@ -345,7 +328,7 @@ ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color=sex))+geom_point()+
 ```
 
 ### Double checking association
-To confirm we hadn't made an error, we reconfirmed our understanding of the associations for the variables. This is not strictly required but included for convience. 
+To confirm we hadn’t made an error, we reconfirmed our understanding of the associations for the variables. This is not strictly required but included for convenience.
 
 #### Look at zero order correlations
 
@@ -376,13 +359,13 @@ print(test_result)
 print(test_result[["effcd"]])
 ```
 ### Reporting Switchs and Interactive effects for variable; sex
-The interaction affects between initial grade in Maths (mG1 taken from school reports) and sex was modeled using a multiple linear model. Being female was not found to be a statistically significant ( P = 0.580 ) predictor of final performance. The interaction effect of being female and initial grade was also not found to be significant (P = 0.05). We saw how the inclusion of the switches or dummy variables had the consequence of giving us two lines of best fit (one for male and one for female students) that have differing intercepts. We also how how the inclusion of interactive variables gave us a slightly different gradient. 
+The interaction affects between initial grade in Maths (mG1 taken from school reports) and sex was modeled using a multiple linear model. Being female was not found to be a statistically significant ( P = 0.580 ) predictor of final performance. The interaction effect of being female and initial grade was also not found to be significant (P = 0.05). We saw how the inclusion of the switches or dummy variables had the consequence of giving us two lines of best fit (one for male and one for female students) that have differing intercept points. We also saw how the inclusion of interactive variables gave us a slightly different gradient.
 
 ## Linear Regression with Interaction effects and more than two categories
-From our explore and analysis phase we established an association for mother’s education (Medu) and student performance and we found the strongest association for students with mothers who obtained the highest level of education.
+From our explore and analysis phase we established there is a relationship between mother’s education (Medu) and student performance, with the strongest relationship found for students with mothers who obtained the highest level of education. Medu differs from sex, in that it is a variable that can take more than two values.
 
 ### Fourth Model mG3 predicted by mG1 using sex as an interaction term
-Our forth model is a multi variable linear regression with final Math grade predicted by initial Math grade, student sex and mother's educational achievement. We transform sex into a interactive variable, male was treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, girl a value of 1. Mothers education have five possible values and this is transformed into 4 switching variables. The lowest educational level (Medu = 0) is taken as the reference category. 
+Our forth model is a multi variable linear regression with final Math grade predicted by initial Math grade, student sex and mother’s educational achievement. We transform sex into a interactive variable, where male was treated as the reference category/baseline and female will be treated as the category of interest. This means in our model male will be given the value of 0, females a value of 1. Mothers' education has five possible values and this is transformed into 4 switching variables. The lowest educational level (Medu = 0) is taken as the reference category.
 
 
 ```{r int_model_4, warning = FALSE, echo=TRUE, include=TRUE}
@@ -415,22 +398,25 @@ ggplot(tbl_sperf_sex_diff,aes(y=mG3,x=mG1,color= tbl_sperf_sex_diff$medu_4==1))+
 
 ### Report Interactive effects for Medu and Sex
 
-A Multiple linear predictive model of final maths grade was built using initial grade in Maths (mG1 taken from school reports), sex and Mothers education. When we take into account the overall contribution from the initial Maths grade a statistically significant result was not found for sex nor mothers education as predictors. We saw how the inclusion of the Mother education switch term had the consequence of giving us two lines of best fit (one for female students with mothers who have higher education and one for female students who didn't) that have differing intercepts as well as differing gradients or slopes. The above analysis supports not including Mothers education in a predictive set with initial grade.
+A multiple linear predictive model of final maths grade was built using initial grade in Maths (mG1 taken from school reports), sex and mothers education. When we take into account the overall contribution from the initial Maths grade, a statistically significant result was not found for sex nor mothers education as predictors. We saw how the inclusion of the mother’s education switch term had the consequence of giving us two lines of best fit (one for female students with mothers who have higher education and one for female students who didn’t) that have different intercepts as well as different slopes. The above analysis supports not including Mothers education in a predictive set with initial grade.
 
-## Assumptions for Linear Regression
-There are a number of assumptions unpinning the usage of the Linear model for regression. For every one unit of change in the independent variable there will be a consistent and uniform change in the dependent variable. This allows us to use the equation of a ling to model the association between predictor variables and outcome variables. Before we build our model we need to validate our assumptions regarding associations. If we are asserting a relationship we need to investigate if there is any evidence of a relationship using correlation and make a decision based on the results (strength, direction etc). If we are asserting a differential effect for different groups. We need to investigate if there is any difference using either the appropriate test and make a decision based on the result
+## Generalisation of Linear Regression Model
 
-Using linear regression as a predictive model requires that a straight line to be a good model. How well a straight line serves as a model is determined by the residuals.
- We want the residuals to follow the a normal distribution because that minimizes the opportunity for error to emerge just because the data is skewed. We want constant error variance because non constant would pull our outcome in particular directions and increase our changes of a type 1 error. An outlier is considered anything that's particularly large. A leverage point is something that's far away from the mean. And anything that's considered an influential observation is something that changes the slope of the line. If we have a particularly large value, this will be in our data as an outlier, it is likely that we'll have a particularly large residual in our regression model. And then it will pull the data in a particular direction, and therefore it will pull the prediction in a particular direction.
+To generalise our model to the population there are a number of assumptions unpinning linear regression that must be validated. For every one unit of change in the independent variable there will be a consistent and uniform change in the dependent variable. This allows us to use the equation of a line to model the association between predictor variables and outcome variables. Before we build our model we need to validate our assumptions regarding associations. If we are asserting a relationship we need to investigate if there is any evidence of a relationship using correlation and make a decision based on the results (strength, direction etc). If we are asserting a differential effect for different groups. We need to investigate if there is any difference using either the appropriate test and make a decision based on the result.
+<p></p>
+
+Using linear regression as a predictive model requires that a straight line be a good representative model of the underlying relationship. How well a straight line serves as a model is determined by the residuals. We want the residuals to follow a normal distribution that minimizes the opportunity for error to emerge just because the data is skewed. We want constant error variance because non constant variance would pull our outcome in particular directions and increase our chances of a type 1 error. An outlier is considered any observation that’s particularly large or small. A leverage point is something that’s far away from the average and changes the gradient of the line of best fit. And anything that’s considered an influential observation is something that changes the slope of the line. If we have a particularly large value, this will be in our data as an outlier, it is likely that we’ll have a particularly large residual in our regression model. And then it will pull the data in a particular direction, and therefore it will pull the prediction in a particular direction.
 
 ### Step 1: Determine our outliers in terms of residuals
-The first thing we need to do is identify our outliers in terms of our residuals. It maybe okay for us to delete those outliers. If we find outliers that are particularly significant, we can choose to delete them and we will repeat the regression without those cases included. The danger here is that something that wasn't an outlier may become an outlier, it may be that we have to retain it because it's a particularly important case in our data set. It's a good idea to do a robustness test and run your data analysis twice to determine how susceptible our model is to your assumptions. To do this we run the regression data analysis twice, once with and once without the outliers. This risk here is bias, so an increased possibility of type one error due to a reduction in power.
+Step 1: Determining our outliers in terms of residuals
+The first thing we need to do is identify our outliers in terms of our residuals. If we find outliers that are particularly significant, it may be acceptable to delete them and repeat the regression without those cases included. The danger if we simply remove cases is that remaining cases that where not outliers may become outliers. It may be that we have to retain it because it’s a particularly important case in our data set. It is a good idea to perform a robustness test and run the data analysis twice to determine how susceptible the model is to assumptions regarding outliers. To do this we run the regression data analysis twice, once with and once without the outliers.
+<p></p>
+Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Residuals for model 1: mG1 as a predictor of mG3, are within an acceptable range. We further investigated by exploring outliers: how many of them there are or whether we can transform the problematic variable  to become more normal.
+<p></p>
+In terms of quantifying the proportion of the residual that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. No variable exceeded our acceptable range for the 95% significance level. Based on this assessment, residual skewness due to outliers is not an issue and residuals can be treated as normally distributed.
+<p></p>
+An analysis of standard residuals was carried out, showing that the data contained no additional outliers once zero scores had been removed. (Std. Residual Min = -3.61, Std. Residual Max = 3.59).
 
-Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Residuals for model 1: mG1 as a predictor of mG3, are within an acceptable range so. We looked into this further by exploring outliers: how many of them there are or whether we can transform it to become more normal.
-
-In terms of quantifying the proportion of the residual that is not normal, we generated standardised z scores for the variable and calculated the percentage of the standardised scores that are outside an acceptable range. No variable exceeded our acceptable range for outside the 95% significance level. Based on this assessment, residual skewness due to outliers is not an issue and residuals can be treated as normally distributed.
-
-An analysis of standard residuals was carried out, which showed that the data contained no additional outliers once zero scores had been removed. (Std. Residual Min = -3.61, Std. Residual Max = 3.59).”
 
 
 ```{r MLR Assess Linearity, warning = FALSE, echo=TRUE, include=TRUE}
@@ -527,10 +513,12 @@ car::leveragePlots(model2) # leverage plots
 
 ```
 
-### Step 2: Check residuals for Constant Variation or error (Homoscedasticity)
-Sometimes we get called heteroscedasticity in terms of error variance. This is when we see a different variation as one level of value compared to at a higher level values for the outcome. In a well-fitting regression model the variation around the line is constant along the line (Homoscedasticity). If we have heteroscedasticity, it's not okay to use multiple linear regression, even if there is strong coefficients and statistical significance, because that introduces the possibility of a type one error as well.
+### Step 2: Check residuals for Constant Variation of error (Homoscedasticity)
+Sometimes our residuals can display heteroscedasticity in terms of error variance. This is when we see a different variation of error from some variables values at a higher level when compared to the lower level values. In a well-fitting regression model the error variation around the reference line is constant (Homoscedasticity). If we detect heteroscedasticity, multiple linear regression is not an acceptable predictive model, even if there are large and statistically significant coefficients, because of the possibility of a type one error.
 
+<p></p>
 The data also met the assumption of non-zero variances (Initial Maths grade Variance = 10.49,, sex=0.25)
+
 
 ```{r, echo=TRUE, include=TRUE}
 plot(model2, 1)
@@ -547,9 +535,10 @@ var_sex <- var(as.numeric(tbl_sperf_sex_diff$sex=='M', rm.na = TRUE)) %>% round(
 
 
 ### Step 3: Check for Collinearity
-Occurs when two or more independent variables contain strongly redundant information. If variables are collinear then it means there is not enough distinct information in these variables for MLR to operate and they are essentially measuring the same thing. The problem is that this concept could end up over represented in our model. A correlation coefficient above 0.8 suggests collinearity might be present. If it is we need to analyse your variables in separate regression equations and then examine how they operate together
-
+Collinearity occurs when two or more independent variables contain redundant information. If variables are collinear then it means there is not enough distinct information in these variables for MLR to operate and they are essentially measuring the same thing. The problem is that this concept could end up over represented in our model. A correlation coefficient above 0.8 suggests collinearity may be present. If it is, we need to analyse the variables in separate regression equations and then examine how they operate together.
+<p></p>
 Tests to see if the model 2 met the assumption of collinearity indicated that multicollinearity was not a concern (Sex, Tolerance = .98, VIF = 1.02; Initial Maths grade, Tolerance = 0.98, VIF = 102.)
+
 
 
 ```{r, echo=TRUE, include=TRUE}
@@ -560,18 +549,453 @@ vifmodel
 1/vifmodel
 ```
 ### Step 4: Check for Causality
-To assert causality we need to assume association, time order and non spuriousness. Statistical methods can justify association assumptions of association but not time order, that depends on our conceptual framework. We control for spuriousness by introducing controlling measures into our predictive model.
+To assert causality we need to assume association, time order and non spuriousness. Statistical methods can justify association assumptions but not time order; that depends on our conceptual framework. We control for spuriousness by introducing controlling measures into our predictive model.
 
 ## Reporting MLR - Model 2
-For expedience I've only reported on model 2. A multiple regression analysis was conducted to determine if a student's score for maths final grade and sex could predict a student’s final academic achievement.
-<p>
+For expedience, I have only reported on model 2. A multiple regression analysis was conducted to determine if a student’s score for initial maths grade and sex could predict a student’s final academic achievement.
+ <p></p>
 In order to include the sex in the regression model it was recorded into a single dummy variable (0 for male, 1 for female).
-<p>
+<p></p>
 Examination of the histogram, normal P-P plot of standardised residuals and the scatterplot of the dependent variable, initial maths grade, and standardised residuals showed that the some outliers existed even after removing the zero score records we deemed invalid earlier. However, examination of the standardised residuals showed that none could be considered to have undue influence (95% within limits of -1.96 to plus 1.96 and none with Cook’s distance >1 as outlined in Field (2013).
-<p>
+<p></p>
 Examination for multicollinearity showed that the tolerance and variance influence factor measures were within acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008). The scatterplot of standardised residuals showed that the data met the assumptions of homogeneity of variance and linearity. The data also meets the assumption of non-zero variances of the predictors.
 
 
+# Logistic Regression
+In linear regression, our outcome variable is continuous and is predicted from one or more continuous or categorical predictor variables. If the outcomes we are interested in are categorical in nature, we cannot use linear regression as there is no linear relationship between predictor and outcomes variables. To predict categorical outcomes, we use logistic regression. If the outcome variable has exactly two values, for example predicting pass or fail for a student, we use a binary logistic regression. When the outcome has more than two categories, we use a multi-nominal logistic regression. The output from a logistic regression is not an estimated value but rather a probability that the given input belongs to a certain category or not. Because we’re looking at probability, we choose one category as the category of interest. The event we’re interested in is the event where that category occurs. The reference event is when the event of interest doesn’t occur and we are interested in the probability of the event of interest occurring versus the probability of it not occurring.
+
+## Binary Logistic Regression
+To illustrate this methodology we will make use of the student performance data set to build a model to predict if students sat the final maths examination, using gender as the predictor.
 
 
+> HA: Gender is a factor in determining if a student will sit the final maths examination
+
+Our outcome variable is the probability that they did not sit the exam. As such we give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used Sex, which takes the value Male or Female.
+<p></p>
+
+Note: We’re building a model with one predictor to illustrate our understanding of how logistic regression works. The starting point is a simple logistic regression, which we will build upon. We gain no new insights from this over and above a difference test.
+
+
+```{r}
+############
+# PART: Add new binary category sat maths yes or no
+############
+
+tbl_sperf_sex_medu_diff <- tbl_sperf_all %>%
+  select(contains('mG'), sex, Medu,Fedu)
+
+tbl_sperf_sex_medu_diff$sat_maths <-  as.integer((tbl_sperf_sex_medu_diff$mG3 != 0)) ## Zero to the no category
+tbl_sperf_sex_medu_diff$pedu_paired <- ' Neither parent with a level 5 qualification'
+tbl_sperf_sex_medu_diff[tbl_sperf_sex_medu_diff$Medu == 3 | tbl_sperf_sex_medu_diff$Fedu ==3 ,'pedu_paired'] <- ' At least one parent with a level 5 qualification'
+tbl_sperf_sex_medu_diff[tbl_sperf_sex_medu_diff$Medu == 4 | tbl_sperf_sex_medu_diff$Fedu ==4 ,'pedu_paired'] <- ' At least one parent with a higer degree'
+```
+
+
+### Step 1: Run Simple Logistic Regression
+
+```{r buildmodel1}
+############
+# PART: Run Simple Logistic Regression
+############
+#Make sure categorical data is used as factors
+#-------------------- Build Model ------------------#
+logmodel1 <- glm(tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex , data = tbl_sperf_sex_medu_diff, na.action = na.exclude, family = binomial(link=logit))
+
+#Full summary of the model
+summary(logmodel1)
+
+#Chi-square plus significance
+lmtest::lrtest(logmodel1)
+
+```
+
+The Pr(>|z|) column shows the two-tailed p-values testing the null hypothesis that the coefficient is equal to zero (i.e. no significant effect). The usual cut-off value is 0.05. From this model it appears that sex does not have a significant effect on the log-odds ratio of the outcome variable, weather or not a student sat the final maths exam. The estimate column shows how much of a contribution or predictor makes to the outcomes. The results indicated that when sex is male the expected change in the log odds is .3221 an increase in comparison of being female, however the result is not statistically significant (p = 0.328).
+
+### Step 2: Calculate odds ratio and probability
+
+To calculate the odds ratio, which is an indication of the change in odds result from a unit change in the predictor, we take the exponential of the co-efficients. We see the odds of sitting the maths exam is 7.6 to 1 and that ratio increases by 1.38 to 8.99 to 1 if a student is Male. From this we can see the probability of sitting the final maths exam when female is .88 and when male is 0.91.
+
+```{r predictorsmodel1}
+############
+# PART: Odds ratio and probability
+############
+
+#-------------- Exponentiate the co-efficients --------------#
+#exp(coefficients(logmodel1))
+## odds ratios and 95% CI
+co_efficients <- cbind(Estimate=round(coef(logmodel1),4), Odds_ratio=round(exp(coef(logmodel1)),4)) %>% data.frame()
+
+#-------------- Probability of sitting math when female --------------#
+#arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*0) #YES this is the same as just having the 1st co-efficient in the equation
+#-------------- Probability of sitting math yes when male --------------#
+#arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*1)
+
+co_efficients[,'Probability'] <- rbind(Female = arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*0)[[1]], Male = arm::invlogit(coef(logmodel1)[1]+ coef(logmodel1)[2]*1)[[1]]) %>% data.frame()
+
+# Pretty print
+co_efficients %>%
+  kbl(caption = "Summary of co-efficients") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 3: Check goodness of fit of the model over the baseline model
+In linear regression we check goodness of fit by comparing our results to the results we would have gotten using the mean as the baseline model. For logistic regression an omnibus test is used to check that the new model (with explanatory variables included) is an improvement over the baseline model which is a sum of frequencies of occurrence of each category. We use chi-square tests to see if there is a significant difference between the baseline model (null) and the model we have created.
+<p></p>
+
+Below we can see our model is not statistically significant (Pr(>Chisq) = 0.3447), which means it cannot be assumed to be a better predictor than the baseline model. This was not surprising since our predictor variable (sex) was shown to not be statistically significant.
+
+
+```{r Compare to the baseline}
+############
+# PART: Compare to the baseline
+############
+#-------------- Chi-square plus significance ----------------#
+lrtest_result <- lmtest::lrtest(logmodel1)
+# Pretty print
+lrtest_result %>%
+  kbl(caption = "Summary statistics for regression compared to baselien model") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Step 4: Determine usefulness
+We can get a pseudo R squared value to determine how useful the model is. From linear regression we understood the R2 was a measure of how much of the outcome variable was explained by the predictor variable. Cox and Snell R2 and Nagelkerke R2 are pseudo R2 statistics we can generate. From this we see that student sex explains between 0.2% and 0.48% of whether a student will sit the final maths exam or not, but we need to keep in mind the result was not statistically significant.
+
+
+```{r R squared calculation}
+#----------Pseudo Rsquared---------------#
+Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel1, which="CoxSnell"),4),
+Nagelkerke = round(DescTools::PseudoR2(logmodel1, which="Nagelkerke"),4))
+rownames(Pseudo.r2) <- 'R-Squared'
+
+# Pretty print
+Pseudo.r2 %>%
+  kbl(caption = "Summary of Pseudo R-Squared values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 5: Sensitivity Analysis and Summary Stats.
+We need to understand how well the model is working. The two main measures are sensitivity and specificity. Sensitivity refers to the proportion of true positives that were correctly identified by the model (correctly identified that a student sat the exam) and specificity is the proportion of true negatives (predicted to be negative and where negative). We achieve this using a ROC chart. Below we can see that our true positive rate is 49.0% and our true negative rate is 59.0%. The positive predictive values is the percentage of cases classified by our model correctly (students who were predicted to sit the exam and did plus students who were predicted not to sit the exam and didn’t). The negative predictive value is 1 - the positive. To use the ROC curve to quantify the performance of a classifier use the Area Under the Curve (AUC). We have an AUC of .54 which is considered weak.
+
+
+```{r roc charts}
+#Output the sensitivity, specificity, and ROC plot
+Epi::ROC(form=tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex, plot="ROC")
+
+```
+
+### Step 6: Check the assumption of linearity of independent variables
+We only have one predictor so we don’t need to check for collinearity. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test.
+
+```{r checkassumptionsmodel1}
+generalhoslem::logitgof(tbl_sperf_sex_medu_diff$sat_maths, fitted(logmodel1))
+```
+### Reporting Binary Logistic Regression
+A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex. Our outcome variable is the probability of a student sitting the final Maths exam given their gender. As such, we give zero to the “no” category, which is our reference category, and 1 to our category of interest which is “yes” they did sit the exam. For our predictor we used sex, with values Male and Female. Being Male was not found to be a statistically significant ( P = .348 ) predictor of whether a student will or will not not sit the examination. Female Students have an odd ratio of 7.60 to 1 to sit the exam while Male student odds where 1.38 higher which corresponds to a probability of .88 and .91 respectively. R2 = .0023 (Cox-Snell), .0048 (Nagelkerke), Pr (>Chisq) = .34.
+
+```{r reporting blr}
+#Summary of the model with co-efficients
+stargazer(logmodel1, type="text")
+```
+
+## Extra: Extending the model to include Parent's Education.
+Similar to Linear regression we can extend logistic regression to include multiple predictors. Our goal is to explore if we can predict if a student will sit the final Maths exam on the basis of their parents' education. We introduce a new categorical variable representing the highest educational achievement of either parent. We have 3 levels: at least one parent with a higher degree, at least one parent with a level 5 qualification (secondary school) and neither parent with a level 5 qualification. At least one parent with a higher degree was taken as the baseline reference category.
+
+### Step 1: Run General Logistic Regression
+We find that the overall model is not statistically significant (Pr(>Chisq) = .077) but the category *Neither parent with a level 5 qualification* is statistically significant at the P <0.05 significances level.
+
+```{r buildmodel2}
+############
+# PART: Run General Logistic Regression with 2 predictors
+############
+#-------------------- Build Model ------------------#
+logmodel2 <- glm(sat_maths ~ sex+pedu_paired, data = tbl_sperf_sex_medu_diff, na.action = na.exclude, family = binomial(link=logit))
+
+#Full summary of the model
+summary(logmodel2)
+
+#Chi-square plus significance
+lmtest::lrtest(logmodel2)
+
+```
+
+### Step 2: Calculate odds ratio and probability
+Student sex remained a statistically insignificant variable. The only level of parental educational achievement that was significant was if neither parent had a level 5 education.
+
+```{r predictorsmodel2}
+############
+# PART: Odds ratio and probability
+############
+
+#-------------- Exponentiate the co-efficients --------------#
+#exp(coefficients(logmodel2))
+## odds ratios and 95% CI
+model2_co_efficients <- cbind(Estimate=round(coef(logmodel2),4), Odds_ratio=round(exp(coef(logmodel2)),4)) %>% data.frame()
+
+
+model2_probability <- rbind(
+  #1. Probability of sitting exam when female and at least one parent has a degree
+  Female = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*0)[[1]],
+  #2. Probability of sitting exam when male and at least one parent has a degree
+  Male = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*1)[[1]],
+  #3. Probability of sitting exam when female when at least one parent has a level 5
+  Female_level5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*0 +coef(logmodel2)[3]*1+coef(logmodel2)[4]*0),
+  #4. Probability of sitting exam when male when at least one parent has a level 5
+  Male_level5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*1 +coef(logmodel2)[3]*1+coef(logmodel2)[4]*0),
+  #5.Probability of sitting exam  female when neither parent has an A level
+  Female_nolevel5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*0 +coef(logmodel2)[3]*0+coef(logmodel2)[4]*1),
+    #6.Probability of answering yes when male when neither parent has an A level
+    Male_nolevel5 = arm::invlogit(coef(logmodel2)[1]+ coef(logmodel2)[2]*1 +coef(logmodel2)[3]*0+coef(logmodel2)[4]*1)
+) %>% data.frame()
+
+# Pretty print
+model2_co_efficients %>%
+  kbl(caption = "Summary of co-efficients") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+model2_probability %>% round(2) %>%
+  kbl(caption = "Summary of co-efficients probabilities") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+confusion_matrix(logmodel2) %>%
+  kbl(caption = "Confusion Matrix") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 3: Check goodness of fit of the model over the baseline model
+```{r Compare to the baseline model 2}
+############
+# PART: Compare to the baseline
+############
+#-------------- Chi-square plus significance ----------------#
+lrtest_result <- lmtest::lrtest(logmodel2)
+# Pretty print
+lrtest_result %>%
+  kbl(caption = "Summary statistics for regression compared to baselien model") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 4: Determine usefulness
+The Pseudo R squared statistics show that our extended model explains between 1.78% and 3.69% of the variation in the outcome variable. This is consistent with our findings above.
+
+```{r R squared calculation model 2}
+#----------Pseudo Rsquared---------------#
+Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel2, which="CoxSnell"),4),
+Nagelkerke = round(DescTools::PseudoR2(logmodel2, which="Nagelkerke"),4))
+rownames(Pseudo.r2) <- 'R-Squared'
+
+# Pretty print
+Pseudo.r2 %>%
+  kbl(caption = "Summary of Pseudo R-Squared values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+### Step 5: Sensitivity Analysis and Summary Stats.
+When we compared the performance of the model using sensitivity analysis, the AUC has increased to 0.61 compared to the first model which had an AUC of .51, but both models are considered weak.
+
+```{r roc charts model 2}
+#Output the sensitivity, specificity, and ROC plot
+Epi::ROC(form=tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex+tbl_sperf_sex_medu_diff$pedu_paired, plot="ROC")
+
+```
+
+### Step 6: Check the assumption of linearity of independent variables
+We have two predictor variables so we need to check for collinearity. Conceptually, student sex and parental educational achievement should not be collinear, but the step is included for illustration. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test.
+
+```{r checkassumptionsmodel2}
+generalhoslem::logitgof(tbl_sperf_sex_medu_diff$sat_maths, fitted(logmodel2))
+
+#Collinearity
+vifmodel<-car::vif(logmodel2)#You can ignore the warning messages, GVIF^(1/(2*Df)) is the value of interest
+vifmodel
+#Tolerance
+1/vifmodel
+```
+
+### Reporting Binary Logistic Regression with two Predictors
+A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex and parental educational achievement. Our outcome variable is the probability of a student sitting the final maths exam given their gender and their parents highest educational achievement. We give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used sex, with values Male and Female. For Parental education we observe 3 different levels: at least one parent with a level 5 qualification, at least one parent with a higher degree and neither parent with a level 5 qualification. At least one parent with a higher degree was our reference category. Neither parent having a level 5 education was shown to be statistically significant (P < .05). Being Male was still not found to be a statistically significant ( P = .43 ) predictor of whether a student will or will not not sit the examination. Female Students have an odd ratio of 10.68 to 1 to sit the exam while Male student odds where 1.31 higher which corresponds to a probability of .91 and .93 respectively. The lowest probability of sitting the Maths exam was Female students for which neither parent has a level 5 education. R2 = .0178 (Cox-Snell), .00369 (Nagelkerke), Pr (>Chisq) = .077.
+
+
+## Multinomial logistic regression
+We can also use logistic regression to predict if a case will be a member of more than two categories. To illustrate this methodology, we will make use of the student performance data set to build a model to predict student alcohol consumption on the basis of performance.
+
+> HA:  Subject performance, failures, and absences are good predictors of student tendency to consume alcohol
+
+### Step 1: Quick summary of the data
+A general guideline is that we need a minimum of 10 cases with the least frequent value for each categorical variable in our model. A quick look at the data shows we meet this requirement.
+
+
+```{r model3 import}
+############
+# PART: Add new binary category sat maths yes or no
+############
+
+tbl_sperf_family_alc <- tbl_sperf_all %>%
+  select(Dalc.p, Walc.p ,health.p,absences.p, famrel.p, Pstatus, famsize,mG3,pG3,failures.p, activities.p)
+
+
+tbl_sperf_family_alc$Walc.p <- factor(tbl_sperf_family_alc$Walc.p)
+tbl_sperf_family_alc$famrel.p <- factor(tbl_sperf_family_alc$famrel.p)
+tbl_sperf_family_alc$Dalc.p  <- factor(tbl_sperf_family_alc$Dalc.p)
+
+freq(tbl_sperf_family_alc$Walc.p) %>%
+  kbl(caption = "Summary of Weekend Alchol Consumption (Walc.p)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+tbl_sperf_family_alc$failures.p %>% psych::describe() %>% as.data.frame() %>% select(-c(mean, sd, vars, trimmed)) %>%
+  kbl(caption = "Summary of Student Failures (failures.p)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+tbl_sperf_family_alc$absences.p %>% psych::describe() %>% as.data.frame() %>% select(-c(mean, sd, vars, trimmed)) %>%
+  kbl(caption = "Summary of Student Absences (absences.p)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Step 2: Run Multi-nominal Logistic Regression
+
+```{r build combinartions3}
+############
+# PART: Build combination
+############
+#Walc.p is the level of alcohol consumption (a categorical variable with four values)
+# absences.p, is a continuous variable
+# pG3 is a continuous variable
+# famrel.p is a categorical variable 5 values.
+with(tbl_sperf_family_alc, table(famrel.p, Walc.p))
+with(tbl_sperf_family_alc, do.call(rbind, tapply(pG3, Walc.p, function(x) c(M = mean(x), SD = sd(x)))))
+with(tbl_sperf_family_alc, do.call(rbind, tapply(pG3, absences.p, function(x) c(M = mean(x), SD = sd(x)))))
+```
+
+```{r build model3}
+############
+# PART: Run Multinominal logistic regression with 2 predictors
+############
+#-------------------- Build Model ------------------#
+#Because Walc.p has four levels we need to indicate which level is our reference
+#We will be comparing the alcohol consumption levels.
+tbl_sperf_family_alc$Walc.p<-relevel(tbl_sperf_family_alc$Walc.p, ref = "1")
+
+#We create the model using multinom from nnet package
+logmodel3 <- multinom(Walc.p ~ absences.p + pG3, data = tbl_sperf_family_alc)
+summary(logmodel3)
+
+#multinom package does not include p-value calculation for the regression coefficients, so we calculate p-values using Wald tests (here z-tests).
+z <- summary(logmodel3)$coefficients/summary(logmodel3)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+p  %>%
+  kbl(caption = "Summary of Predictor Probability Pr(>|z|) ") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+#Chi-square plus significance
+lmtest::lrtest(logmodel3)
+```
+
+### Step 2: Calculate odds ratio and probability
+The relative odds ratio for a one-unit increase in Portuguese final grade is .9492 for being a level 2 alcohol consumer (Likelihood is decreasing) versus level 1. The relative odds ratio for a one-unit increase in Portuguese absences is 1.045 for being a level 2 alcohol consumer (Likelihood is decreasing) versus level 1.
+
+```{r predictorsmodel3}
+############
+# PART: Odds ratio and probability
+############
+
+#-------------- Exponentiate the co-efficients --------------#
+#exp(coefficients(logmodel3))
+## odds ratios
+model3_co_efficients <- cbind(Odds_ratio=round(exp(coef(logmodel3)),4)) %>% data.frame()
+
+# Pretty print
+model3_co_efficients %>%
+  kbl(caption = "Summary of co-efficients (Odds Ratios)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+#-------------- Probabilitities--------------#
+#You can calculate predicted probabilities for each of our outcome levels using the fitted function
+pp <- fitted(logmodel3)
+#pp %>%
+#  kbl(caption = "Summary of co-efficients (Odds Ratios)") %>%
+#  kable_styling(bootstrap_options = c("striped", "hover"))
+
+#If we want to examine the changes in predicted probability associated with one of our two variables, we can create small datasets varying one variable while holding the other constant. We will first do this holding write at its mean and examining the predicted probabilities for each level of ses.
+dabsences <- data.frame(absences.p  = tbl_sperf_family_alc$absences.p, pG3 = mean(tbl_sperf_family_alc$pG3))
+#predict(logmodel3, newdata = dabsences, "probs")
+
+#We can also use the predicted probabilities is to look at the averaged predicted probabilities for different values of the continuous predictor variable write within each level of ses.
+
+#for every level of absences we want a pG3 Range. Total is 20*6 = 66
+dwrite <- data.frame(absences.p = rep(c(0:20), 21), pG3 = rep(c(0:20), 21))
+
+## store the predicted probabilities for each value of ses and write
+pp.write <- cbind(dwrite, predict(logmodel3, newdata = dwrite, type = "probs", se = TRUE))
+
+## calculate the mean probabilities within each level of ses
+#by(pp.write[, 3:5], pp.write$absences.p, colMeans)
+
+#Using the predictions we generated for the pp.write object above, we can plot the predicted probabilities against the writing score by the level of ses for different levels of the outcome variable.
+
+lpp <- reshape2::melt(pp.write, id.vars = c("absences.p", "pG3"), value.name = "probability")
+
+head(lpp)  # view first few rows
+
+## plot predicted probabilities across write values for each level of ses
+## facetted by program type
+ggplot(lpp, aes(x = pG3, y = probability)) +
+  geom_point(aes(colour =  absences.p)) +
+  facet_grid(variable ~ ., scales = "free") +
+  theme_bw()
+```
+
+### Step 4: Check goodness of fit of the model over the baseline model
+Below we can see our model is statistically significant (Pr(>Chisq) < .001), which means it can be assumed to be better than the baseline.
+
+```{r Compare to the baseline model 3}
+############
+# PART: Compare to the baseline
+############
+#-------------- Chi-square plus significance ----------------#
+lrtest_result <- lmtest::lrtest(logmodel3)
+# Pretty print
+lrtest_result %>%
+  kbl(caption = "Summary statistics for regression compared to baselien model") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Step 5: Determine usefulness
+The Pseudo R squared statistics show that our extended model explains between 6.93% and 7.31% of the variation in the outcome variable. This is consistent with our findings above.
+
+```{r R squared calculation model 3}
+#----------Pseudo Rsquared---------------#
+Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel3, which="CoxSnell"),4),
+Nagelkerke = round(DescTools::PseudoR2(logmodel3, which="Nagelkerke"),4))
+rownames(Pseudo.r2) <- 'R-Squared'
+
+# Pretty print
+Pseudo.r2 %>%
+  kbl(caption = "Summary of Pseudo R-Squared values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+### Step 6: Check the assumption of linearity of independent variables
+We checked the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test and found it was not statistically significant. Multicollinearity analysis showed that the tolerance and variance influence factor measures were not within acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008). As such we may have problems with collinearity.
+```{r check assumptiosn model 3}
+#Check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statsitically significant we are ok
+generalhoslem::logitgof(tbl_sperf_family_alc$Walc.p, fitted(logmodel3))
+
+#Collinearity
+vifmodel<-car::vif(logmodel3)#You can ignore the warning messages, GVIF^(1/(2*Df)) is the value of interest
+#Tolerance
+cbind(data.frame(VIF.Tolerance = 1/vifmodel),vifmodel) %>%
+  kbl(caption = "Multi colinearity Tolerance") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+### Reporting Multinominal Logistic Regression
+A Multinomial logistic regression model of student Alcohol consumption as predicted by student performance and absenteeism was built. Our outcome variable is the probability of a student having each of the alcohol consumption levels given their performance and absenteeism rates. Our reference outcome category was level 1, very low consumption. For our predictor, we used student performance and absence from Portuguese class. The model was statistically significant (Pr(>Chisq) = .001 ) and explains between 6.93% and 7.31% of the variation in the output variable. The level of collinearity between predictors was outside the acceptable range, however.
+
+
+```{r}
+stargazer(logmodel3, type="text")
+```
 

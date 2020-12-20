@@ -1,8 +1,14 @@
 ---
-title: "R Notebook"
-author: ocarrolj
-date: 05/12/2020
-output: html_notebook
+title: "TU060 - Math 9102 – PSI - Portfolio - Model - Logistic"
+author: "Joseph O'Carroll"
+date: "20/12/2020"
+output:
+  html_document:
+    df_print: paged
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 04/12/2020
+Objective: Modeling phase for statistical Modelling - Logistic
 ---
 
 ```{r global-options, include=FALSE}
@@ -46,16 +52,19 @@ tbl_sperf_description_all <- read.csv('./TU060_MATH9102_Student_variables_descri
 ```
 
 # Logistic Regression
-In linear regression our outcome variable is continuous that is predicted from one or more continuous or categorical predictor variables. If the outcomes we are interested in is categorical in nature we cannot use linear regression as there is no linear relationship between predictor and outcomes variables. To predict categorical outcomes we use logistic regression. If the outcome variable has exactly two values, for example predicting pass or fail for a student, it is called binary logistic regression, and when the outcome has more than two categories it is called multi-nominal logistic regression. The output from a logistic regression is not an estimated value but rather a probability that the given input belongs to a certain category or not. Because we're looking at probability, we choose one category values as the category of interest. The event we're interested in is the event where that category occurs. The reference event is when the event of interest doesn't occur and we are interested in the probability of the event of interest occurring versus the probability of it not occurring.
+In linear regression, our outcome variable is continuous and is predicted from one or more continuous or categorical predictor variables. If the outcomes we are interested in are categorical in nature, we cannot use linear regression as there is no linear relationship between predictor and outcomes variables. To predict categorical outcomes, we use logistic regression. If the outcome variable has exactly two values, for example predicting pass or fail for a student, we use a binary logistic regression. When the outcome has more than two categories, we use a multi-nominal logistic regression. The output from a logistic regression is not an estimated value but rather a probability that the given input belongs to a certain category or not. Because we’re looking at probability, we choose one category as the category of interest. The event we’re interested in is the event where that category occurs. The reference event is when the event of interest doesn’t occur and we are interested in the probability of the event of interest occurring versus the probability of it not occurring.
 
 ## Binary Logistic Regression
-To illustrate this methodology we will make use of the student performance data set to build a model to predict if students sat the final maths examination on the basis of gender.
+To illustrate this methodology we will make use of the student performance data set to build a model to predict if students sat the final maths examination, using gender as the predictor.
+
 
 > HA: Gender is a factor in determining if a student will sit the final maths examination
 
-Our outcome variable is the probability of a student is male or female given that they did not sit the exam. As such we give zero to the "no" category, which is our reference category and 1 to our category of interest which is 'Yes' they did sit the exam. For our predictor we used Sex with values Male and Female.
+Our outcome variable is the probability that they did not sit the exam. As such we give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used Sex, which takes the value Male or Female.
+<p></p>
 
-Note: We're building a model with one predictor to illustrate our understanding of how logistic regression works. The starting point is a simple logistic regression, which we will build upon. We gain no new insights from this over and above a difference test.
+Note: We’re building a model with one predictor to illustrate our understanding of how logistic regression works. The starting point is a simple logistic regression, which we will build upon. We gain no new insights from this over and above a difference test.
+
 
 ```{r}
 ############
@@ -90,7 +99,7 @@ lmtest::lrtest(logmodel1)
 
 ```
 
-The Pr(>|z|) column shows the two-tailed p-values testing the null hypothesis that the coefficient is equal to zero (i.e. no significant effect). The usual cut-off value is 0.05. From this model it appears that sex does not have a significant effect on the log-odds ratio of the outcome variable, weather or not a student sat the final maths exam. The estimate column shows how much of a contribution or predictor makes to the outcomes. The results indicated that when sex is male the expected change in the log odds is .3221 an increase in comparison of being female, however we know the result is not statistically significant (p = 0.328).
+The Pr(>|z|) column shows the two-tailed p-values testing the null hypothesis that the coefficient is equal to zero (i.e. no significant effect). The usual cut-off value is 0.05. From this model it appears that sex does not have a significant effect on the log-odds ratio of the outcome variable, weather or not a student sat the final maths exam. The estimate column shows how much of a contribution or predictor makes to the outcomes. The results indicated that when sex is male the expected change in the log odds is .3221 an increase in comparison of being female, however the result is not statistically significant (p = 0.328).
 
 ### Step 2: Calculate odds ratio and probability
 
@@ -120,9 +129,11 @@ co_efficients %>%
 
 ```
 ### Step 3: Check goodness of fit of the model over the baseline model
-In linear regression we check goodness of fit by comparing our results to the results we would have gotten using the mean as the baseline model. For logistic regression an omnibus test of model is used to check that the new model (with explanatory variables included) is an improvement over the baseline model which is a sum of frequencies of occurrence of each category. We use chi-square tests to see if there is a significant difference between the baseline model (null) and the model we have created.
+In linear regression we check goodness of fit by comparing our results to the results we would have gotten using the mean as the baseline model. For logistic regression an omnibus test is used to check that the new model (with explanatory variables included) is an improvement over the baseline model which is a sum of frequencies of occurrence of each category. We use chi-square tests to see if there is a significant difference between the baseline model (null) and the model we have created.
+<p></p>
 
 Below we can see our model is not statistically significant (Pr(>Chisq) = 0.3447), which means it cannot be assumed to be a better predictor than the baseline model. This was not surprising since our predictor variable (sex) was shown to not be statistically significant.
+
 
 ```{r Compare to the baseline}
 ############
@@ -140,6 +151,7 @@ lrtest_result %>%
 ### Step 4: Determine usefulness
 We can get a pseudo R squared value to determine how useful the model is. From linear regression we understood the R2 was a measure of how much of the outcome variable was explained by the predictor variable. Cox and Snell R2 and Nagelkerke R2 are pseudo R2 statistics we can generate. From this we see that student sex explains between 0.2% and 0.48% of whether a student will sit the final maths exam or not, but we need to keep in mind the result was not statistically significant.
 
+
 ```{r R squared calculation}
 #----------Pseudo Rsquared---------------#
 Pseudo.r2 <- cbind(CoxSnell = round(DescTools::PseudoR2(logmodel1, which="CoxSnell"),4),
@@ -153,7 +165,7 @@ Pseudo.r2 %>%
 
 ```
 ### Step 5: Sensitivity Analysis and Summary Stats.
-We need to understand how well the classification is working. The two main measures of sensitivity and specificity. Sensitivity is measuring the proportion of true positives that were correctly identified by the model (correctly identified that a student sat the exam) and specificity is the proportion of true negatives (predicted to be negative and where negative). We does this using a ROC chart. Below we can see that our true positive rate is 49.0% and our true negative rate is 59.0%. The positive predictive values is the percentage of case classified by our model correctly (students who where predicted to sit the exam and did plus students who where predicted not to sit the exam and didn't). The negative predictive values is 1 - the positive. To use the ROC curve to quantify the performance of a classifier use the Area Under the Curve (AUC). We hve an AUC of .54 which is considered weak.
+We need to understand how well the model is working. The two main measures are sensitivity and specificity. Sensitivity refers to the proportion of true positives that were correctly identified by the model (correctly identified that a student sat the exam) and specificity is the proportion of true negatives (predicted to be negative and where negative). We achieve this using a ROC chart. Below we can see that our true positive rate is 49.0% and our true negative rate is 59.0%. The positive predictive values is the percentage of cases classified by our model correctly (students who were predicted to sit the exam and did plus students who were predicted not to sit the exam and didn’t). The negative predictive value is 1 - the positive. To use the ROC curve to quantify the performance of a classifier use the Area Under the Curve (AUC). We have an AUC of .54 which is considered weak.
 
 
 ```{r roc charts}
@@ -163,13 +175,13 @@ Epi::ROC(form=tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex, p
 ```
 
 ### Step 6: Check the assumption of linearity of independent variables
-We only have one predictor so we don't need to check for collinearity. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statistically significant we are ok.
+We only have one predictor so we don’t need to check for collinearity. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test.
 
 ```{r checkassumptionsmodel1}
 generalhoslem::logitgof(tbl_sperf_sex_medu_diff$sat_maths, fitted(logmodel1))
 ```
 ### Reporting Binary Logistic Regression
-A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex. Our outcome variable is the probability of a student sitting the final Maths exam given their gender. As such we give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used sex with values Male and Female. Being Male was not found to be a statistically significant ( P = .348 ) predictor of in a student will or not not sit the examination. Female Students have an odd ratio of 7.60 to 1 to sit the exam while Male student odds where 1.38 higher which corresponds to a probability of .88 and .91 respectively. R2 = .0023 (Cox-Snell), .0048 (Nagelkerke), Pr (>Chisq) = .34.
+A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex. Our outcome variable is the probability of a student sitting the final Maths exam given their gender. As such, we give zero to the “no” category, which is our reference category, and 1 to our category of interest which is “yes” they did sit the exam. For our predictor we used sex, with values Male and Female. Being Male was not found to be a statistically significant ( P = .348 ) predictor of whether a student will or will not not sit the examination. Female Students have an odd ratio of 7.60 to 1 to sit the exam while Male student odds where 1.38 higher which corresponds to a probability of .88 and .91 respectively. R2 = .0023 (Cox-Snell), .0048 (Nagelkerke), Pr (>Chisq) = .34.
 
 ```{r reporting blr}
 #Summary of the model with co-efficients
@@ -177,10 +189,10 @@ stargazer(logmodel1, type="text")
 ```
 
 ## Extra: Extending the model to include Parent's Education.
-Similar to Linear regression we can extend logistic regression to include multiple predictors. Our goal is to explore if we can predict if a student will sit the final Maths exam on the basic of their parents education. We introduced a new categorical variable representing the highest educational achievement of either parent. We have 3 levels, at least one parent with a higher degree, at least one parent with a level 5 qualification (secondary school) and neither parent with a level 5 qualification. At least one parent with a higher degree was taken as the baseline reference category.
+Similar to Linear regression we can extend logistic regression to include multiple predictors. Our goal is to explore if we can predict if a student will sit the final Maths exam on the basis of their parents' education. We introduce a new categorical variable representing the highest educational achievement of either parent. We have 3 levels: at least one parent with a higher degree, at least one parent with a level 5 qualification (secondary school) and neither parent with a level 5 qualification. At least one parent with a higher degree was taken as the baseline reference category.
 
 ### Step 1: Run General Logistic Regression
-We find that the overall model is not statistically significant (Pr(>Chisq) = .077) but the category "Neither parent with a level 5 qualification" is statistically significant at the P <0.05 significances level.
+We find that the overall model is not statistically significant (Pr(>Chisq) = .077) but the category *Neither parent with a level 5 qualification* is statistically significant at the P <0.05 significances level.
 
 ```{r buildmodel2}
 ############
@@ -269,7 +281,7 @@ Pseudo.r2 %>%
 
 ```
 ### Step 5: Sensitivity Analysis and Summary Stats.
-When we compared the performance of the model using sensitivity analysis. The AUC has increase to 0.61 compared to the first model which had an AUC of .51, but both models are considered weak.
+When we compared the performance of the model using sensitivity analysis, the AUC has increased to 0.61 compared to the first model which had an AUC of .51, but both models are considered weak.
 
 ```{r roc charts model 2}
 #Output the sensitivity, specificity, and ROC plot
@@ -278,7 +290,7 @@ Epi::ROC(form=tbl_sperf_sex_medu_diff$sat_maths ~ tbl_sperf_sex_medu_diff$sex+tb
 ```
 
 ### Step 6: Check the assumption of linearity of independent variables
-We have two predictor so we need to check for collinearity. Conceptually student sex and parental educational achievement should not be collinear, but the step is included for illustration. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statistically significant we are ok.
+We have two predictor variables so we need to check for collinearity. Conceptually, student sex and parental educational achievement should not be collinear, but the step is included for illustration. We check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test.
 
 ```{r checkassumptionsmodel2}
 generalhoslem::logitgof(tbl_sperf_sex_medu_diff$sat_maths, fitted(logmodel2))
@@ -291,16 +303,16 @@ vifmodel
 ```
 
 ### Reporting Binary Logistic Regression with two Predictors
-A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex and parental educational achievement. Our outcome variable is the probability of a student sitting the final maths exam given their gender and their parents highest educational achievement. We give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used sex with values Male and Female. For Parental education we had 3 levels, At least one parent with a level 5 qualification, At least one parent with a higher degree and neither parent with a level 5 qualification. At least one parent with a higher degree was our reference category. Neither parent having a level 5 education was shown to be statistically significant (P < .05). Being Male was still not found to be a statistically significant ( P = .43 ) predictor of if a student will or not not sit the examination. Female Students have an odd ratio of 10.68 to 1 to sit the exam while Male student odds where 1.31 higher which corresponds to a probability of .91 and .93 respectively. The lowest probability of sitting the Maths exam was Female students for which neither parent has a level 5 education. R2 = .0178 (Cox-Snell), .00369 (Nagelkerke), Pr (>Chisq) = .077.
+A Binary logistic regression model was built of student propensity to sit the final Maths examination as predicted by student sex and parental educational achievement. Our outcome variable is the probability of a student sitting the final maths exam given their gender and their parents highest educational achievement. We give zero to the “no” category, which is our reference category and 1 to our category of interest which is ‘Yes’ they did sit the exam. For our predictor we used sex, with values Male and Female. For Parental education we observe 3 different levels: at least one parent with a level 5 qualification, at least one parent with a higher degree and neither parent with a level 5 qualification. At least one parent with a higher degree was our reference category. Neither parent having a level 5 education was shown to be statistically significant (P < .05). Being Male was still not found to be a statistically significant ( P = .43 ) predictor of whether a student will or will not not sit the examination. Female Students have an odd ratio of 10.68 to 1 to sit the exam while Male student odds where 1.31 higher which corresponds to a probability of .91 and .93 respectively. The lowest probability of sitting the Maths exam was Female students for which neither parent has a level 5 education. R2 = .0178 (Cox-Snell), .00369 (Nagelkerke), Pr (>Chisq) = .077.
 
 
 ## Multinomial logistic regression
-We can also use logistic regression to predict if a case will be a member of more than two categories. To illustrate this methodology we will make use of the student performance data set to build a model to predict based student alcohol consumption on the basis of performance.
+We can also use logistic regression to predict if a case will be a member of more than two categories. To illustrate this methodology, we will make use of the student performance data set to build a model to predict student alcohol consumption on the basis of performance.
 
-> HA: Subject performance, failures, and absences are good predictors of student tendency to consume alcohol
+> HA:  Subject performance, failures, and absences are good predictors of student tendency to consume alcohol
 
 ### Step 1: Quick summary of the data
-A general guideline is that we need at minimum of 10 cases with the least frequent outcome for each independent variable in our model. A quick look at the data shows we meet this requirement. We need approximately 200 records based on this guideline.
+A general guideline is that we need a minimum of 10 cases with the least frequent value for each categorical variable in our model. A quick look at the data shows we meet this requirement.
 
 
 ```{r model3 import}
@@ -423,7 +435,7 @@ ggplot(lpp, aes(x = pG3, y = probability)) +
 ```
 
 ### Step 4: Check goodness of fit of the model over the baseline model
-Below we can see our model is not statistically significant (Pr(>Chisq) < .001), which means it can be assumed to be better than the baseline.
+Below we can see our model is statistically significant (Pr(>Chisq) < .001), which means it can be assumed to be better than the baseline.
 
 ```{r Compare to the baseline model 3}
 ############
@@ -455,7 +467,7 @@ Pseudo.r2 %>%
 ```
 
 ### Step 6: Check the assumption of linearity of independent variables
-We checked the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test and found it was not statistically significant so we are ok. Multicollinearity analysis showed that the tolerance and variance influence factor measures were not within acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008). As such we may have problems with collinearity.
+We checked the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test and found it was not statistically significant. Multicollinearity analysis showed that the tolerance and variance influence factor measures were not within acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008). As such we may have problems with collinearity.
 ```{r check assumptiosn model 3}
 #Check the assumption of linearity of independent variables and log odds using a Hosmer-Lemeshow test, if this is not statsitically significant we are ok
 generalhoslem::logitgof(tbl_sperf_family_alc$Walc.p, fitted(logmodel3))
@@ -470,7 +482,7 @@ cbind(data.frame(VIF.Tolerance = 1/vifmodel),vifmodel) %>%
 
 
 ### Reporting Multinominal Logistic Regression
-A Multinominal logistic regression model was built of student Alcohol consumption as predicted by student performance and absenteeism. Our outcome variable is the probability of a student have each of the alcohol consumption levels given their performance and absenteeism rates. Our reference outcome category was level 1, very low consumption. For our predictor we used student performance and absence level in Portuguese. The model was statistically significant (Pr(>Chisq) = .001 ) and explains between 6.93% and 7.31% of the variation in the output variable. The level of colinearity between predictors was outside the acceptable range however.
+A Multinomial logistic regression model of student Alcohol consumption as predicted by student performance and absenteeism was built. Our outcome variable is the probability of a student having each of the alcohol consumption levels given their performance and absenteeism rates. Our reference outcome category was level 1, very low consumption. For our predictor, we used student performance and absence from Portuguese class. The model was statistically significant (Pr(>Chisq) = .001 ) and explains between 6.93% and 7.31% of the variation in the output variable. The level of collinearity between predictors was outside the acceptable range, however.
 
 
 ```{r}
