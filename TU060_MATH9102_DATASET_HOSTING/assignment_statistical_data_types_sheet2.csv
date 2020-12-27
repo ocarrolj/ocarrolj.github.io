@@ -1,9 +1,9 @@
 Attribute,Description,Statistical.Data.Type
 GENDER,Gender,Binary: Categorical with values Female or Male.
-EDU_FATHER,Father’s education,Ordinal: Categorical with 12 levels.
-EDU_MOTHER,Mother’s education,Ordinal: Categorical with 12 levels.
-OCC_FATHER,Father’s occupation,Nominal: Categorical with 13 values
-OCC_MOTHER,Mother’s occupation,Nominal: Categorical with 13 values
+EDU_FATHER,Father's education,Ordinal: Categorical with 12 levels.
+EDU_MOTHER,Mother's education,Ordinal: Categorical with 12 levels.
+OCC_FATHER,Father's occupation,Nominal: Categorical with 13 values
+OCC_MOTHER,Mother's occupation,Nominal: Categorical with 13 values
 STRATUM,Stratum,Ordinal: Categorical with 7 levels.
 SISBEN,Sisben,Ordinal: Categorical with 6 levels.
 PEOPLE_HOUSE,People in the house,Ordinal: Categorical with 13 levels.
