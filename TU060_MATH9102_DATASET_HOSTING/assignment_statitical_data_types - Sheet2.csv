@@ -1,0 +1,28 @@
+Attribute,Description,Statistical.Data.Type
+GENDER,Gender,Binary: Categorical with values Female or Male.
+EDU_FATHER,Father’s education,Ordinal: Categorical with 12 levels.
+EDU_MOTHER,Mother’s education,Ordinal: Categorical with 12 levels.
+OCC_FATHER,Father’s occupation,Nominal: Categorical with 13 values
+OCC_MOTHER,Mother’s occupation,Nominal: Categorical with 13 values
+STRATUM,Stratum,Ordinal: Categorical with 7 levels.
+SISBEN,Sisben,Ordinal: Categorical with 6 levels.
+PEOPLE_HOUSE,People in the house,Ordinal: Categorical with 13 levels.
+INTERNET,Internet,Binary: Categorical with values Yes or No.
+TV,TV,Binary: Categorical with values Yes or No.
+COMPUTER,Computer,Binary: Categorical with values Yes or No.
+WASHING_MCH,Washing machine,Binary: Categorical with values Yes or No.
+MIC_OVEN,Microwave oven,Binary: Categorical with values Yes or No.
+CAR,Car,Binary: Categorical with values Yes or No.
+DVD,DVD,Binary: Categorical with values Yes or No.
+FRESH,Fresh,Binary: Categorical with values Yes or No.
+PHONE,Phone,Binary: Categorical with values Yes or No.
+MOBILE,Mobile,Binary: Categorical with values Yes or No.
+REVENUE,Revenue,Ordinal: Categorical with 3 levels.
+JOB,Job,Ordinal: Categorical with 8 levels.
+SCHOOL_NAME,School name,Nominal: Categorical with 4 values
+SCHOOL_NAT,Nature of School,Nominal: Categorical with 2 values
+SCHOOL_TYPE,Type of School,Nominal: Categorical with 4 values
+COD_SPRO,Code Saber Pro,"Nominal: Unique Student ID, not a statitical data type"
+UNIVERSITY,University,Nominal: Categorical with 134 values
+ACADEMIC_PROGRAM,Academic Program,Nominal: Categorical with 23 values
+COD_S11,Code Saber 11,"Nominal: Unique Student ID, not a statitical data type"

@@ -1,0 +1,18 @@
+Attribute,Description,Statistical.Data.Type
+MAT_S11,Mathematics,Numeric: Interval ratio
+CR_S11,Critical Reading,Numeric: Interval ratio
+CC_S11,Citizen Competencies S11,Numeric: Interval ratio
+BIO_S11,Biology,Numeric: Interval ratio
+ENG_S11,English,Numeric: Interval ratio
+QR_PRO,Quantitative Reasoning,Numeric: Interval ratio
+CR_PRO,Critical Reading,Numeric: Interval ratio
+CC_PRO,Citizen Competencies SPRO,Numeric: Interval ratio
+ENG_PRO,English,Numeric: Interval ratio
+WC_PRO,Written Communication,Numeric: Interval ratio
+FEP_PRO,Formulation of Engineering Projects,Numeric: Interval ratio
+G_SC,Global Score,Numeric: Interval ratio
+PERCENTILE,Percentile,Numeric: Interval ratio
+2ND_DECILE,Second Decile,Categorical: ordinal data values 1 to 5
+QUARTILE,Quartile,Categorical: ordinal data values 1 to 4
+SEL,Socioeconomic Level,Categorical: ordinal data values 1 to 4
+SEL_IHE,Socioeconomic Level of The Institution of Higher Education,Categorical: ordinal data values 1 to 4
