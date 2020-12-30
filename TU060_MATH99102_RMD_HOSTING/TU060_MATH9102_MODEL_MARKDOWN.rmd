@@ -79,6 +79,7 @@ library(summarytools)
 library(stats)
 library(car) ##Levenes test
 library(stargazer)
+library(dplyr)
 
 ```
 
@@ -112,7 +113,7 @@ tbl_sperf_description_all <- read.csv('./TU060_MATH9102_Student_variables_descri
 
 
 tbl_sperf_sex_diff <- tbl_sperf_all %>%
-  select(contains('mG'), contains('pG'), sex, Medu) %>%
+  dplyr::select(contains('mG'), contains('pG'), sex, Medu) %>%
   filter(mG1 != 0, mG2 != 0, mG3 != 0, pG1 != 0, pG2 != 0, pG3 != 0) # Filtering records with missing data.
 ```
 ### Step 1: Investigate Normality
@@ -124,7 +125,7 @@ Because simple linear regression is based on the equation for a line, our first 
 ############
 
 tbl_sperf_numerical_measurements <- tbl_sperf_all %>%
-  select(contains('mG'), contains('pG')) %>%
+  dplyr::select(contains('mG'), contains('pG')) %>%
   filter(mG1 != 0, mG2 != 0, mG3 != 0, pG1 != 0, pG2 != 0, pG3 != 0) # Filtering records with missing data.
 
 tbl_sperf_numerical_stats <- tbl_sperf_numerical_measurements %>% psych::describe(omit = TRUE)
@@ -163,7 +164,7 @@ tbl_sperf_numerical_stats_2$gt_3sd <- gt_329
 
 # Pretty print
 tbl_sperf_numerical_stats_2 %>%
-  select(-(median)) %>%
+  dplyr::select(-(median)) %>%
   kbl(caption = "Summary statistics for Performance (zero scores removed)") %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
@@ -203,7 +204,7 @@ For our predictors we will use initial grade and whether a student is male or fe
 ### Step 1: Investigate differential effects
 We have already as part of the explore and analysis phase established there is a differential effect between male and female students for performance. That analysis is not repeated here but we can assume the variables of interest meet the criteria for Multiple linear Regression..
 
-### Step 2: Run Simple Linear Regression
+### Step 2: Run Multiple Linear Regression
 Given the assumptions of normality and that a strong positive relationship exists it is safe to use the students performance dataset to illustrate the Simply Linear regression predictive modeling technique.
 
 ```{r Multipsle Regression 1, warning = FALSE, echo=TRUE, include=TRUE}
@@ -408,7 +409,6 @@ To generalise our model to the population there are a number of assumptions unpi
 Using linear regression as a predictive model requires that a straight line be a good representative model of the underlying relationship. How well a straight line serves as a model is determined by the residuals. We want the residuals to follow a normal distribution that minimizes the opportunity for error to emerge just because the data is skewed. We want constant error variance because non constant variance would pull our outcome in particular directions and increase our chances of a type 1 error. An outlier is considered any observation that’s particularly large or small. A leverage point is something that’s far away from the average and changes the gradient of the line of best fit. And anything that’s considered an influential observation is something that changes the slope of the line. If we have a particularly large value, this will be in our data as an outlier, it is likely that we’ll have a particularly large residual in our regression model. And then it will pull the data in a particular direction, and therefore it will pull the prediction in a particular direction.
 
 ### Step 1: Determine our outliers in terms of residuals
-Step 1: Determining our outliers in terms of residuals
 The first thing we need to do is identify our outliers in terms of our residuals. If we find outliers that are particularly significant, it may be acceptable to delete them and repeat the regression without those cases included. The danger if we simply remove cases is that remaining cases that where not outliers may become outliers. It may be that we have to retain it because it’s a particularly important case in our data set. It is a good idea to perform a robustness test and run the data analysis twice to determine how susceptible the model is to assumptions regarding outliers. To do this we run the regression data analysis twice, once with and once without the outliers.
 <p></p>
 Next, we quantify how far away from normal the distribution is. To do this, we calculate statistics for skew and kurtosis and standardise them so we can compare them to heuristics. Standardised scores (value/std.error) for skewness between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal distribution. Residuals for model 1: mG1 as a predictor of mG3, are within an acceptable range. We further investigated by exploring outliers: how many of them there are or whether we can transform the problematic variable  to become more normal.
