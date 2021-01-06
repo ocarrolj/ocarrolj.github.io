@@ -1,0 +1,1441 @@
+---
+title: "TU060 - Math 9102 – PSI - Assignment"
+author: "Joseph O'Carroll"
+date: "06/01/2021"
+output:
+  bookdown::html_document2:
+    df_print: paged
+    toc: true
+Student Number: C03001130
+Created by: Joseph O'Carroll
+Created on: 27/12/2020
+Objective: Submission for Continuous Assessment Part II
+---
+```{r global-options, include=FALSE}
+# https://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+knitr::opts_chunk$set(fig.width = 12, fig.height = 8, fig.path = 'Figs/', echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(
+  tab.cap.style = "Table Caption",
+  tab.cap.pre = "Table ",
+  tab.cap.sep = ": "
+  )
+```
+
+```{r setup, message=FALSE, warning=FALSE}
+# ********************************************************************
+#
+#   Setup Section
+#
+# ********************************************************************
+needed_packages <- c("tidyverse", "readxl", "lubridate", "cowplot", "knitr", "kableExtra", "summarytools", "pastecs", "semTools", "ggplot2", "car", "effectsize", "stargazer")
+# Extract not installed packages
+not_installed <- needed_packages[!(needed_packages %in% installed.packages()[, "Package"])]
+# Install not installed packages
+if (length(not_installed)) { install.packages(not_installed) }
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(cowplot)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(pastecs) #For creating descriptive statistic summaries
+library(ggplot2) #For creating histograms with more detail than plot
+library(semTools) #For skewness and kurtosis
+library(car) # For Levene's test for homogeneity of variance
+library(effectsize) #To calculate effect size for t-test
+library(stargazer)
+library(stats)
+```
+
+<!---
+# ***********************************************************************
+#
+#                    Main body of program
+#
+# ***********************************************************************
+# ********************************************************************
+#
+#   Part 1:
+#
+# ********************************************************************
+-->
+
+# Introduction: {-}
+The purpose of this report is to address all statistical concepts comprehensively and demonstrate coherent understanding of statistical analysis through an independent project, as covered during the TU060 MATH9102 Module. For this part of the assignment we will be using a dataset of academic performance evolution for engineering students. The dataset (E. Delahoz-Dominguez et al., 2020) contains the results in national assessments for secondary and university education in engineering students and contains academic, social, economic information for 12,411 students. The data was collected as part of the Master’s Degree in Engineering project of the Technological University of Bolívar (UTB) titled Academic Efficiency Analysis in Engineering students.
+<p></p>
+
+A full descriptor is available [here](https://www.sciencedirect.com/science/article/pii/S2352340920304315). The dataset is available for download at from [mendeley](https://data.mendeley.com/datasets/83tcx8psxv/1).
+
+
+### Option A Selected {-}
+We have selected option A. The assignment is broken into different sections, each section addressing different requirements. Option A includes the following learning outcomes which are illustrated with references to the academic performance dataset provided:
+
+* State (a) research question(s) which can be investigated using statistical analysis.
+* Develop testable hypotheses by building a linear or a logistic regression model.
+* Derive and present appropriate statistical evidence.
+* Using either linear regression or logistic regression.
+    +Build a baseline regression model with at least 2 predictors.
+    - Assess its fit and usefulness.
+    - Test the assumptions of the approach.
+    - Illustrate findings using appropriate examples from the data.
+  + Build at least one additional model which extends this baseline either adding or removing predictors relevant to your hypotheses.
+      - Note: The model must have at least 2 predictors.
+      - Assess its fit and usefulness.
+      - Test the assumptions of the approach.
+      - Illustrate our findings using appropriate examples from the data.
+  + Compare the fit and usefulness of our successive models.
+* Note: At least one of our models should investigate a differential effect.
+
+
+# Research Question(s)
+This section captured the main research question for this independent project. We've included the research goal and broken down the research question into three parts that can be validated through statistical methods.
+
+## Research Goal:
+> To gain a deeper understanding of the nature of the relationship between engineering student academic performance and socio-economic factors.
+
+## Main Research Questions:
+
+> Can an engineering student’s final university performance in engineering be predicted from a combination of past performance in national standardised tests at the final year of high school, is there a difference between private and public school students and is there a differential effect for male and female students?
+
+To answer this main research question, we also must look at a number of contributing descriptive, comparative and relational questions, which serve to explore specific aspects of the data.
+
+### Question 1
+RQ: What is the relationship between student high school performance and university performance?
+
+*Hypothesis*; Students who perform well overall in highschool will perform well in engineering at university.
+
+### Question 2
+RQ: What is the relationship between attending a private or public school and final educational achievement?
+
+*Hypothesis*; Students who attend private high schools will perform better overall in engineering at university.
+
+### Question 3
+RQ: What is the relationship between being male or female and final educational achievement?
+
+*Hypothesis*; There will be a difference in male and female student performance.
+
+
+# Data understanding / Prepare
+For this part of the assignment we will be using a dataset of academic performance evolution for engineering students.
+The dataset contains the results in national assessments for secondary and university education in engineering students
+and contains academic, social, economic information for 12,411 students. The sample contains 44 potential variables of interest.
+<p></p>
+
+## Describe the Sample:
+
+### Import dataset
+There are three files that should be imported. The RMD file attached to this report automatically downloads these datasets from github.
+
+* [data_academic_performance.xlsx](https://data.mendeley.com/public-files/datasets/83tcx8psxv/files/5c30de80-46ca-4565-8ae5-3531ed8c1cdc/file_downloaded).
+* [statistical_data_types_sheet1.csv - Numeric variables](ttps://ocarrolj.github.io/TU060_MATH9102_DATASET_HOSTING/assignment_statistical_data_types_sheet1.csv).
+* [statistical_data_types_sheet2.csv - Categorical variables](ttps://ocarrolj.github.io/TU060_MATH9102_DATASET_HOSTING/assignment_statistical_data_types_sheet2.csv).
+
+```{r Import Data, include=TRUE, echo=TRUE}
+############
+# PART: Import data
+############
+# Dateset 1 : Import sperformance-dataset
+uri <- 'https://ocarrolj.github.io/TU060_MATH9102_DATASET_HOSTING/data_academic_performance.xlsx'
+download.file(uri, 'data_academic_performance_downloaded.xlsx', mode = 'wb')
+tbl_sperf_all <- read_excel('data_academic_performance_downloaded.xlsx') %>% as.data.frame()
+names(tbl_sperf_all)[42] <- 'SECOND_DECILE' # Fix issue with the name of first field.
+
+# Datedescriptors 1 : Import numberic variables
+uri <- 'https://ocarrolj.github.io/TU060_MATH9102_DATASET_HOSTING/assignment_statistical_data_types_sheet1.csv'
+tbl_sperf_desciption_numeric <- read.csv(uri)
+
+# Datedescriptors 2 : Import categorical variables
+uri <- 'https://ocarrolj.github.io/TU060_MATH9102_DATASET_HOSTING/assignment_statistical_data_types_sheet2.csv'
+tbl_sperf_desciption_categorical <- read.csv(uri)
+
+```
+### Describe the dataset
+```{r Describe the sample}
+############
+# PART: Describe the sample
+############
+tbl_sperf_desciption_numeric %>%
+  kbl(caption = "Statistical Data Types - Numeric",  booktabs = T) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+tbl_sperf_desciption_categorical %>%
+  kbl(caption = "Statistical Data Types - Categorical") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## Variables of interest to research question
+Based on our research question, the concepts we are interested in are:
+* Student performance in high-school (Represented by 5 continuous numerical variables)
+* The nature of the high-school attended (Represented by 1 Categorical variable - School_Nat)
+* The sex of the student (Represented by 1 Binary nominal Categorical variable - Gender)
+* The final performances of the student (Represented by the overall average score of the professional evaluation G_SC)
+
+### Quantitative Data:
+In the sample dataset there are 5 continuous numerical quantitative variables of interest related to student performance. The tables below contain statistics that describe the center point (Mean and Median), the shape (skew, kurtosis) and the variability (Standard Deviation, Variance). These statistics inform us about the overall shape and distribution of the variables under consideration. The shape of the distribution is important because it will help us during hypothesis testing to determine what sort of tests we can use; for instance, if we can use parametric tests or if we have to revert to the less statistically powerful non-parametric tests.
+<p></p>
+
+The first step in the process to understand our data is to validate normality of variables. To do this we generate summary statistics, histograms and Q-Q Plots for each of the variables. Should we discover that the variables are not ideally normal, we will need to quantify how far away from normal the data is by calculating the standard skew and kurtosis.
+<p>
+
+
+```{r section 2 - sample - numeric measurements}
+############
+# PART: Describe the numerical measurements and assess normality
+############
+tbl_sperf_continuous_scale <- tbl_sperf_all %>%
+  dplyr::select(MAT_S11, CR_S11, CC_S11, BIO_S11, ENG_S11, G_SC) %>%
+  as.data.frame()
+
+#------------------ Summary stats for Approximately Normal  -------------------#
+#tbl_sperf_continuous_scale_stats <- tbl_sperf_continuous_scale %>%
+#        psych::describe(omit = TRUE)  %>%
+#       as.data.frame() %>%
+#        dplyr::select(-(median:range),-trimmed)
+
+#--------------------- Iterate through eact variable --------------------------#
+#Generate regular summary statistics - not as nice as psych package but gives p value
+st <- pastecs::stat.desc(tbl_sperf_continuous_scale, basic = F)
+tbl_sperf_continuous_scale_2 <- st %>% data.table::transpose()
+colnames(tbl_sperf_continuous_scale_2) <- rownames(st)
+rownames(tbl_sperf_continuous_scale_2) <- colnames(st)
+
+# Initialise vectors
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_258 <- list()
+gt_329 <- list()
+variable_count <- nrow(tbl_sperf_continuous_scale_2)
+
+# Iterate through variables
+for (n in 1:variable_count) { variable <- row.names.data.frame(tbl_sperf_continuous_scale_2)[n]
+  tpskew                               <- semTools::skew(tbl_sperf_continuous_scale[[variable]])
+  tpkurt                               <- semTools::kurtosis(tbl_sperf_continuous_scale[[variable]])
+  std_skew[[variable]]                 <- tpskew[1] / tpskew[2]
+  std_kurt[[variable]]                 <- tpkurt[1] / tpkurt[2]
+  z_score                              <- abs(scale(tbl_sperf_continuous_scale[[variable]]))
+  gt_196[[variable]]                   <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+  gt_258[[variable]]                   <- FSA::perc(as.numeric(z_score), 2.58, "gt") # 99% within +/- 2.58
+  gt_329[[variable]]                   <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+
+}
+
+tbl_sperf_continuous_scale_2$std_skew <- std_skew
+tbl_sperf_continuous_scale_2$std_kurt <- std_kurt
+tbl_sperf_continuous_scale_2$gt_2sd <- gt_196
+tbl_sperf_continuous_scale_2$gt_P99 <- gt_258
+tbl_sperf_continuous_scale_2$gt_3sd <- gt_329
+
+# Pretty print
+tbl_sperf_continuous_scale_2 %>%
+  kbl(caption = "Summary statistics for Performance") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+
+```
+
+```{r section 2 - sample - numeric plots}
+############
+# PART: Visualize the numerical variables
+############
+
+# -------------- Box Plot --------------- #
+# Just a little box plot to eye skewness
+tbl_sperf_continuous_scale %>%
+  gather(MAT_S11, CR_S11, CC_S11, BIO_S11, ENG_S11, G_SC, key = "var", value = "value") %>%
+  ggplot(aes(x = var, y = value)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(y = "Grades", x = "Performance Variables", title = "Box Plots to eye ball variance")
+
+#------------------- Continuous Scale Data -------------------#
+#Create histograms
+num_diagram_count <- ncol(tbl_sperf_continuous_scale)
+plots <- list()
+for (n in 1:num_diagram_count) { variable <- colnames(tbl_sperf_continuous_scale)[n]
+  binwidth                                <- 4
+
+
+  gs <- ggplot(tbl_sperf_continuous_scale, aes_string(colnames(tbl_sperf_continuous_scale)[n]))
+  gs <- gs + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+  gs <- gs +
+    stat_function(fun = dnorm, color = "red", args = list(mean = mean(tbl_sperf_continuous_scale[, n]), sd = sd(tbl_sperf_continuous_scale[, n])), na.rm = TRUE) +
+    theme_bw()
+  gs <- gs + labs(x = variable)
+  gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+  #------------- Q-Q Plot -------------#
+  label <- paste("Q-Q Plot for", names(tbl_sperf_continuous_scale)[n])
+  gs2   <- ggplot(tbl_sperf_continuous_scale, aes_string(sample = colnames(tbl_sperf_continuous_scale)[n])) +
+    stat_qq() +
+    stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+    theme_bw() +
+    labs(title = "Q-Q Plot", subtitle = variable)
+
+  # Gather All the plots
+  plots[[names(tbl_sperf_continuous_scale)[n]]] <- gs
+  plots[[label]]                                <- gs2
+
+  plot_grid(gs, gs2, labels = "", ncol = 2) %>% show() }
+
+
+
+
+
+```
+At first inspection, the histograms appear to show approximately normal distributions for all variables, but the Boxplots, Q-Q Plots and summary statistics show that we may have an issue with skewness, kurtosis and outliers. For skewness and kurtosis standardised score, we use George, D., & Mallery, M. (2003) heuristics. Which states that a standardised score (value/std.error) for skewness (and kurtosis) between +/-2 (1.96 rounded) are considered acceptable in order to assume a normal univariate distribution. None of the variables of interest meet the criteria and all have excessive skew and Kurtosis. The distribution shape is not acceptable so we need to determine the proportion of our distribution which are outliers.
+<p></p>
+
+
+We converted the raw scores for our variables into standardised scores. If 95% of our data falls within +/- 1.96 (+/- 2.58 if our sample size is greater than 80) then we can treat the data as normal (using the empirical rule). In our case the sample size is larger than 80 cases, so a case is an outlier if its standard score is +/- 3.29 or beyond. For CR_S11 .37% of our data is outside our range, for CC_S11 .47% of our data is outside our range and this means we can not consider them normally distributed as our limit was .3% of our data.
+
+
+### Categorical/Qualitative data:
+
+In the sample dataset there are 26 categorical variables describing the social, economic and demographics attributes of students. For our analysis we are interested in Gender and School Nature. For categorical data, it doesn’t make sense to describe the data in terms of average value or standard deviation since the numerical values are just an encoding and have no quantitative meaning. As such, we describe categorical data in terms of possible values and frequency of occurrence of those values. Important summary statistics include the count of distinct values, a list of possible values, the relative proportion that each value occurs, and the most frequently occurring value. The following table and figures describe the summary statistics for the categorical variables in the sample dataset.
+
+
+```{r section 2 - sample - categorical measurements}
+############
+# PART: Describe the categorical measurements
+############
+tbl_sperf_categorical_measurements <- tbl_sperf_all %>%
+  dplyr::select(GENDER, SCHOOL_NAT) %>%
+  as.data.frame()
+
+tbl_sperf_categorical_stats <- tbl_sperf_categorical_measurements %>% summarytools::freq()
+
+tbl_sperf_categorical_stats %>% show()
+```
+```{r Visualisation of categorical measurement statistics 1}
+############
+# PART: Visualisation of categorical measurement statistics
+############
+plots <- list()
+
+gs <- tbl_sperf_categorical_measurements %>% ggplot(aes(x = GENDER))
+gs <- gs + labs(x = 'Student Sex')
+gs <- gs + geom_bar(colour = "black", aes(y = ..prop.., group = 1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["gender"]] <- gs
+
+gs <- tbl_sperf_categorical_measurements %>% ggplot(aes(x = SCHOOL_NAT))
+gs <- gs + labs(x = 'Nature of School')
+gs <- gs + geom_bar(colour = "black", aes(y = ..prop.., group = 1, fill = ..count..))
+gs <- gs + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+plots[["SCHOOL_NAT"]] <- gs
+
+plot_grid(plotlist = plots, labels = "auto", ncol = 2, align = 'h', hjust = -1.0, vjust = 2, label_size = 7)
+```
+## Potential Issues and Shortcomings
+
+###	Missing Data
+Missing data can be considered to be an outlier. This is where we have a variable but we are missing a value for that variable in some records. It is common, particularly when dealing with data related to human beings, that not all variables will have values in all cases. In the engineering performance dataset there are variables with missing values, for example approximately 1% of students did not indicate if they had a job or not. For the variables of interest for our research question, all student records have all variables, and as such missing data is not considered to be an issue.
+
+### Representativeness
+To make generalised statements regarding the results in national assessments for secondary and university education in the engineering student population, two necessary (though not sufficient) requirements are that the sample be big enough and representative. “Big enough” means that whatever we’re interested in investigating as part of our statistical analysis, can be found in our sample if it is present in the population. The sample has records from 12,411 students across 3649 schools, 134 universities and 21 academic programs. The dataset is both broad and deep.
+“Representative” means that the characteristics of our sample mirrors the representation in the population in the same proportions. For example, If we are interested in privately educated versus publicly educated, then we need to have a similar fraction of students in our sample from private schools and students from public schools, in proportion to that which prevails in the wider engineering student population. Without an understanding of the general population it is difficult to assert that the sample is representative, however we can determine specific dimensions which are unlikely to be, for example the number of responses for each university varies significantly from 1 to 639 responses. As such if we wished to perform statistical analysis between universities or within the population or a given university our analysis may not be representative.
+<p></p>
+For the variables of interest, critical reading at highschool level (CR_11) and citizen competencies (CC_11) appear to have a disproportionate number of students obtaining maximum scores. This might suggest an over-sampling of high achievers within the dataset. Similarly, many of the variables do not have records for low scores. This is less surprising since our population is highschool students who attended and completed engineering courses at a university. Students who failed highschool or failed their university course would naturally not be represented in this dataset.
+<p></p>
+
+
+# Results
+## Statistical Evidence
+In this section we will look to provide statistical evidence for the inclusion of variables in our hypotheses test. The steps for hypothesis testing are:
+Determine whether variables are related to one another.
+<p></P
+
+* Investigate if differential effects exist for different groups.
+* Provide statistical evidence that justifies the inclusion of these variables in a predictive model.
+<p></p>
+
+The first step is to collect data to see whether our hypotheses are accurate. In section 2 we already selected a number of variables for consideration. The next step is to investigate if our predictor variables are related to our outcome variable through correlation or if there is a differential effect for different groups. This will provide the justification for including these variables in our predictive models.
+
+### Correlation
+One of the tests for correlation is the Pearson Correlation. This requires that the variables be normally distributed and the relationship linear. Non-Parametric Spearman or Kendall tests can be used when the data doesn’t meet the criteria to be considered normal and the assumptions of Pearson are violated. Spearman does require a monotonic relationship however.
+
+#### Step 1 Check for Linearity of Co Variance
+Pearson Correlation requires there to be a linear relationship between the two variables, as Pearson uses the equation of a line to model the relationship. We validate this condition through inspection of a scatter plot, which should resemble a straight line rather than a curved line. For linearity of Covariance (Homoscedasticity) we want the values to be evenly spaced around the line in a rectangular space. The shape of the scatterplot for the normally distributed variables is tube-like in shape indicating homoscedasticity.
+
+```{r section 3 Step 1 Check for Linearity of Co Variance, include=TRUE, echo=TRUE}
+############
+# PART: Visualisation of Linearity of Co Variance
+############
+plots <- list()
+
+#------------------- Generate Plots-------------------#
+#Create histograms
+gs <- tbl_sperf_continuous_scale %>% ggplot2::ggplot(aes(x = MAT_S11, y = G_SC))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Highschool Mathematics score (MAT_S11)", y = "Final University Global Score (G_SC)")
+plots[["math"]] <- gs
+
+gs <- tbl_sperf_continuous_scale %>% ggplot2::ggplot(aes(x = BIO_S11, y = G_SC))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Highschool Biology score (BIO_S11)", y = "Final University Global Score (G_SC)")
+plots[["bio"]] <- gs
+
+gs <- tbl_sperf_continuous_scale %>% ggplot2::ggplot(aes(x = ENG_S11, y = G_SC))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Highschool Engineering score (ENG_S11)", y = "Final University Global Score (G_SC)")
+plots[["eng"]] <- gs
+
+plot_grid(plotlist = plots, labels = "", ncol = 3)
+
+```
+
+#### Step 2 Run the pearson correlation test
+```{r Section 3 Run the pearson correlection test, include=TRUE, echo=TRUE}
+############
+# PART: Correlation test
+############
+#Pearson Correlation
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_continuous_scale$MAT_S11, tbl_sperf_continuous_scale$G_SC, method = 'pearson')
+show(tbl_correlation_stats)
+
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_continuous_scale$BIO_S11, tbl_sperf_continuous_scale$G_SC, method = 'pearson')
+show(tbl_correlation_stats)
+
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_continuous_scale$ENG_S11, tbl_sperf_continuous_scale$G_SC, method = 'pearson')
+show(tbl_correlation_stats)
+
+```
+
+
+#### Step 3:
+Spearman Correlation requires there to be a monotonic relationship between the two variables. The below graphs show that condition is met.
+
+```{r section 3 Check for monontonic increasing variables, include=TRUE, echo=TRUE}
+############
+# PART: Visualisation of non-normally distributed variables
+############
+plots <- list()
+
+gs <- tbl_sperf_continuous_scale %>% ggplot2::ggplot(aes(x = CR_S11, y = G_SC))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Highschool Critical Reading score (CR_S11)", y = "Final University Global Score (G_SC)")
+plots[["CR"]] <- gs
+
+gs <- tbl_sperf_continuous_scale %>% ggplot2::ggplot(aes(x = CC_S11, y = G_SC))
+gs <- gs +
+  geom_point() +
+  geom_smooth(method = "lm", colour = "Red", se = F) +
+  labs(x = "Highschool Citizen Competencies score (CC_S11)", y = "Final University Global Score (G_SC)")
+plots[["CC"]] <- gs
+
+
+plot_grid(plotlist = plots, labels = "", ncol = 2)
+
+```
+
+#### Step 4 Run the Spearman correlation test
+
+```{r Section 3 Run the Spearman correlection test,include=TRUE, echo=TRUE}
+############
+# PART: Correlation test
+############
+#Pearson Correlation
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_continuous_scale$CR_S11, tbl_sperf_continuous_scale$G_SC, method = 'spearman')
+show(tbl_correlation_stats)
+
+tbl_correlation_stats <- stats::cor.test(tbl_sperf_continuous_scale$CC_S11, tbl_sperf_continuous_scale$G_SC, method = 'spearman')
+show(tbl_correlation_stats)
+
+
+```
+
+#### Reporting Correlation
+The relationship between high school maths score (MAT_S11) and final university performance (G_SC) was investigated using a Pearson Correlation. A strong positive correlation was found (r = .644, n = 12409, p < .001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between high school maths score and final university performance.
+
+The relationship between high school biology score (BIO_S11) and final university performance (G_SC) was investigated using a Pearson Correlation. A strong positive correlation was found (r = .667, n = 12409, p < .001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between high school biology score and final university performance.
+
+The relationship between high school engineering score (ENG_S11) and final university performance (G_SC) was investigated using a Pearson Correlation. A strong positive correlation was found (r = .662, n = 12409, p < .001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between high school engineering score and final university performance.
+
+The relationship between high school critical reading score (CR_S11) and final university performance (G_SC) was investigated using a Spearman Correlation. A strong positive correlation was found (rho = .669, p < .001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between high school critical reading score and final university performance.
+
+The relationship between high school citizen competencies score (CC_S11) and final university performance (G_SC) was investigated using a Pearson Correlation. A strong positive correlation was found (rho = .65, p < .001). There is therefore evidence to reject the null hypothesis and accept the alternative hypothesis that there is a relationship between high school citizen competencies score and final university performance.
+
+### Difference tests
+Before we can build a predictive model, we need to work out which groupings to include in our hypothesis testing. The choice of test we perform to Investigate if differential effects exist depends on the measurement level of the variable and the shape of the data. If our data measurement level is at interval data and normally distributed then we can use the independent samples t-test, provided the variables are independent. If our data is ordinal or is continuous scale data that does not conform to the normal distribution, then we must use a non-parametric test, such as the Mann-Whitney U-Test.
+<p></p>
+
+We will be using a number of heuristics to justify our assessment of differential effects. A benchmark suggested by Cohen (1988) is to consider an effect size d as small (d = 0.2), medium (d = 0.5), or large (d = 0.8) for the independent samples t-test.
+<p></p>
+
+#### Step 1 Check for Homogeneity of Variance for different groups
+Homogeneity of variance means that the pattern in variance of the variable around the mean for each group is the same. The t-test is a robust test and it does not require Homogeneity of variance between the two groups, however if we can assume homogeneity of variance we increase the power of the t-test.
+<p></p>
+
+```{r Check for Homogeneity of Variance - Summary stats, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Homoscedasticity
+############
+# Create a subset dataframe with just the variables of interest.
+tbl_sperf_sex_nat_diff <- tbl_sperf_all %>% dplyr::select(MAT_S11, CR_S11, CC_S11, BIO_S11, ENG_S11, G_SC, GENDER, SCHOOL_NAT)
+# -------------- Box Plot --------------- #
+# Just a little eye ball test fo variance and mean to cross check with Leven's test
+tbl_sperf_sex_nat_diff %>%
+  gather(MAT_S11, CR_S11, CC_S11, BIO_S11, ENG_S11, G_SC, key = "var", value = "value") %>%
+  ggplot(aes(x = var, y = value, fill = GENDER)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(y = "Grades", x = "Performance Variables", title = "Box Plots to eye ball variance", subtitle = "Difference testing: Male and Female")
+
+# -------------- Box Plot --------------- #
+# Just a little eye ball test fo variance and mean to cross check with Leven's test
+tbl_sperf_sex_nat_diff %>%
+  gather(MAT_S11, CR_S11, CC_S11, BIO_S11, ENG_S11, G_SC, key = "var", value = "value") %>%
+  ggplot(aes(x = var, y = value, fill = SCHOOL_NAT)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(y = "Grades", x = "Performance Variables", title = "Box Plots to eye ball variance", subtitle = "Difference testing: Public and Private Highschools")
+
+# -------------- Create summary statistics --------------- #
+tbl_sperf_sex_diff_stats <- tbl_sperf_sex_nat_diff %>%
+  dplyr::select(-(SCHOOL_NAT)) %>%
+  psych::describeBy(tbl_sperf_sex_nat_diff$GENDER, mat = TRUE) %>%
+  filter(!is.na(skew)) # removes categorical variables.
+
+tbl_sperf_nat_diff_stats <- tbl_sperf_sex_nat_diff %>%
+  dplyr::select(-(GENDER)) %>%
+  psych::describeBy(tbl_sperf_sex_nat_diff$SCHOOL_NAT, mat = TRUE) %>%
+  filter(!is.na(skew))
+
+# Pretty print table
+tbl_sperf_sex_diff_stats %>%
+  kbl(caption = "Summary statistics for Performance by student Sex") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# Pretty print table
+tbl_sperf_nat_diff_stats %>%
+  kbl(caption = "Summary statistics for Performance by student highschool nature") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+```{r section 3 lavene test, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Levene test
+############
+# -------------- Levene's test --------------- #
+# Conduct Levene's test for homogeneity of variance in library car - the null hypothesis is that variances in groups are equal so to
+# assume homogeneity we woudl expect probaility to not be statistically significant.
+# Part 1: Iterate through variables with median for Gender
+variable_count <- 6
+result <- list()
+for (n in 1:variable_count) { variable <- colnames(tbl_sperf_sex_nat_diff)[n]
+  result[[variable]]                   <- car::leveneTest(y = tbl_sperf_sex_nat_diff[, 1], group = as.factor(tbl_sperf_sex_nat_diff$GENDER), center = median) }
+
+#Pr(>F) is your probability - in this case it is not statistically significant for any variable so we can assume homogeneity.
+print.listof(result)
+
+# Part 1: Iterate through variables with median for School Nature
+variable_count <- 6
+result <- list()
+for (n in 1:variable_count) { variable <- colnames(tbl_sperf_sex_nat_diff)[n]
+  result[[variable]]                   <- car::leveneTest(y = tbl_sperf_sex_nat_diff[, n], group = as.factor(tbl_sperf_sex_nat_diff$SCHOOL_NAT), center = median) }
+# Pr(>F) is your probability - in this case it is not statistically significant for any variable so we can assume homogeneity.
+# No difference in outcomes from using mean versus median, which is a good sign.
+print.listof(result)
+```
+#### Step 2 Select and run the T-Test for Gender
+Based on the analysis above, it is appropriate to select a parametric independent samples t-test to evaluate if two different groups exist for gender for Maths, Biology, Engineering and Final Score on the basis of student sex (male or female). For this t-test we will set the variance to be not equal for each difference test as a statistically significant difference in variance was discovered when the Lavene test was run.
+
+
+```{r section 3 t test part 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART 1: T-Test for Gender
+############
+# -------------- Conduct the t-test --------------- #
+#Conduct the t-test from package stats
+#In this case we can use the var.equal = FALSE option to specify not equal variances.
+
+tbl_test_result <- data.frame()
+tbl_test_effectsize <- data.frame()
+
+# Brittle code here, hardcoded variable of interest index.
+for (n in c(1, 4, 5, 6)) {
+  ## start
+  variable    <- colnames(tbl_sperf_sex_nat_diff)[n]
+  test_result <- stats::t.test(tbl_sperf_sex_nat_diff[, n] ~ as.factor(tbl_sperf_sex_nat_diff$GENDER), var.equal = FALSE) %>%
+          broom::tidy() %>%
+          as.data.frame()
+
+  # Build output table
+  row.names(test_result) <- variable
+  tbl_test_result        <- rbind(tbl_test_result, test_result)
+
+  #---------- Calculate Cohens D Effect size ---------- #
+  effcd <- round(effectsize::t_to_d(t = test_result$statistic, test_result$parameter), 2)
+
+  #---------- Calculate Eta Squared Effect size ---------- #
+  #Eta squared calculation
+  effes <- round((test_result$statistic * test_result$statistic) / ((test_result$statistic * test_result$statistic) + (test_result$parameter)), 3)
+
+  # Build output table
+  tbl_merged_effectsize            <- merge(effcd, effes)
+  row.names(tbl_merged_effectsize) <- variable
+  tbl_test_effectsize              <- rbind(tbl_test_effectsize, tbl_merged_effectsize)
+
+}
+
+## tidy up column names
+colnames(tbl_test_result)[1] <- 'mean.diff.est'
+colnames(tbl_test_result)[2] <- paste('mean', levels(as.factor(tbl_sperf_sex_nat_diff$GENDER))[1], sep = ".")
+colnames(tbl_test_result)[3] <- paste('mean', levels(as.factor(tbl_sperf_sex_nat_diff$GENDER))[2], sep = ".")
+colnames(tbl_test_result)[6] <- 'df'
+#P-value is your probability - in this case every result was statiscally significant @ P < .05*
+
+# -------------- Pretty Print Test statistics --------------- #
+tbl_test_result %>%
+        kbl(caption = "Summary of T-Test Statistics for the Male and Female student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+# -------------- Pretty Print Test Effect size --------------- #
+tbl_test_effectsize %>%
+        kbl(caption = "Summary of T-Test Effectsize for the Male and Female student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+#### Step 3 select and run the T-Test for School Nature
+Based on the analysis above, it is appropriate to  select a parametric independent samples t-test to evaluate if two different groups exist for Maths, Biology, Engineering and Final Score on the basis of School nature (public or private). For this t-test we will set the variance to be not equal.
+
+```{r section 3 t test part 2, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART 2: T-Test for School Nature
+############
+# -------------- Conduct the t-test --------------- #
+#Conduct the t-test from package stats
+#In this case we can use the var.equal = FALSE option to specify not equal variances.
+
+tbl_test_result <- data.frame()
+tbl_test_effectsize <- data.frame()
+
+# Brittle code here, hardcoded variable of interest index.
+for (n in c(1, 4, 5, 6)) {
+  ## start
+  variable    <- colnames(tbl_sperf_sex_nat_diff)[n]
+  test_result <- stats::t.test(tbl_sperf_sex_nat_diff[, n] ~ as.factor(tbl_sperf_sex_nat_diff$SCHOOL_NAT), var.equal = FALSE) %>%
+          broom::tidy() %>%
+          as.data.frame()
+
+  # Build output table
+  row.names(test_result) <- variable
+  tbl_test_result        <- rbind(tbl_test_result, test_result)
+
+  #---------- Calculate Cohens D Effect size ---------- #
+  effcd <- round(effectsize::t_to_d(t = test_result$statistic, test_result$parameter), 2)
+
+  #---------- Calculate Eta Squared Effect size ---------- #
+  #Eta squared calculation
+  effes <- round((test_result$statistic * test_result$statistic) / ((test_result$statistic * test_result$statistic) + (test_result$parameter)), 3)
+
+  # Build output table
+  tbl_merged_effectsize            <- merge(effcd, effes)
+  row.names(tbl_merged_effectsize) <- variable
+  tbl_test_effectsize              <- rbind(tbl_test_effectsize, tbl_merged_effectsize)
+
+}
+
+## tidy up column names
+colnames(tbl_test_result)[1] <- 'mean.diff.est'
+colnames(tbl_test_result)[2] <- paste('mean', levels(as.factor(tbl_sperf_sex_nat_diff$SCHOOL_NAT))[1], sep = ".")
+colnames(tbl_test_result)[3] <- paste('mean', levels(as.factor(tbl_sperf_sex_nat_diff$SCHOOL_NAT))[2], sep = ".")
+colnames(tbl_test_result)[6] <- 'df'
+#P-value is your probability - in this case every result was statiscally significant @ P < .05*
+
+# -------------- Pretty Print Test statistics --------------- #
+tbl_test_result %>%
+        kbl(caption = "Summary of T-Test Statistics for the Private and Public student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+# -------------- Pretty Print Test Effect size --------------- #
+tbl_test_effectsize %>%
+        kbl(caption = "Summary of T-Test Effectsize for the Private and Public student Groups") %>%
+        kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+#### Reporting gender difference with Cohen's D
+An independent-samples t-test was conducted to compare highschool maths final scores for students who are male or female. A statistically significant result was found (M = 65.96, SD = 12.06 for Male students, M = 61.93, SD = 11.17 for female students), (t(11353) = -19.07, p < .001). Cohen’s d also indicated a small effect size (d = - 0.36).
+<p></p>
+
+An independent-samples t-test was conducted to compare highschool biology final scores for students who are male or female. A statistically significant result was found (M = 65.96, SD = 11.42 for Male students, M = 62.27, SD = 10.53 for female students), (t(11383) = -14.22, p < .001). Cohen’s d also indicated a small effect size (d = - 0.27).
+<p></p>
+
+An independent-samples t-test was conducted to compare highschool engineering final scores for students who are male or female. A statistically significant result was found (M = 62.04 SD = 14.63 for Male students, M = 61.45, SD = 13.78 for female students), (t(11240) = -2.28, p < .05). Cohen’s d also indicated a very small effect size (d = -0.04).
+<p></p>
+
+An independent-samples t-test was conducted to compare final university global scores for students who are male or female. A statistically significant result was found (M = 163.69 SD = 23.58 for Male students, M = 161.28, SD = 22.33 for female students), (t(11207) = -5.78, p < .001). Cohen’s d also indicated a very small effect size (d = -0.11).
+<p></p>
+
+For the sake of expedience testing for the normal variables has been omitted.
+
+#### Reporting school nature difference with Cohen's D
+An independent-samples t-test was conducted to compare highschool maths final scores for students who attended private or public schools. A statistically significant result was found (M = 66.88, SD = 12.14 for private school students, M = 61.44, SD = 11.17 for public school students), (t(12408) = 26.37, p < .001). Cohen’s d also indicated a small effect size (d = 0.47).
+<p></p>
+
+An independent-samples t-test was conducted to compare highschool biology final scores for students who attended private or public schools. A statistically significant result was found (M = 66.08, SD = 11.21 for private school students, M = 61.56, SD = 10.60 for public school students), (t(12364) = 23.07, p < .001). Cohen’s d also indicated a small effect size (d = 0.41).
+<p></p>
+
+An independent-samples t-test was conducted to compare highschool engineering final scores for students who attended private or public schools. A statistically significant result was found (M = 67.08, SD = 14.89 for private school students, M = 55.87, SD = 10.89 for public school students), (t(11971) = 48.22, p < .001). Cohen’s d also indicated a large effect size (d = 0.88).
+<p></p>
+
+An independent-samples t-test was conducted to compare final university global scores for students who attended private or public schools. A statistically significant result was found (M = 168.22, SD = 22.82 for private school students, M = 156.52, SD = 21.84 for public school students), (t(12345) = 29.14, p < .001). Cohen’s d also indicated a moderate effect size (d = 0.52).
+
+<p></p>
+For the sake of expedience testing for the normal variables has been omitted and we will not use these variables in the later sections.
+
+## Model 1
+### Multiple Linear Regression of student performance
+We are looking to determine how much collectively a set of predictors contribute to the outcome variable on average and additionally, how much do each of the individual predictors contribute on average.
+
+> HA: Students who perform well overall in highschool will perform well in engineering at university. In this model we have 3 predictor variables (student highschool scores in maths, biology and engineering) and 1 outcome variable (final university score).
+
+
+
+#### Step 1: Run Multiple Linear Regression
+Given the assumptions of normality and that a positive correlation exists between the predictors and outcome variables, it is safe to use the dataset to build a predictive model.
+
+```{r reg_model_1 Simple LM Regression, warning = FALSE,  include=FALSE, echo = FALSE}
+############
+# PART: Simple Linear Regression,
+############
+# Included just for double checking, not outputted in the report
+# -------------- Linear Regression --------------- #
+reg_model <-lm(tbl_sperf_sex_nat_diff$G_SC~tbl_sperf_sex_nat_diff$ENG_S11)
+
+# -------------- Determine how good our model is versus using the mean --------------- #
+anova(reg_model) ## Get sums of squares of variability
+summary(reg_model)
+lm.beta::lm.beta(reg_model) # Not needed as units are the same for predictor and outcome
+stargazer(reg_model, type="text")
+
+```
+
+```{r Multipsle Regression 1, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Multiple Linear Regression
+############
+
+# -------------- Regression --------------- #
+reg_model_1 <-lm(tbl_sperf_sex_nat_diff$G_SC~tbl_sperf_sex_nat_diff$ENG_S11+tbl_sperf_sex_nat_diff$MAT_S11+tbl_sperf_sex_nat_diff$BIO_S11)
+
+# -------------- Determine how good our model is versus using the mean --------------- #
+stats::anova(reg_model_1) ## Get sums of squares of variability
+summary(reg_model_1)
+stargazer(reg_model_1, type ="text")
+
+```
+```{r Model 1 - Equation}
+############
+# PART: Multiple Linear Regression Equation
+############
+#https://cran.r-project.org/web/packages/ggiraphExtra/vignettes/ggPredict.html
+#------------ First Model: -----------#
+equation1 <- function(x1, x2, x3) { coef(reg_model_1)[2] * x1 +
+        coef(reg_model_1)[3] * x2 +
+        coef(reg_model_1)[4] * x3 +
+        coef(reg_model_1)[1] }
+
+```
+#### Step 2: Assessing the regression model: diagnostics
+##### Outliers and residuals
+
+The first step is to identify our outliers in terms of our residuals. In other words, observations that have an unusual error compared to our model. Based on the assessment below we can assume normal distribution of residuals. We calculated standardised scores for skew and kurtosis and found both were outside our acceptable range of +/- 3.29. However, we found that 95% of values fell within 2 standard deviations (+/- 1.96) of our mean at a cut off value of 0.05. No records had a cooks d value greater than 1. We concluded the outliers will not have a significant effect on the usefulness of this model.
+
+```{r Section 3 Check for residual outliers,  warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: check for outliers in our residuals
+############
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+#--------------- Check for percentage outliers ---------------#
+variable <- "model1_stats"
+st <- as.data.frame(pastecs::stat.desc(reg_model_1$residuals, basic = F))
+model_1_stats <- st %>% data.table::transpose()
+colnames(model_1_stats) <- rownames(st)
+rownames(model_1_stats) <-('Model 1: Residuals')
+
+## Build standard statistics
+tpskew <- semTools::skew(reg_model_1$residuals)
+tpkurt <- semTools::kurtosis(reg_model_1$residuals)
+std_skew[[variable]] <- tpskew[1] / tpskew[2]
+std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+z_score <- abs(scale(reg_model_1$residuals))
+gt_196[[variable]] <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+gt_329[[variable]] <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+cooksd_gt_1 <- FSA::perc(as.numeric(cooks.distance(reg_model_1)), 1, "gt") # How many records are greater than 1.
+
+## Build output
+model_1_stats$std_skew <- std_skew
+model_1_stats$std_kurt <- std_kurt
+model_1_stats$gt_2sd <- gt_196
+model_1_stats$gt_3sd <- gt_329
+model_1_stats$cooksd_gt_1 <- cooksd_gt_1
+
+#-------- Pretty print my table -------#
+model_1_stats %>%
+  kbl(caption = "Summary statistics for Residuals - Model 1") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+
+```{r Model 1 - Visualisation Histograms for residuals, echo=TRUE, include=TRUE}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+
+binwidth <- 10
+gs1 <- reg_model_1 %>% ggplot(aes(x = reg_model_1$residuals))
+gs1 <- gs1 + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+gs1 <- gs1 + stat_function(fun = dnorm, color = "red", args = list(mean = model_1_stats$mean, sd = model_1_stats$std.dev), na.rm = TRUE)
+gs1 <- gs1 + labs(x = "Model 1 Residuals: G_SC predicted by MAT_S11,BIO_S11 & ENG_S11")
+gs1 <- gs1 + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+
+gs2 <- reg_model_1 %>% ggplot(aes(sample = reg_model_1$residuals)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Model 1 Residuals", subtitle = "G_SC predicted by MAT_S11,BIO_S11 & ENG_S11")
+
+
+plot_grid(gs1, gs2, labels = "", ncol = 2)
+```
+
+##### Influential observations
+
+As well as testing for outliers, we also looked at whether certain cases exert undue influence over the parameters of the model. An influential observation is an observation that changes the slope of the line of best fit for our model. This type of analysis can help to determine whether the regression model is stable or if a few observations have a large bias on the fit of the model. Cook’s distance is a measure of the overall influence of a case on the model, and Cook and Weisberg (1982) suggests any value of 1 should be investigated. As mentioned we have no outliers with a cohens D greater than 1.
+
+```{r Model 1 - Influential outliers, echo=TRUE, include=TRUE}
+############
+# PART: Model 1 Check for Influential outliers
+############
+#--------------- Influential Outliers - Cook's distance ---------------#
+cooksd<-sort(cooks.distance(reg_model_1))
+# plot Cook's distance
+plot(cooksd, pch="*", cex=2, main="Influential Obs by Cooks distance")
+abline(h = 4*mean(cooksd, na.rm=T), col="red")  # add cutoff line
+text(x = seq_along(cooksd) +1, y =cooksd, labels =ifelse(cooksd>4*mean(cooksd, na.rm =T), names(cooksd), ""), col ="red")  # add labels
+
+#--------------- find rows related to influential observations ---------------#
+influential <- as.numeric(names(cooksd)[(cooksd > 4*mean(cooksd, na.rm=T))])  # influential row numbers
+stem(influential)
+head(tbl_sperf_sex_nat_diff[influential, ])  # influential observations.
+
+car::outlierTest(reg_model_1) # Bonferonni p-value for most extreme obs - Are there any cases where the outcome variable has an unusual variable for its predictor values?
+car::leveragePlots(reg_model_1) # leverage plots
+
+
+```
+
+##### Homoscedasticity of Residuals
+ At each level of the predictor variable(s), the variance of the residual terms should be constant. This just means that the residuals at each level of the predictor(s) should have the same variance (homoscedasticity). Below the first plot is the chart of residuals vs fitted values, in the second plot the standardised/studentized residuals are on the Y axis. We see a completely random, equal distribution of points throughout the range of X axis and an almost flat red line. We see that there is no real pattern in the residuals and that they are equally spread around the y = 0 line (the dashed line). We concluded that there is no homoscedasticity of Residuals for this
+
+
+```{r model 1 check for homoscedasticity of residuals, echo=TRUE, include=TRUE}
+############
+# PART: Model 1 Check for homoscedasticity outliers
+############
+# --------------- residuals vs fitted values ---------- #
+plot(reg_model_1, 1)
+# --------------- studentized residuals --------------- #
+plot(reg_model_1, 3)
+# --------------- Q-Q plot studentized residuals --------------- #
+car::qqPlot(reg_model_1, main = "QQ Plot") #qq plot for studentized resid
+
+var_G_SC <- var(as.numeric(tbl_sperf_sex_nat_diff$G_SC, rm.na = TRUE)) %>% round(2)
+
+```
+##### Collinearity of predictors
+Collinearity exists when there is a strong correlation between two or more predictors in a regression model. It occurs when two or more independent variables contain strongly redundant information. We assess Collinearity by examining a correlation matrix that compares the predictor variables with each other. No correlation coefficient above 0.8 was found indicating no strong correlation is present. We also generated the variance inflation factor (VIF) for each predictor and found them to be all below 10 as suggested by Myers (1990). Related to the VIF is the tolerance statistic, which is its reciprocal (1/VIF). Lecture notes indicated that we should use the heuristic suggested by Tarling (2008).
+
+> One should be concerned if VIF is above 2.5. (A VIF of 2.5 is equivalent to a tolerance of .4.)
+
+As such, tests to see if the data met the assumption of collinearity indicated that multicollinearity was a concern for two predictors (Math highschool score, Tolerance = .39, VIF = 2.59; Biology highschool score, Tolerance = .39, VIF = 2.58)
+
+
+```{r Correlation matrix for all, echo=TRUE}
+### Correlation matrix for all
+correlation_matrix <- tbl_sperf_sex_nat_diff %>%
+        dplyr::select(ENG_S11,MAT_S11,BIO_S11) %>%
+        as.matrix() %>%
+        Hmisc::rcorr()
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+title <- "Model 1: Correlation matrix for all Predictors variables"
+gs <- corrplot::corrplot(correlation_matrix$r, method = "color", col = col(200), type = "upper", order = "hclust", addCoef.col = "black",              # Add coefficient of correlation
+               tl.col                       = "black", tl.srt = 45,                                                                          #Text label color and rotation
+               # Combine with significance
+               p.mat                        = correlation_matrix$p, sig.level = 0.01, insig = "blank",
+               # hide correlation coefficient on the principal diagonal
+               diag                         = FALSE, title = title, mar = c(0, 0, 2, 0) ) # http://stackoverflow.com/a/14754408/54964)
+```
+
+```{r vif for all, echo=TRUE}
+#------------Calculate Collinearity ------------#
+vifmodel<-car::vif(reg_model_1) %>% as.data.frame()
+colnames(vifmodel) <- 'VIF'
+#Calculate tolerance
+vifmodel$Tolerance <- 1/vifmodel$VIF
+rownames(vifmodel) <- c('ENG_S11','MAT_S11','BIO_S11')
+
+#-------- Pretty print my table -------#
+vifmodel %>%
+  kbl(caption = "Summary statistics for Residuals - Model 1") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+### Reporting on Model 1
+<!-- https://www.statisticssolutions.com/reporting-statistics-in-apa-format/ -->
+The following predictive model was generated:
+
+\begin{equation}
+  G\_SC\ (Predicted) = 0.595*ENG\_S11 + 0.386*MAT\_S11 + 0.615*BIO\_S11 + 61.774
+  (\#eq:model1)
+\end{equation}
+
+The relationship between high school maths score (MAT_S11), high school biology score (BIO_S11) high school engineering score (ENG_S11) and university final performance (G_SC) was modeled using a multiple linear model. The model was found to be statistically significant difference at the p < .001 level (F(3, 12407)= 5467, p<0.01). The model explains 57% of the variance in the outcome variable $R^2 = .569$.
+
+The individual predictors were examined further and indicated that Engineering (t = 75.58, p < .001), Biology (t = 31.39, p < .001) and Math (t = 20.92, p < .001) scores at the end of highschool were all significant predictors in the model.
+<p></p>
+
+Examination of the histogram, normal P-P plot of standardised residuals and the scatterplot of the dependent variable (final university score) and standardised residuals showed that some outliers existed. However, examination of the standardised residuals showed that none could be considered to have undue influence (95% within limits of +/1 1.96 and none with Cook’s distance > 1).
+<p></p>
+
+The scatterplot of standardised residuals showed that the data met the assumptions of homogeneity of variance and linearity. The data also meets the assumption of non-zero variances of the predictor. Examination for multicollinearity showed that the tolerance and variance influence factor measures were outside the acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008).
+
+
+## Model 2
+
+### Multiple Linear Regression of student performance
+As part of our assessment of model 1 \@ref(eq:model1) we determined that there is an issue with Collinearity of predictors. Math and Biology were found to have VIF statistic values of concern. As such, our second model is also a Multiple linear regression model with continuous scale predictors but with the Math variable removed. Math was removed from the model because it had the weaker effect size and in the model had a smaller coefficient.
+
+> HA: Students who perform well overall in highschool will perform well in engineering at university.
+
+In this model we have 2 predictor variables, student highschool scores in biology and engineering and 1 outcome variable, final university score.
+
+#### Step 1: Run Multiple Linear Regression
+Given the assumptions of normality and that a positive correlation exists between the predictors and outcome variables, it is acceptable to use the dataset to build a predictive model.
+
+```{r Multiple Regression 2, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Multiple Linear Regression
+############
+# -------------- Regression --------------- #
+reg_model_2 <-lm(tbl_sperf_sex_nat_diff$G_SC~tbl_sperf_sex_nat_diff$ENG_S11+tbl_sperf_sex_nat_diff$BIO_S11)
+
+# -------------- Determine how good our model is versus using the mean --------------- #
+stats::anova(reg_model_2) ## Get sums of squares of variability
+summary(reg_model_2)
+stargazer(reg_model_1, reg_model_2,type ="text")
+
+```
+
+```{r Model 2 - Equation}
+############
+# PART: Multiple Linear Regression Equation
+############
+#https://cran.r-project.org/web/packages/ggiraphExtra/vignettes/ggPredict.html
+#------------ Second Model: -----------#
+equation2 <- function(x1, x2) { coef(reg_model_2)[2] * x1 +
+        coef(reg_model_2)[3] * x2 +
+        coef(reg_model_2)[1] }
+
+```
+
+
+
+#### Step 2: Assessing the regression model: diagnostics
+##### Outliers and residuals
+Based on the assessment below, we can assume normal distribution of residuals. We calculated standardised scores for skew and kurtosis and found both were outside our acceptable range of +/- 3.29. However, we found that 95% of values fell within 2 standard deviations (+/- 1.96) of our mean at a cut off value of 0.05. No records had a cooks d value greater than 1. We concluded the outliers will not have a significant effect on the usefulness of this model.
+
+```{r Section 3 Model 2 Check for residual outliers,  warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: check for outliers in our residuals
+############
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+#--------------- Check for percentage outliers ---------------#
+variable <- "model2_stats"
+st <- as.data.frame(pastecs::stat.desc(reg_model_2$residuals, basic = F))
+model_2_stats <- st %>% data.table::transpose()
+colnames(model_2_stats) <- rownames(st)
+rownames(model_2_stats) <-('Model 2: Residuals')
+
+## Build standard statistics
+tpskew <- semTools::skew(reg_model_2$residuals)
+tpkurt <- semTools::kurtosis(reg_model_2$residuals)
+std_skew[[variable]] <- tpskew[1] / tpskew[2]
+std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+z_score <- abs(scale(reg_model_2$residuals))
+gt_196[[variable]] <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+gt_329[[variable]] <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+cooksd_gt_1 <- FSA::perc(as.numeric(cooks.distance(reg_model_2)), 1, "gt") # How many records are greater than 1.
+
+## Build output
+model_2_stats$std_skew <- std_skew
+model_2_stats$std_kurt <- std_kurt
+model_2_stats$gt_2sd <- gt_196
+model_2_stats$gt_3sd <- gt_329
+model_2_stats$cooksd_gt_1 <- cooksd_gt_1
+
+#-------- Pretty print my table -------#
+rbind(model_1_stats,model_2_stats) %>%
+  kbl(caption = "Summary statistics for Residuals - Model 1 and Model 2") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+```{r Model 2 - Visualisation Histograms for residuals, echo=TRUE, include=TRUE}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+
+binwidth <- 10
+gs1 <- reg_model_2 %>% ggplot(aes(x = reg_model_2$residuals))
+gs1 <- gs1 + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+gs1 <- gs1 + stat_function(fun = dnorm, color = "red", args = list(mean = model_2_stats$mean, sd = model_2_stats$std.dev), na.rm = TRUE)
+gs1 <- gs1 + labs(x = "Model 2 Residuals: G_SC predicted by BIO_S11 & ENG_S11")
+gs1 <- gs1 + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+
+gs2 <- reg_model_2 %>% ggplot(aes(sample = reg_model_2$residuals)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Model 2 Residuals", subtitle = "G_SC predicted by BIO_S11 & ENG_S11")
+
+
+plot_grid(gs1, gs2, labels = "", ncol = 2)
+
+############
+# PART: Visualisation of density together
+############
+## http://www.sthda.com/english/wiki/ggplot2-density-plot-quick-start-guide-r-software-and-data-visualization
+
+
+gs <- cbind(model1 = resid(reg_model_1),model2 = resid(reg_model_2)) %>%
+      as.data.frame() %>%
+      gather(model1, model2, key = "var", value = "value") %>%
+      ggplot(aes(x = value)) +
+      geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..)) +
+        geom_density(alpha = .2, fill = "#FF6666") +
+        facet_grid(var ~ .) +
+        theme_bw() +
+        labs(title = "Model 1 & Model 2 Residual density curves", x = "Residuals", y = "Density")
+
+show(gs)
+```
+
+##### Influential observations
+
+```{r Model 2 - Influential outliers, echo=TRUE, include=TRUE}
+############
+# PART: Model 2 Check for Influential outliers
+############
+#--------------- Influential Outliers - Cook's distance ---------------#
+cooksd<-sort(cooks.distance(reg_model_2))
+# plot Cook's distance
+plot(cooksd, pch="*", cex=2, main="Influential Obs by Cooks distance")
+abline(h = 4*mean(cooksd, na.rm=T), col="red")  # add cutoff line
+text(x = seq_along(cooksd) +1, y =cooksd, labels =ifelse(cooksd>4*mean(cooksd, na.rm =T), names(cooksd), ""), col ="red")  # add labels
+
+#--------------- find rows related to influential observations ---------------#
+influential <- as.numeric(names(cooksd)[(cooksd > 4*mean(cooksd, na.rm=T))])  # influential row numbers
+stem(influential)
+head(tbl_sperf_sex_nat_diff[influential, ])  # influential observations.
+
+car::outlierTest(reg_model_2) # Bonferonni p-value for most extreme obs - Are there any cases where the outcome variable has an unusual variable for its predictor values?
+car::leveragePlots(reg_model_2) # leverage plots
+
+
+```
+
+##### Homoscedasticity of Residuals
+The first plot is the chart of residuals vs fitted values, in the second plot the standardised/studentized residuals are on the Y axis. We see a completely random, equal distribution of points throughout the range of the X axis and an almost flat red line. We see that there is no real pattern in the residuals and that they are equally spread around the y = 0 line (the dashed line). We concluded that there is no homoscedasticity of residuals for this model.
+
+```{r model 2 check for homoscedasticity of residuals, echo=TRUE, include=TRUE}
+############
+# PART: Model 2 Check for homoscedasticity outliers
+############
+# --------------- residuals vs fitted values ---------- #
+plot(reg_model_2, 1)
+# --------------- studentized residuals --------------- #
+plot(reg_model_2, 3)
+# --------------- Q-Q plot studentized residuals --------------- #
+car::qqPlot(reg_model_2, main = "QQ Plot") #qq plot for studentized resid
+
+## already reported on in section 2.
+var_G_SC <- var(as.numeric(tbl_sperf_sex_nat_diff$G_SC, rm.na = TRUE)) %>% round(2)
+var_MAT_S11 <- var(as.numeric(tbl_sperf_sex_nat_diff$BIO_S11, rm.na = TRUE)) %>% round(2)
+var_ENG_S11 <- var(as.numeric(tbl_sperf_sex_nat_diff$ENG_S11, rm.na = TRUE)) %>% round(2)
+
+```
+##### Collinearity of predictors
+No correlation coefficient above 0.8 was found, indicating no strong correlation is present. We also generated the variance inflation factor (VIF) for each predictor and found them to be all below 10 as suggested by Myers (1990). Related to the VIF is the tolerance statistic, which is its reciprocal (1/VIF). Tests to see if the data met the assumption of collinearity indicated that multicollinearity was not concern for the two predictors (Biology highschool score, Tolerance = .65, VIF = 1.54; Engineering highschool score, Tolerance = .65, VIF = 1.54)
+
+
+```{r Correlation matrix for model 2, echo=TRUE}
+### Correlation matrix for all
+correlation_matrix <- tbl_sperf_sex_nat_diff %>%
+        select(ENG_S11,BIO_S11) %>%
+        as.matrix() %>%
+        Hmisc::rcorr()
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+title <- "Model 2: Correlation matrix for all Predictors variables"
+gs <- corrplot::corrplot(correlation_matrix$r, method = "color", col = col(200), type = "upper", order = "hclust", addCoef.col = "black",              # Add coefficient of correlation
+               tl.col                       = "black", tl.srt = 45,                                                                          #Text label color and rotation
+               # Combine with significance
+               p.mat                        = correlation_matrix$p, sig.level = 0.01, insig = "blank",
+               # hide correlation coefficient on the principal diagonal
+               diag                         = FALSE, title = title, mar = c(0, 0, 2, 0) ) # http://stackoverflow.com/a/14754408/54964)
+```
+
+```{r vif for model 2, echo=TRUE}
+#------------Calculate Collinearity ------------#
+vifmodel<-car::vif(reg_model_2) %>% as.data.frame()
+colnames(vifmodel) <- 'VIF'
+#Calculate tolerance
+vifmodel$Tolerance <- 1/vifmodel$VIF
+rownames(vifmodel) <- c('ENG_S11','BIO_S11')
+
+#-------- Pretty print my table -------#
+vifmodel %>%
+  kbl(caption = "Summary statistics for Residuals - Model 2") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+### Reporting on Model 2
+<!-- yhttps://www.statisticssolutions.com/reporting-statistics-in-apa-format/ -->
+The following predictive model was generated:
+
+\begin{equation}
+  G\_SC\ (Predicted) = 0.665*ENG\_S11 + 0.875*BIO\_S11 + 65.628
+  (\#eq:model2)
+\end{equation}
+
+The relationship between high school biology score (BIO_S11), high school engineering score (ENG_S11) and university final performance (G_SC) was modeled using a multiple linear model. The model was found to be statistically significant difference at the p < .001 level (F(2, 12408)= 7,711, p<0.01). The model explains 55% of the variance in the outcome variable $Adjusted R^2 = .0.554$.
+<p></p>
+
+The individual predictors were examined further and indicated that Engineering (t = 55.26, p < .001), Biology (t = 56.74, p < .001) scores at the end of highschool were significant predictors in the model.
+<p></p>
+
+Examination of the histogram, normal P-P plot of standardised residuals and the scatterplot of the dependent variable, final university score, and standardised residuals showed that some outliers existed. However, examination of the standardised residuals showed that none could be considered to have undue influence (95% within limits of +/1 1.96 and none with Cook’s distance > 1).
+<p></p>
+
+The scatterplot of standardised residuals showed that the data met the assumptions of homogeneity of variance and linearity. The data also meets the assumption of non-zero variances of the predictor. Examination for multicollinearity showed that the tolerance and variance influence factor measures were within the acceptable levels (tolerance >0.4, VIF <2.5 ) as outlined in Tarling (2008).
+<p></p>
+
+The assumptions of causality are given due to the nature of the conceptual framework of the statistical analysis. Students attend highschool before university. Similarly independence is assured since each student is unique and each evaluation independently assessed.
+
+
+## Model 3
+
+### Multiple Linear Regression using school nature and subject interaction terms
+As part of our assessment of model 2 \@ref(eq:model2) we determined that highschool biology and engineering scores were good predictors for our model. Our third model extends \@ref(eq:model2) by including an interaction term representing the contribution of attending a public or private school on university final sc
+
+> HA: Students who attend private high schools will perform better overall in engineering at university.
+
+In this model we use 2 continuous scale predictor variables, student highschool scores in biology and engineering and 1 outcome variable and 1 categorical predictor, school nature.
+
+#### Step 1: Run Multiple Linear Regression
+We transformed schooling type into an interactive variable, where public school was treated as the reference category/baseline and private school was treated as the category of interest. This means in our model public school was given the value of 0 and private school the value of 1. Both the switch, and the interaction variable are included because the switch variable determines the inception point of the model with the Y axis (the starting point) while the interaction determines the slope of the line.
+
+```{r Multiple Regression 3, warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: Multiple Linear Regression
+############
+# -------------- create interaction term --------------- #
+tbl_sperf_sex_nat_diff$school_switch <- as.integer(tbl_sperf_sex_nat_diff$SCHOOL_NAT == 'PRIVATE')
+tbl_sperf_sex_nat_diff$int_bio_school_private <- tbl_sperf_sex_nat_diff$BIO_S11*tbl_sperf_sex_nat_diff$school_switch
+tbl_sperf_sex_nat_diff$int_eng_school_private <- tbl_sperf_sex_nat_diff$ENG_S11*tbl_sperf_sex_nat_diff$school_switch
+
+# -------------- Regression --------------- #
+reg_model_3 <-lm(tbl_sperf_sex_nat_diff$G_SC~tbl_sperf_sex_nat_diff$ENG_S11+
+        tbl_sperf_sex_nat_diff$BIO_S11 +
+        tbl_sperf_sex_nat_diff$int_bio_school_private +
+        tbl_sperf_sex_nat_diff$int_eng_school_private +
+        tbl_sperf_sex_nat_diff$school_switch
+)
+
+# -------------- Determine how good our model is versus using the mean --------------- #
+stats::anova(reg_model_3) ## Get sums of squares of variability
+summary(reg_model_3)
+stargazer(reg_model_1, reg_model_2,reg_model_3, type ="text")
+
+```
+
+```{r Model 3 - Equation}
+############
+# PART: Multiple Linear Regression Equation
+############
+#https://cran.r-project.org/web/packages/ggiraphExtra/vignettes/ggPredict.html
+#------------ Third Model: -----------#
+# x1 = eng, x2 = bio
+equation3_public <- function(x1, x2) { coef(reg_model_3)[2] * x1 +
+        coef(reg_model_3)[3] * x2 +
+        coef(reg_model_3)[1] }
+# x1 = eng, x2 = bio
+equation3_private <- function(x1, x2) {
+  (coef(reg_model_3)[2] + coef(reg_model_3)[5])* x1 +
+  (coef(reg_model_3)[3] + coef(reg_model_3)[4])* x2
+        + coef(reg_model_3)[6] + coef(reg_model_3)[1] }
+
+```
+
+#### Step 2: Assessing the regression model: diagnostics
+##### Outliers and residuals
+Based on the assessment below we can assume a normal distribution of residuals. We calculated standardised scores for skew and kurtosis and found both were outside our acceptable range of +/- 3.29. However we found that 95% of values fell within 2 standard deviations (+/- 1.96) of our mean at a cut off value of 0.05. No records had a cooks d value greater than 1. We concluded the outliers will not have a significant effect on the usefulness of this model.
+
+```{r Section 3 Model 3 Check for residual outliers,  warning = FALSE, echo=TRUE, include=TRUE}
+############
+# PART: check for outliers in our residuals
+############
+std_skew <- list()
+std_kurt <- list()
+gt_196 <- list()
+gt_329 <- list()
+#--------------- Check for percentage outliers ---------------#
+variable <- "model3_stats"
+st <- as.data.frame(pastecs::stat.desc(reg_model_3$residuals, basic = F))
+model_3_stats <- st %>% data.table::transpose()
+colnames(model_3_stats) <- rownames(st)
+rownames(model_3_stats) <-('Model 3: Residuals')
+
+## Build standard statistics
+tpskew <- semTools::skew(reg_model_3$residuals)
+tpkurt <- semTools::kurtosis(reg_model_3$residuals)
+std_skew[[variable]] <- tpskew[1] / tpskew[2]
+std_kurt[[variable]] <- tpkurt[1] / tpkurt[2]
+z_score <- abs(scale(reg_model_3$residuals))
+gt_196[[variable]] <- FSA::perc(as.numeric(z_score), 1.96, "gt") # 95% within +/- 1.96
+gt_329[[variable]] <- FSA::perc(as.numeric(z_score), 3.29, "gt") # 99.7% within +- 3.29 for larger distributions
+cooksd_gt_1 <- FSA::perc(as.numeric(cooks.distance(reg_model_3)), 1, "gt") # How many records are greater than 1.
+
+## Build output
+model_3_stats$std_skew <- std_skew
+model_3_stats$std_kurt <- std_kurt
+model_3_stats$gt_2sd <- gt_196
+model_3_stats$gt_3sd <- gt_329
+model_3_stats$cooksd_gt_1 <- cooksd_gt_1
+
+#-------- Pretty print my table -------#
+rbind(model_1_stats,model_2_stats, model_3_stats) %>%
+  kbl(caption = "Summary statistics for Residuals - Model 1, Model 2 & Model 3") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+```{r Model 3 - Visualisation Histograms for residuals, echo=TRUE, include=TRUE}
+############
+# PART: Visualisation Histograms
+############
+# Plot single variable
+
+binwidth <- 10
+gs1 <- reg_model_3 %>% ggplot(aes(x = reg_model_3$residuals))
+gs1 <- gs1 + geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..))
+gs1 <- gs1 + stat_function(fun = dnorm, color = "red", args = list(mean = model_3_stats$mean, sd = model_3_stats$std.dev), na.rm = TRUE)
+gs1 <- gs1 + labs(x = "Model 3 Residuals: G_SC predicted by BIO_S11, ENG_S11 & School Nature")
+gs1 <- gs1 + scale_fill_gradient("Count", low = "#DCDCDC", high = "#7C7C7C")
+
+
+############
+# PART: Visualisation Histograms Q-Q Plot
+############
+
+gs2 <- reg_model_3 %>% ggplot(aes(sample = reg_model_3$residuals)) +
+  stat_qq() +
+  stat_qq_line(linetype = "dotted", color = "red", size = 1) +
+  theme_bw() +
+  labs(title = "Q-Q Plot of Model 3 Residuals", subtitle = "G_SC predicted by BIO_S11, ENG_S11 & School Nature")
+
+
+plot_grid(gs1, gs2, labels = "", ncol = 2)
+
+############
+# PART: Visualisation of density together
+############
+## http://www.sthda.com/english/wiki/ggplot2-density-plot-quick-start-guide-r-software-and-data-visualization
+
+
+gs <- cbind(model1 = resid(reg_model_1),model2 = resid(reg_model_2), model3 = resid(reg_model_3)) %>%
+      as.data.frame() %>%
+      gather(model1, model2,model3, key = "var", value = "value") %>%
+      ggplot(aes(x = value)) +
+      geom_histogram(binwidth = binwidth, colour = "black", aes(y = ..density.., fill = ..count..)) +
+        geom_density(alpha = .2, fill = "#FF6666") +
+        facet_grid(var ~ .) +
+        theme_bw() +
+        labs(title = "Model 1, Model 2, Model 3 Residual density curves", x = "Residuals", y = "Density")
+
+show(gs)
+```
+
+##### Influential observations
+
+```{r Model 3 - Influential outliers, echo=TRUE, include=TRUE}
+############
+# PART: Model 3 Check for Influential outliers
+############
+#--------------- Influential Outliers - Cook's distance ---------------#
+cooksd<-sort(cooks.distance(reg_model_3))
+# plot Cook's distance
+plot(cooksd, pch="*", cex=2, main="Influential Obs by Cooks distance")
+abline(h = 4*mean(cooksd, na.rm=T), col="red")  # add cutoff line
+text(x = seq_along(cooksd) +1, y =cooksd, labels =ifelse(cooksd>4*mean(cooksd, na.rm =T), names(cooksd), ""), col ="red")  # add labels
+
+#--------------- find rows related to influential observations ---------------#
+influential <- as.numeric(names(cooksd)[(cooksd > 4*mean(cooksd, na.rm=T))])  # influential row numbers
+stem(influential)
+head(tbl_sperf_sex_nat_diff[influential, ])  # influential observations.
+
+car::outlierTest(reg_model_3) # Bonferonni p-value for most extreme obs - Are there any cases where the outcome variable has an unusual variable for its predictor values?
+car::leveragePlots(reg_model_3) # leverage plots
+
+
+```
+
+##### Homoscedasticity of Residuals
+The first plot below is the chart of residuals vs fitted values, in the second plot the standardised/studentized residuals are on the Y axis. We see a completely random, equal distribution of points throughout the range of the X axis and an almost flat red line. We see that there is no real pattern in the residuals and that they are equally spread around the y = 0 line (the dashed line). We concluded that there is no homoscedasticity of Residuals for this model.
+
+```{r model 3 check for homoscedasticity of residuals, echo=TRUE, include=TRUE}
+############
+# PART: Model 3 Check for homoscedasticity outliers
+############
+# --------------- residuals vs fitted values ---------- #
+plot(reg_model_3, 1)
+# --------------- studentized residuals --------------- #
+plot(reg_model_3, 3)
+# --------------- Q-Q plot studentized residuals --------------- #
+car::qqPlot(reg_model_3, main = "QQ Plot") #qq plot for studentized resid
+```
+##### Collinearity of predictors
+No correlation coefficient above 0.8 was found indicating no strong correlation is present. We did not generate a variance inflation factor (VIF) for each predictor as the inclusion of interaction terms and a switching term meant that all variables would have at least one term in the model that resulted in a high VIF statistic.
+
+```{r Correlation matrix for model 3, echo=TRUE}
+### Correlation matrix for all
+correlation_matrix <- tbl_sperf_sex_nat_diff %>%
+        select(ENG_S11,BIO_S11,school_switch) %>%
+        as.matrix() %>%
+        Hmisc::rcorr()
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+title <- "Model 3: Correlation matrix for all Predictors variables"
+gs <- corrplot::corrplot(correlation_matrix$r, method = "color", col = col(200), type = "upper", order = "hclust", addCoef.col = "black",              # Add coefficient of correlation
+               tl.col                       = "black", tl.srt = 45,                                                                          #Text label color and rotation
+               # Combine with significance
+               p.mat                        = correlation_matrix$p, sig.level = 0.01, insig = "blank",
+               # hide correlation coefficient on the principal diagonal
+               diag                         = FALSE, title = title, mar = c(0, 0, 2, 0) ) # http://stackoverflow.com/a/14754408/54964)
+```
+
+### Reporting on Model 3
+<!-- yhttps://www.statisticssolutions.com/reporting-statistics-in-apa-format/ -->
+The following predictive model was generated:
+<p></p>
+\begin{equation}
+  G\_SC\ (Predicted) = 0.687*ENG\_S11 + 0.947*BIO\_S11 + (10.603 - 0.139*BIO\_S11- 0.025*ENG\_S11)*PRIVATE_SCHOOL + 59.890
+  (\#eq:model3)
+\end{equation}
+<p></p>
+The relationship between high school biology score (BIO_S11), high school engineering score (ENG_S11), school nature (SCHOOL_NATURE) and university final performance (G_SC) was modeled using a multiple linear model. The model was found to be statistically significant difference at the p < .001 level (F(5, 12405)= 3101, p<0.01). The model explains 56% of the variance in the outcome variable $Adjusted R^2 = .0.555$.
+
+<p></p>
+The individual predictors were examined further and indicated that Engineering (t = 46.684, p < .001), Biology (t = 31.408, p < .001), scores at the end of highschool were significant predictors in the model. Attending a private school was found to be a statistically significant factor (t = 6.129, p < .001). We can see that the inclusion of the interaction term between biology and school nature had a statistically significant contribution (t = -4.505, P < 0.001). The Interaction term for engineering and school nature was not statistically significant.
+<p></p>
+Examination of the histogram, normal P-P plot of standardised residuals and the scatterplot of the dependent variable, final university score, and standardised residuals showed that some outliers existed. However, examination of the standardised residuals showed that none could be considered to have undue influence (95% within limits of +/1 1.96 and none with Cook’s distance > 1).
+<p></p>
+The scatterplot of standardised residuals showed that the data met the assumptions of homogeneity of variance and linearity. The data also meets the assumption of non-zero variances of the predictor. Examination for multicollinearity showed a small correlation between school nature and biology or engineering scores at high school.
+<p></p>
+Again, causality can be assumed since students attend highschool before university. Similarly, independence is assured since each student is unique and each evaluation independently assessed.
+
+## Summary Comparison
+As part of the statistical analysis we generated three predictive models.
+```{r Section 3 Comparision}
+stargazer(reg_model_1, reg_model_2,reg_model_3, type ="text")
+```
+```{r Model Comparision}
+lmtest::lrtest(reg_model_1,reg_model_2,reg_model_3)
+
+# ---------- Hierachical comparision ----------#
+anova(reg_model_2,reg_model_3)
+
+anova(reg_model_2,reg_model_1)
+```
+
+### Differences in fit and usefulness
+The adjusted R squared statistic tells us how much of the variance in university final score is accounted for by our model and can be considered a measure of the usefulness of each model. Model 3 \@ref(eq:model3) has an a value $Adjusted R^2 = .0.555$ while model 2 \@ref(eq:model2) has an $Adjusted R^2 = .0.554$, as such \@ref(eq:model3) is the more useful model, though the difference in $Adjusted R^2$ is very small. The Likelihood ratio test indicated a statistically significant difference between each of the models compared to simply using the mean. We used Anova to compare model fit. We can say that Model \@ref(eq:model3) significantly improved the fit of the model to the data compared to \@ref(eq:model2), F(3, 12405) = 12.846, p < .001.
+
+### Assumptions
+With the exception of Model 1 \@ref(eq:model1), which did need not meet the criteria regarding multi Collinearity, all tested assumptions were met for all models.
+
+* The outcome variable was a continuous variable.
+* All predictor variables were shown to be either continuous normally distributed or dichotomous.
+* All variables had non-zero Variance:
+* A linear relationship was shown.
+* All values of the outcome should come from a different person.
+* Residuals where shown to be normally distributed within acceptable limits with a constant variance
+* No significant outliers, influence or leverage points had to be removed.
+* We can assert causality as conceptually all predictor variable values are determined prior to the outcome variable.
+
+
+# Discussion/Conclusion
+e find that there is reason to accept our first hypothesis that Students who perform well overall in highschool will perform well in engineering at university. Furthermore there is also justification to accept the second hypothesis that Students who attend private high schools will perform better overall in engineering at university. The predictive model selection can account for 56% of the variation in final student performance which is a very useful model in the education domain.
+<p></p>
+
+It was surprising to find that biology and maths had multi Collinearity, as an additional step it would be interesting to perform factoring to see if a newly constructed feature could be generated to represent this relationship.
+
+
+
+# References: {-}
+* Delahoz-Dominguez, Enrique, Rohemi Zuluaga, and Tomas Fontalvo-Herrera. "Dataset of academic performance evolution for engineering students." _Data in Brief (2020)_: 105537.
+
+* Cortez and A. Silva. “Using Data Mining to Predict Secondary School Student Performance.” In A. Brito and J. Teixeira Eds., Proceedings of 5th FUture BUsiness TEChnology Conference (FUBUTEC 2008) pp. 5-12, Porto, Portugal, April, 2008, EUROSIS, ISBN 978-9077381-39-7. (https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf)
+
+* Cohen, J. (1988). Set Correlation and Contingency Tables. Applied Psychological Measurement, 12(4), 425–434. https://doi.org/10.1177/014662168801200410
+
+* George, Darren & Mallery, Paul. (2003). SPSS for Windows Step-by-Step: A Simple Guide and Reference, 14.0 update (7th Edition). http://lst-iiep.iiep-unesco.org/cgi-bin/wwwi32.exe/[in=epidoc1.in]/?t2000=026564/(100).
+
+* Tabachnick, B. G., Fidell, L. S., & Ullman, J. B. (2007). Using multivariate statistics (Vol. 5, pp. 481-498). Boston, MA: Pearson.
+
+* Cook, R. D., & Weisberg, S. (1982). Residuals and influence in regression. New York: Chapman and Hall.
+
+* Myers, R. H., & Myers, R. H. (1990). Classical and modern regression with applications (Vol. 2). Belmont, CA: Duxbury press.
+
+* Tarling, R. (2008). Statistical modelling for social researchers: Principles and practice. Routledge.
+
+* Field, Andy; Miles, Jeremy; Field, Zoe. Discovering Statistics Using R (p. iv). SAGE Publications. (2008)
+
+<!---
+# ***********************************************************************
+#
+#                    END
+#
+# ***********************************************************************
+-->
