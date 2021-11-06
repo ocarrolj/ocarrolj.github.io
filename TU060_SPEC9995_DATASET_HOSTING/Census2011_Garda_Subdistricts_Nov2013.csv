@@ -153,7 +153,7 @@ Meath,,Paul Creaner,2170K,Trim,403,Meath,M2179B,4,Eastern Region,2179B,Ballivor,
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2273L,4,Eastern Region,2273L,Duleek,Damhliag,3995,Polygon,2971,4086,8.6,2675,8081,296,256
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2041K,4,Eastern Region,2041K,Dunboyne,D�n B�inne,6048,Polygon,4306,6069,7.2,3891,12117,415,312
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2042G,4,Eastern Region,2042G,Dunshaughlin,D�n Seachlainn,4298,Polygon,3170,4375,7.7,2860,8673,310,243
-Meath,,Paul Creaner,2170K,Trim,403,Meath,M2178D,4,Eastern Region,2178D,Baile Atha Bui,An B�thar Bu�,2248,Polygon,1639,2246,7.6,1477,4494,162,125
+Meath,,Paul Creaner,2170K,Trim,403,Meath,M2178D,4,Eastern Region,2178D,enfield,An B�thar Bu�,2248,Polygon,1639,2246,7.6,1477,4494,162,125
 Meath,,Paul Creaner,2100H,Kells,403,Meath,M2100H,4,Eastern Region,2100H,Kells,Ceanannus M�r,7141,Polygon,5854,7179,10.2,5132,14320,722,595
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2006M,4,Eastern Region,2006M,Laytown,An Inse,11121,Polygon,8608,11037,11,7413,22158,1195,947
 Meath,,Paul Creaner,2170K,Trim,403,Meath,M2175L,4,Eastern Region,2175L,Longwood [SS],Maigh Dearmha� [SS],2176,Polygon,1636,2212,10.4,1432,4388,204,170
@@ -168,7 +168,7 @@ Mayo,,Paul Creaner,5900E,Castlebar,224,Mayo,M5903L,2,Western Region,5903L,Balla,
 Mayo,,Paul Creaner,5970F,Ballina,224,Mayo,M5970F,2,Western Region,5970F,Ballina,B�al an �tha,7223,Polygon,6618,7106,16.6,5373,14329,1245,1098
 Mayo,,Paul Creaner,6070D,Claremorris,224,Mayo,M6072M,2,Western Region,6072M,Ballindine,Baile an Daighin,1196,Polygon,1194,1264,24,890,2460,304,286
 Mayo,,Paul Creaner,6070D,Claremorris,224,Mayo,M6074G,2,Western Region,6074G,Ballinrobe,Baile an R�ba,2502,Polygon,2492,2512,23.8,1864,5014,628,593
-Mayo,,Paul Creaner,6000C,Belmullet,224,Mayo,M6004F,2,Western Region,6004F,Ballinrobe,Baile Chruaich [SS],264,Polygon,284,313,27.5,204,577,80,78
+Mayo,,Paul Creaner,6000C,Belmullet,224,Mayo,M6004F,2,Western Region,6004F,ballycroy,Baile Chruaich [SS],264,Polygon,284,313,27.5,204,577,80,78
 Mayo,,Paul Creaner,6070D,Claremorris,224,Mayo,M6104B,2,Western Region,6104B,Ballyhaunis,B�al �tha hAmhnais,2648,Polygon,2725,2858,25.1,2007,5506,718,683
 Mayo,,Paul Creaner,6000C,Belmullet,224,Mayo,M6003H,2,Western Region,6003H,Bangor Erris,Erris Baingear,929,Polygon,1165,993,34.4,744,1922,421,401
 Mayo,,Paul Creaner,6000C,Belmullet,224,Mayo,M6000C,2,Western Region,6000C,Beal an Mhuirthead,B�al an Mhuirthead,2266,Polygon,2416,2445,27.9,1689,4711,727,675
@@ -195,7 +195,7 @@ Mayo,,Paul Creaner,6170M,Westport,224,Mayo,M6170M,2,Western Region,6170M,Westpor
 Louth,,Paul Creaner,2271C,Ardee,113,Louth,M2271C,1,Northern Region,2271C,Ardee,�tha Fhirdhia,4580,Polygon,3726,4623,10.1,3279,9203,447,375
 Louth,,Paul Creaner,2070B,Dundalk,113,Louth,M2076A,1,Northern Region,2076A,Blackrock,Na Creagacha Dubha,4217,Polygon,3521,3982,15.7,2878,8199,643,554
 Louth,,Paul Creaner,2070B,Dundalk,113,Louth,M2071M,1,Northern Region,2071M,Carlingford,Cairlinn,2189,Polygon,2178,2044,30.9,1471,4233,707,673
-Louth,,Paul Creaner,2271C,Ardee,113,Louth,M2002H,1,Northern Region,2002H,Castlebellinham,Baile an Ghearl�naigh,2710,Polygon,2216,2687,12.2,1908,5397,308,271
+Louth,,Paul Creaner,2271C,Ardee,113,Louth,M2002H,1,Northern Region,2002H,castlebellingham,Baile an Ghearl�naigh,2710,Polygon,2216,2687,12.2,1908,5397,308,271
 Louth,,Paul Creaner,2000A,Drogheda,113,Louth,M2004D,1,Northern Region,2004D,Clogherhead,Ceann Chlochair,2223,Polygon,1771,2210,14.6,1480,4433,291,259
 Louth,,Paul Creaner,2271C,Ardee,113,Louth,M2272A,1,Northern Region,2272A,Collon,Collann,1379,Polygon,1005,1381,9.4,892,2760,113,94
 Louth,,Paul Creaner,2000A,Drogheda,113,Louth,M2000A,1,Northern Region,2000A,Drogheda,Droichead �tha,21960,Polygon,17402,21263,9.1,15473,43223,1929,1582
@@ -205,38 +205,38 @@ Louth,,Paul Creaner,2000A,Drogheda,113,Louth,M2005B,1,Northern Region,2005B,Dunl
 Louth,,Paul Creaner,2070B,Dundalk,113,Louth,M2072K,1,Northern Region,2072K,Hackballscross,Crois an Mhaoir,1380,Polygon,1057,1440,11.1,929,2820,128,117
 Louth,,Paul Creaner,2271C,Ardee,113,Louth,M2075C,1,Northern Region,2075C,Louth,L�,2153,Polygon,1658,2222,9.5,1481,4375,177,157
 Louth,,Paul Creaner,2070B,Dundalk,113,Louth,M2074E,1,Northern Region,2074E,Omeath,� M�ith,750,Polygon,811,828,32.4,532,1578,279,263
-Clare,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4803H,3,Southern Region,4803H,Ardnacrusha,Ard na Croise,5341,Polygon,3728,5212,5.4,3454,10553,274,200
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4971K,3,Southern Region,4971K,Abbeyfeale,Mainistir na F�ile,3449,Polygon,3208,3525,18.5,2582,6974,626,593
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4881L,3,Southern Region,4881L,Adare,�th Dara,1679,Polygon,1362,1646,16.1,1118,3325,244,219
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4880A,3,Southern Region,4880A,Askeaton,Eas G�itine,1107,Polygon,948,1123,12.8,812,2230,136,121
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4977H,3,Southern Region,4977H,Athea,�th an tSl�ibhe,843,Polygon,799,920,15.5,665,1763,134,124
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4973E,3,Southern Region,4973E,Ballingarry,Baile an Gharra�,1379,Polygon,1178,1453,13.4,1006,2832,172,158
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4902F,3,Southern Region,4902F,Ballylanders,Baile an Londraigh,1619,Polygon,1458,1716,13.8,1238,3335,220,201
-Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4876C,3,Southern Region,4876C,Ballyneety,Baile an Fhaoitigh,2358,Polygon,1709,2440,7.3,1565,4798,144,125
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4900L,3,Southern Region,4900L,Bruff,An Br�,1937,Polygon,1551,1913,10.4,1365,3850,186,162
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4905M,3,Southern Region,4905M,Bruree,Br� R�,1041,Polygon,854,1150,13.8,730,2191,124,118
-Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4877A,3,Southern Region,4877A,Caherconlish,Cathair Chinn Lis,2083,Polygon,1553,2014,9.5,1383,4097,170,147
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4912C,3,Southern Region,4912C,Cappamore,An Cheapach Mh�r,1824,Polygon,1502,1834,12.3,1307,3658,195,184
-Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4802L,3,Southern Region,4802L,Castleconnell,Caisle�n U� Chonaill,3524,Polygon,2820,3590,10.3,2431,7114,389,291
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4883F,3,Southern Region,4883F,Croom,Cromadh,2155,Polygon,1651,2191,10.4,1449,4346,202,172
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4177G,3,Southern Region,4177G,Dromcollogher,Drom Collachair,2162,Polygon,1930,2337,15.1,1614,4499,316,292
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4884D,3,Southern Region,4884D,Foynes,Faing,1624,Polygon,1475,1786,16.9,1204,3410,271,249
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4885B,3,Southern Region,4885B,Glin,An Gleann,1049,Polygon,1087,1175,19.9,836,2224,251,216
-Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4800C,3,Southern Region,4800C,Henry Street,Sr�id Anra�,13806,Polygon,13373,14636,14.2,11041,28442,2332,1902
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4903D,3,Southern Region,4903D,Hospital,An tOspid�al,1553,Polygon,1314,1561,13.7,1111,3114,203,180
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4906K,3,Southern Region,4906K,Kilmallock,Cill Mocheall�g,3232,Polygon,3000,3413,16.3,2472,6645,528,490
-Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4804F,3,Southern Region,4804F,Mayorstone,Mayorstone,13951,Polygon,12039,12811,11.2,10332,26762,1707,1344
-Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4913A,3,Southern Region,4913A,Murroe [SS],Maigh Rua [SS],1458,Polygon,1180,1617,11.1,1027,3075,153,131
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4970M,3,Southern Region,4970M,Newcastle West,An Caisle�n Nua,5538,Polygon,4856,5377,15,4055,10915,801,726
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M3876H,3,Southern Region,3876H,Oola,�lla,637,Polygon,577,704,14.9,488,1341,89,86
-Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4907G,3,Southern Region,4907G,Pallas Green,Pail�s Ghr�ine,1243,Polygon,1033,1357,11.8,893,2600,140,122
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4882H,3,Southern Region,4882H,Pallaskenry,Pail�s Chaonra�,1865,Polygon,1474,1894,11.1,1288,3759,186,164
-Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4872M,3,Southern Region,4872M,Patrickswell,Tobar Ph�draig,3183,Polygon,2412,3179,7.4,2187,6362,225,179
-Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4887K,3,Southern Region,4887K,Rathkeale,R�th Caola,2586,Polygon,2157,2436,20.3,1691,5022,466,437
 Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4870D,3,Southern Region,4870D,Roxboro Road,B�thar Bhaile an R�istigh,16795,Polygon,13357,15688,7.1,11992,32483,1365,942
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4887K,3,Southern Region,4887K,Rathkeale,R�th Caola,2586,Polygon,2157,2436,20.3,1691,5022,466,437
+Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4872M,3,Southern Region,4872M,Patrickswell,Tobar Ph�draig,3183,Polygon,2412,3179,7.4,2187,6362,225,179
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4882H,3,Southern Region,4882H,Pallaskenry,Pail�s Chaonra�,1865,Polygon,1474,1894,11.1,1288,3759,186,164
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4907G,3,Southern Region,4907G,pallasgreen,Pail�s Ghr�ine,1243,Polygon,1033,1357,11.8,893,2600,140,122
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M3876H,3,Southern Region,3876H,Oola,�lla,637,Polygon,577,704,14.9,488,1341,89,86
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4970M,3,Southern Region,4970M,Newcastle West,An Caisle�n Nua,5538,Polygon,4856,5377,15,4055,10915,801,726
+Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4913A,3,Southern Region,4913A,Murroe [SS],Maigh Rua [SS],1458,Polygon,1180,1617,11.1,1027,3075,153,131
+Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4804F,3,Southern Region,4804F,mayorstone park,Mayorstone,13951,Polygon,12039,12811,11.2,10332,26762,1707,1344
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4906K,3,Southern Region,4906K,Kilmallock,Cill Mocheall�g,3232,Polygon,3000,3413,16.3,2472,6645,528,490
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4903D,3,Southern Region,4903D,Hospital,An tOspid�al,1553,Polygon,1314,1561,13.7,1111,3114,203,180
+Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4800C,3,Southern Region,4800C,Henry Street,Sr�id Anra�,13806,Polygon,13373,14636,14.2,11041,28442,2332,1902
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4885B,3,Southern Region,4885B,Glin,An Gleann,1049,Polygon,1087,1175,19.9,836,2224,251,216
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4884D,3,Southern Region,4884D,Foynes,Faing,1624,Polygon,1475,1786,16.9,1204,3410,271,249
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4177G,3,Southern Region,4177G,drumcollogher,Drom Collachair,2162,Polygon,1930,2337,15.1,1614,4499,316,292
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4883F,3,Southern Region,4883F,Croom,Cromadh,2155,Polygon,1651,2191,10.4,1449,4346,202,172
+Limerick,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4802L,3,Southern Region,4802L,Castleconnell,Caisle�n U� Chonaill,3524,Polygon,2820,3590,10.3,2431,7114,389,291
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4912C,3,Southern Region,4912C,Cappamore,An Cheapach Mh�r,1824,Polygon,1502,1834,12.3,1307,3658,195,184
+Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4877A,3,Southern Region,4877A,Caherconlish,Cathair Chinn Lis,2083,Polygon,1553,2014,9.5,1383,4097,170,147
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4905M,3,Southern Region,4905M,Bruree,Br� R�,1041,Polygon,854,1150,13.8,730,2191,124,118
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4900L,3,Southern Region,4900L,Bruff,An Br�,1937,Polygon,1551,1913,10.4,1365,3850,186,162
+Limerick,,Paul Creaner,4870D,Limerick City South,321,Limerick,M4876C,3,Southern Region,4876C,Ballyneety,Baile an Fhaoitigh,2358,Polygon,1709,2440,7.3,1565,4798,144,125
+Limerick,,Paul Creaner,4900L,Bruff,321,Limerick,M4902F,3,Southern Region,4902F,Ballylanders,Baile an Londraigh,1619,Polygon,1458,1716,13.8,1238,3335,220,201
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4973E,3,Southern Region,4973E,Ballingarry,Baile an Gharra�,1379,Polygon,1178,1453,13.4,1006,2832,172,158
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4977H,3,Southern Region,4977H,Athea,�th an tSl�ibhe,843,Polygon,799,920,15.5,665,1763,134,124
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4880A,3,Southern Region,4880A,Askeaton,Eas G�itine,1107,Polygon,948,1123,12.8,812,2230,136,121
+Clare,,Paul Creaner,4800C,Limerick City North,321,Limerick,M4803H,3,Southern Region,4803H,Ardnacrusha,Ard na Croise,5341,Polygon,3728,5212,5.4,3454,10553,274,200
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4881L,3,Southern Region,4881L,Adare,�th Dara,1679,Polygon,1362,1646,16.1,1118,3325,244,219
+Limerick,,Paul Creaner,4970M,Newcastle West,321,Limerick,M4971K,3,Southern Region,4971K,Abbeyfeale,Mainistir na F�ile,3449,Polygon,3208,3525,18.5,2582,6974,626,593
 Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2575E,4,Eastern Region,2575E,Arles,Ardlios,1982,Polygon,1502,2044,10.1,1334,4026,168,151
-Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2574G,4,Eastern Region,2574G,Ballylynan,Baile U� Laighean�in,2173,Polygon,1661,2227,10.9,1454,4400,207,181
-Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2577A,4,Eastern Region,2577A,Borris-In-Ossery,Buir�os M�r Osra�,1105,Polygon,1022,1157,18.3,825,2262,197,187
+Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2574G,4,Eastern Region,2574G,ballylinan,Baile U� Laighean�in,2173,Polygon,1661,2227,10.9,1454,4400,207,181
+Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2577A,4,Eastern Region,2577A,borris-in-ossory,Buir�os M�r Osra�,1105,Polygon,1022,1157,18.3,825,2262,197,187
 Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2505D,4,Eastern Region,2505D,Clonaslee,Cluain na Sl�,925,Polygon,735,999,11.8,634,1924,101,87
 Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2570D,4,Eastern Region,2570D,Abbeyleix,Mainistir Laoise,3688,Polygon,3061,3756,13.2,2590,7444,471,404
 Laois,,Paul Creaner,2500C,Portlaoise,402,Laois/Offaly,M2572M,4,Eastern Region,2572M,Durrow,Dar�,1138,Polygon,930,1150,12.4,800,2288,130,115
@@ -255,7 +255,7 @@ Offaly,,Paul Creaner,2670M,Tullamore,402,Laois/Offaly,M2673E,4,Eastern Region,26
 Offaly,,Paul Creaner,2670M,Tullamore,402,Laois/Offaly,M2674C,4,Eastern Region,2674C,Edenderry,�adan Doire,4120,Polygon,3299,4162,10.8,2901,8282,398,355
 Offaly,,Paul Creaner,2600L,Birr,402,Laois/Offaly,M2603D,4,Eastern Region,2603D,Ferbane,An F�ar B�n,2346,Polygon,1976,2395,14.1,1671,4741,305,278
 Offaly,,Paul Creaner,2600L,Birr,402,Laois/Offaly,M2604B,4,Eastern Region,2604B,Kilcormac,Cill Chormaic,1064,Polygon,931,1115,14.1,776,2179,155,131
-Offaly,,Paul Creaner,2600L,Birr,402,Laois/Offaly,M2605M,4,Eastern Region,2605M,Kinnity,Cionn Eitigh,965,Polygon,786,1031,15.8,656,1996,130,124
+Offaly,,Paul Creaner,2600L,Birr,402,Laois/Offaly,M2605M,4,Eastern Region,2605M,kinnitty,Cionn Eitigh,965,Polygon,786,1031,15.8,656,1996,130,124
 Offaly,,Paul Creaner,2670M,Tullamore,402,Laois/Offaly,M2675A,4,Eastern Region,2675A,Rhode,Rhode,1567,Polygon,1161,1559,9.8,1028,3126,133,114
 Offaly,,Paul Creaner,2600L,Birr,402,Laois/Offaly,M2606K,4,Eastern Region,2606K,Shinrone,Su� an R�in,1208,Polygon,1005,1415,13.8,854,2623,151,139
 Offaly,,Paul Creaner,2670M,Tullamore,402,Laois/Offaly,M2670M,4,Eastern Region,2670M,Tullamore,Tulach Mh�r,11897,Polygon,9283,11523,9.9,8195,23420,1088,920
@@ -268,19 +268,19 @@ Carlow,,Paul Creaner,2800B,Carlow,514,Kilkenny/Carlow,M2804E,5,South Eastern Reg
 Carlow,,Paul Creaner,2800B,Carlow,514,Kilkenny/Carlow,M2908D,5,South Eastern Region,2908D,Rathvilly,R�th Bhile,1219,Polygon,1059,1243,13.7,895,2462,164,145
 Carlow,,Paul Creaner,2800B,Carlow,514,Kilkenny/Carlow,M2910F,5,South Eastern Region,2910F,Tullow,An Tulach,3201,Polygon,2855,3103,20.6,2215,6304,640,588
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3574B,5,South Eastern Region,3574B,Ballyhale,Baile H�il,956,Polygon,799,981,14.3,678,1937,121,114
-Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3571H,5,South Eastern Region,3571H,Bennetsbridge,Droichead Bin�id,1553,Polygon,1223,1572,7.8,1108,3125,115,95
+Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3571H,5,South Eastern Region,3571H,bennettsbridge,Droichead Bin�id,1553,Polygon,1223,1572,7.8,1108,3125,115,95
 Kilkenny,,Paul Creaner,3500K,Kilkenny,514,Kilkenny/Carlow,M3502E,5,South Eastern Region,3502E,Callan,Callainn,2690,Polygon,2187,2689,12.7,1874,5379,313,277
 Kilkenny,,Paul Creaner,3500K,Kilkenny,514,Kilkenny/Carlow,M3503C,5,South Eastern Region,3503C,Castlecomer,Caisle�n an Chomair,4573,Polygon,3648,4624,12.3,3167,9197,481,447
 Kilkenny,,Paul Creaner,3500K,Kilkenny,514,Kilkenny/Carlow,M3501G,5,South Eastern Region,3501G,Freshford,Achadh �r,1353,Polygon,1063,1426,11.2,932,2779,131,119
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3305G,5,South Eastern Region,3305G,Glenmore,An Gleann M�r,1730,Polygon,1295,1804,9.7,1152,3534,143,125
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3504A,5,South Eastern Region,3504A,Goresbridge,An Droichead Nua,2146,Polygon,1749,2166,13.8,1476,4312,273,242
-Kilkenny,Carlow,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3572F,5,South Eastern Region,3572F,Graiguenmanagh,Gr�ig na Manach,2808,Polygon,2546,2887,19.8,2019,5695,527,505
+Kilkenny,Carlow,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3572F,5,South Eastern Region,3572F,graiguenamanagh,Gr�ig na Manach,2808,Polygon,2546,2887,19.8,2019,5695,527,505
 Kilkenny,,Paul Creaner,3500K,Kilkenny,514,Kilkenny/Carlow,M3500K,5,South Eastern Region,3500K,Kilkenny,Cill Chainnigh,16005,Polygon,13201,15474,10.6,11486,31479,1715,1400
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3306E,5,South Eastern Region,3306E,Kilmacow,Cill Mhic Bh�ith,1253,Polygon,984,1349,6.5,913,2602,71,64
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3576K,5,South Eastern Region,3576K,Kilmoganny,Cill Mogeanna,635,Polygon,584,730,11.1,501,1365,83,65
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3304K,5,South Eastern Region,3304K,Mooncoin,M�in Choinn,1433,Polygon,1066,1447,8,952,2880,114,85
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3577G,5,South Eastern Region,3577G,Mullinavat,Miuileann an Bhata,1210,Polygon,960,1356,9.5,856,2566,104,91
-Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3676E,5,South Eastern Region,3676E,Pilltown,Baile an Phoill,1968,Polygon,1636,2029,10,1438,3997,198,164
+Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3676E,5,South Eastern Region,3676E,piltown,Baile an Phoill,1968,Polygon,1636,2029,10,1438,3997,198,164
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3573D,5,South Eastern Region,3573D,Stoneyford [SS],�th St�in,939,Polygon,820,966,20.2,643,1905,177,166
 Kilkenny,,Paul Creaner,3570L,Thomastown,514,Kilkenny/Carlow,M3570L,5,South Eastern Region,3570L,Thomastown,Thomastown,1965,Polygon,1668,1959,15.8,1380,3924,288,264
 Kilkenny,,Paul Creaner,3500K,Kilkenny,514,Kilkenny/Carlow,M3606D,5,South Eastern Region,3606D,Urlingford,�th na nUrlainn,1763,Polygon,1470,1870,12.6,1267,3633,203,185
@@ -291,7 +291,7 @@ Kildare,,Paul Creaner,2730,Leixlip,401,Kildare,M2701D,4,Eastern Region,2701D,Cel
 Kildare,,Paul Creaner,2700F,Naas,401,Kildare,M2702B,4,Eastern Region,2702B,Clane,Claonadh,7641,Polygon,5572,7778,6.4,5075,15419,497,357
 Kildare,,Paul Creaner,2730,Leixlip,401,Kildare,M2043E,4,Eastern Region,2043E,Kilcock,Cill Choca,5206,Polygon,3682,5032,6.3,3378,10238,304,233
 Kildare,,Paul Creaner,2770G,Kildare,401,Kildare,M2770G,4,Eastern Region,2770G,Kildare,Cill Dara,6285,Polygon,4756,6366,8.1,4274,12651,482,387
-Kildare,,Paul Creaner,2700F,Naas,401,Kildare,M2772C,4,Eastern Region,2772C,Killcullen,Cill Chuillinn,4764,Polygon,3547,4584,8.8,3155,9348,392,312
+Kildare,,Paul Creaner,2700F,Naas,401,Kildare,M2772C,4,Eastern Region,2772C,kilcullen,Cill Chuillinn,4764,Polygon,3547,4584,8.8,3155,9348,392,312
 Kildare,,Paul Creaner,2730,Leixlip,401,Kildare,M1711F,4,Eastern Region,1711F,Leixlip,L�im an Bhrad�in,7898,Polygon,5563,7784,4.5,5185,15682,378,249
 Kildare,,Paul Creaner,2730,Leixlip,401,Kildare,M2704K,4,Eastern Region,2704K,Maynooth,Maigh Nuad,7054,Polygon,5475,7115,8.3,4839,14169,636,453
 Kildare,,Paul Creaner,2770G,Kildare,401,Kildare,M2773A,4,Eastern Region,2773A,Monasterevin,Mainistir Eimh�n,3568,Polygon,2876,3502,13.3,2448,7070,428,382
@@ -299,11 +299,11 @@ Kildare,,Paul Creaner,2700F,Naas,401,Kildare,M2700F,4,Eastern Region,2700F,Naas,
 Kildare,,Paul Creaner,2770G,Kildare,401,Kildare,M2774L,4,Eastern Region,2774L,Newbridge,Droichead Nua,13906,Polygon,10365,13585,7.9,9348,27491,1017,822
 Kildare,,Paul Creaner,2770G,Kildare,401,Kildare,M2775H,4,Eastern Region,2775H,Rathangan,R�th Iomgh�in,2142,Polygon,1640,2022,12,1414,4164,226,196
 Kildare,,Paul Creaner,2700F,Naas,401,Kildare,M2771E,4,Eastern Region,2771E,Robertstown,Baile Riobaird,4057,Polygon,2960,4065,7.5,2696,8122,264,221
-Kerry,,Paul Creaner,4600M,Tralee,320,Kerry,M4638H,3,Southern Region,4638H,Anascaul [SS],Abhainn an Sc�il [SS],831,Polygon,1008,869,35.7,643,1700,365,360
+Kerry,,Paul Creaner,4600M,Tralee,320,Kerry,M4638H,3,Southern Region,4638H,annascaul,Abhainn an Sc�il [SS],831,Polygon,1008,869,35.7,643,1700,365,360
 Kerry,,Paul Creaner,4600M,Tralee,320,Kerry,M4601K,3,Southern Region,4601K,Ardfert,Ard Fhearta,2477,Polygon,2353,2516,20.3,1832,4993,521,478
-Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4773B,3,Southern Region,4773B,Ballybunnion,Baile an Bhuinne�naigh,1886,Polygon,2451,1905,37.4,1513,3791,938,916
+Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4773B,3,Southern Region,4773B,ballybunion,Baile an Bhuinne�naigh,1886,Polygon,2451,1905,37.4,1513,3791,938,916
 Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4774M,3,Southern Region,4774M,Ballyduff,An Baile Dubh,1373,Polygon,1319,1476,20.9,1025,2849,294,276
-Kerry,,Paul Creaner,4600M,Tralee,320,Kerry,M4639F,3,Southern Region,4639F,Ballyferriter [SS],Baile an Fheir�araigh [SS],643,Polygon,1217,640,54.5,529,1283,688,663
+Kerry,,Paul Creaner,4600M,Tralee,320,Kerry,M4639F,3,Southern Region,4639F,BAILE AN FHEIRTÉARAIG,Baile an Fheir�araigh [SS],643,Polygon,1217,640,54.5,529,1283,688,663
 Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4771F,3,Southern Region,4771F,Ballyheigue,Baile U� Thaidhg,1501,Polygon,1576,1565,27.7,1118,3066,458,436
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4706F,3,Southern Region,4706F,Barraduff,Barraduff,1336,Polygon,1148,1465,15.2,962,2801,186,175
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4650G,3,Southern Region,4650G,Caherciveen,Baile an Sceilg [SS],1763,Polygon,2513,1808,40.2,1453,3571,1060,1010
@@ -316,91 +316,91 @@ Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4653A,3,Southern Region,4653A,Gle
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4702C,3,Southern Region,4702C,Kenmare,Neid�n,3161,Polygon,4337,3202,42.3,2420,6363,1917,1834
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4700G,3,Southern Region,4700G,Killarney,Cill �irne,12000,Polygon,10108,11769,20,7869,23769,2239,2019
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4655H,3,Southern Region,4655H,Killorglin,Cill Orglan,4732,Polygon,4653,4621,23.2,3484,9353,1169,1078
-Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4776G,3,Southern Region,4776G,knockgoshel,Cnoc na gCaiseal,1114,Polygon,1126,1208,18.6,898,2322,228,209
+Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4776G,3,Southern Region,4776G,knocknagoshel,Cnoc na gCaiseal,1114,Polygon,1126,1208,18.6,898,2322,228,209
 Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4770H,3,Southern Region,4770H,Listowel,Lios Tuathail,4946,Polygon,4810,4829,19.2,3827,9775,983,922
 Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4777E,3,Southern Region,4777E,Lixnaw,Leic Sn�mha,1663,Polygon,1511,1708,18.3,1221,3371,290,277
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4654L,3,Southern Region,4654L,Portmagee,An Caladh,685,Polygon,1223,792,52.3,573,1477,650,640
 Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4657D,3,Southern Region,4657D,Sneem,An tSnidm,453,Polygon,920,512,55.1,402,965,518,507
 Kerry,,Paul Creaner,4770H,Listowel,320,Kerry,M4779A,3,Southern Region,4779A,Tarbert,Tairbeart,1793,Polygon,1790,1845,21.3,1397,3638,393,382
 Kerry,,Paul Creaner,4600M,Tralee,320,Kerry,M4600M,3,Southern Region,4600M,Tralee,"Tr� L�,",16370,Polygon,14749,15628,16.1,12044,31998,2705,2371
-Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4656F,3,Southern Region,4656F,Waterville,An Coire�n,1126,Polygon,2201,1139,57.6,909,2265,1292,1267
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5671E,2,Western Region,5671E,Ahascragh,�th Eascrach,1070,Polygon,910,1148,18.7,730,2218,180,170
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5401A,2,Western Region,5401A,Ardrahan,Ard Raithin,1409,Polygon,1122,1451,14.8,937,2860,185,166
-Galway,,Paul Creaner,5240L,Galway,223,Galway,M5247G,2,Western Region,5247G,Athenry,�tha an R�,4868,Polygon,4102,4910,14.5,3436,9778,666,594
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5670G,2,Western Region,5670G,Ballinasloe,�tha na Sluaighe,4284,Polygon,3673,4162,17.3,2962,8446,711,637
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5606E,2,Western Region,5606E,Ballygar,B�al �tha Gh�rtha,1073,Polygon,1034,1068,22.3,791,2141,243,231
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5807F,2,Western Region,5807F,Barnaderg,Bearna Dhearg,1651,Polygon,1325,1763,16.7,1091,3414,234,221
-Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5254L,2,Western Region,5254L,Carna,Carna,914,Polygon,1008,924,35.3,638,1838,370,356
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5352L,2,Western Region,5352L,Carraroe,An Cheathr� Rua,1250,Polygon,1269,1255,26,914,2505,355,330
-Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5250G,2,Western Region,5250G,Clifden,An Cloch�n,2142,MultiPolygon,2665,2095,47.7,1376,4237,1289,1272
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5806H,2,Western Region,5806H,Corofin,Corofinne,2168,Polygon,1627,2198,13.2,1407,4366,220,214
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5402L,2,Western Region,5402L,Craughwell,Creaghmhaoil,3519,Polygon,2702,3594,13.5,2287,7113,415,366
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5605G,2,Western Region,5605G,Creggs,Na Creaga,466,Polygon,473,498,25.8,342,964,131,122
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5805L,2,Western Region,5805L,Dunmore,D�n M�r,1239,Polygon,1183,1337,19,934,2576,249,225
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5306F,2,Western Region,5306F,Eyrecourt,D�n an Uchta,959,Polygon,859,1006,15.4,714,1965,145,132
-Galway,,Paul Creaner,5240L,Galway,223,Galway,M5240L,2,Western Region,5240L,Galway,Gaillimh,22889,Polygon,20328,22255,11.8,16817,45144,3511,2398
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5804A,2,Western Region,5804A,Glenamaddy,Gleann na Madadh,1098,Polygon,1042,1088,20.1,815,2186,227,209
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5400C,2,Western Region,5400C,Gort,An Gort,2803,Polygon,2671,2801,21.5,2058,5604,613,574
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5245M,2,Western Region,5245M,Headford,Ath Cinn,2943,Polygon,2529,3004,17.6,2056,5947,473,445
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5358K,2,Western Region,5358K,Kilronan,Cill Ronain,591,Polygon,754,660,29.7,504,1251,250,224
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5673A,2,Western Region,5673A,Kiltormer,Cill Torm�ir,1020,Polygon,887,1098,16.6,729,2118,158,147
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5403H,2,Western Region,5403H,Kinvara,Cinn Mhara,1292,Polygon,1168,1241,22.9,864,2533,304,267
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5356B,2,Western Region,5356B,Leitir Mor,Leitir Mor,1115,Polygon,1057,1152,22.2,802,2267,255,235
-Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5252C,2,Western Region,5252C,Letterfrack,Leitir Fraic,1121,Polygon,1366,1244,35.2,857,2365,509,481
-Galway,,Paul Creaner,5240L,Galway,223,Galway,M5244B,2,Western Region,5244B,Loughgeorge,Leacht Sheoirse,6728,Polygon,5125,7136,10.6,4488,13864,637,541
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5300G,2,Western Region,5300G,Loughrea,Locha Riach,3789,Polygon,3547,3593,18.9,2795,7382,752,671
-Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5255H,2,Western Region,5255H,Maum,An Maam,935,Polygon,1097,956,39.5,651,1891,446,433
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5802E,2,Western Region,5802E,Milltown,Baile an Mhuilinn,986,Polygon,940,1037,18.5,752,2023,188,174
-Galway,,Paul Creaner,5240L,Galway,223,Galway,M5248E,2,Western Region,5248E,Monivea,Monivea,1348,Polygon,1053,1361,12.9,900,2709,153,136
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5675H,2,Western Region,5675H,Mountbellew,An Creag�n,2096,Polygon,1820,2116,18.1,1464,4212,356,330
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5351A,2,Western Region,5351A,Moycullen [SS],Maigh Cuilinn [SS],2040,Polygon,1521,1952,9.7,1334,3992,187,147
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5678B,2,Western Region,5678B,Moylough,Maigh Locha,1095,Polygon,958,1137,18.4,768,2232,190,176
-Galway,,Paul Creaner,5240L,Galway,223,Galway,M5242F,2,Western Region,5242F,Oranmore,Or�n M�r,8492,Polygon,6900,8298,9.8,5973,16790,927,677
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5350C,2,Western Region,5350C,Oughterard,Uachtar Ard,2610,Polygon,2355,2588,21.4,1805,5198,550,504
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5307D,2,Western Region,5307D,Portumna,Port Omna,1584,Polygon,1543,1607,24.2,1148,3191,395,373
-Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5251E,2,Western Region,5251E,Recess [SS],Sraith Salach [SS],186,Polygon,223,198,36.3,138,384,85,81
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5353H,2,Western Region,5353H,Ros Muc,Ros Muc,415,Polygon,468,488,26.1,337,903,131,122
-Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5256F,2,Western Region,5256F,Roundstone,Cloch na R�n,376,Polygon,723,424,56,312,800,411,405
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5357M,2,Western Region,5357M,Salthill,B�thar na Tr�,15474,Polygon,12571,13856,10.5,10755,29330,1816,1325
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5355D,2,Western Region,5355D,Spiddle,An Spid�al,1891,Polygon,1702,1851,19.3,1326,3742,376,329
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5800K,2,Western Region,5800K,Tuam,Tuaim,6692,Polygon,6231,6529,16.5,5066,13221,1165,1030
-Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5801G,2,Western Region,5801G,Williamstown,Williamstown,1007,Polygon,1032,1049,24.6,749,2056,283,254
+Kerry,,Paul Creaner,4650G,Killarney,320,Kerry,M4656F,3,Southern Region,4656F,an coirean,An Coire�n,1126,Polygon,2201,1139,57.6,909,2265,1292,1267
 Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5304L,2,Western Region,5304L,Woodford,An Ghr�ig,749,Polygon,750,816,22.3,577,1565,173,167
-Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5354F,2,Western Region,5354F,Inverin,Indreabh�n,1423,Polygon,1375,1502,22.2,1050,2925,325,305
-Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5672C,2,Western Region,5672C,Kilconnell,Cill Chonaill,896,Polygon,771,964,15.4,638,1860,133,119
-Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5303A,2,Western Region,5303A,Killimor,Cill �omair,1622,Polygon,1442,1725,18.8,1156,3347,286,271
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5801G,2,Western Region,5801G,Williamstown,Williamstown,1007,Polygon,1032,1049,24.6,749,2056,283,254
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5800K,2,Western Region,5800K,Tuam,Tuaim,6692,Polygon,6231,6529,16.5,5066,13221,1165,1030
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5355D,2,Western Region,5355D,an spideal,An Spid�al,1891,Polygon,1702,1851,19.3,1326,3742,376,329
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5357M,2,Western Region,5357M,Salthill,B�thar na Tr�,15474,Polygon,12571,13856,10.5,10755,29330,1816,1325
+Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5256F,2,Western Region,5256F,cloch na ron,Cloch na R�n,376,Polygon,723,424,56,312,800,411,405
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5353H,2,Western Region,5353H,Ros Muc,Ros Muc,415,Polygon,468,488,26.1,337,903,131,122
+Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5251E,2,Western Region,5251E,sraith salach,Sraith Salach [SS],186,Polygon,223,198,36.3,138,384,85,81
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5307D,2,Western Region,5307D,Portumna,Port Omna,1584,Polygon,1543,1607,24.2,1148,3191,395,373
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5350C,2,Western Region,5350C,Oughterard,Uachtar Ard,2610,Polygon,2355,2588,21.4,1805,5198,550,504
+Galway,,Paul Creaner,5240L,Galway,223,Galway,M5242F,2,Western Region,5242F,ÓRÁN MÓR,ÓRÁN MÓR,8492,Polygon,6900,8298,9.8,5973,16790,927,677
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5678B,2,Western Region,5678B,Moylough,Maigh Locha,1095,Polygon,958,1137,18.4,768,2232,190,176
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5351A,2,Western Region,5351A,maigh cuilinn,Maigh Cuilinn [SS],2040,Polygon,1521,1952,9.7,1334,3992,187,147
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5675H,2,Western Region,5675H,Mountbellew,An Creag�n,2096,Polygon,1820,2116,18.1,1464,4212,356,330
+Galway,,Paul Creaner,5240L,Galway,223,Galway,M5248E,2,Western Region,5248E,Monivea,Monivea,1348,Polygon,1053,1361,12.9,900,2709,153,136
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5802E,2,Western Region,5802E,Milltown,Baile an Mhuilinn,986,Polygon,940,1037,18.5,752,2023,188,174
+Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5255H,2,Western Region,5255H,AN MÁM,An Maam,935,Polygon,1097,956,39.5,651,1891,446,433
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5300G,2,Western Region,5300G,Loughrea,Locha Riach,3789,Polygon,3547,3593,18.9,2795,7382,752,671
+Galway,,Paul Creaner,5240L,Galway,223,Galway,M5244B,2,Western Region,5244B,LOUGH GEORGE,Leacht Sheoirse,6728,Polygon,5125,7136,10.6,4488,13864,637,541
+Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5252C,2,Western Region,5252C,Letterfrack,Leitir Fraic,1121,Polygon,1366,1244,35.2,857,2365,509,481
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5356B,2,Western Region,5356B,Leitir Mor,Leitir Mor,1115,Polygon,1057,1152,22.2,802,2267,255,235
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5403H,2,Western Region,5403H,Kinvara,Cinn Mhara,1292,Polygon,1168,1241,22.9,864,2533,304,267
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5673A,2,Western Region,5673A,Kiltormer,Cill Torm�ir,1020,Polygon,887,1098,16.6,729,2118,158,147
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5358K,2,Western Region,5358K,cill ronain,Cill Ronain,591,Polygon,754,660,29.7,504,1251,250,224
 Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5308B,2,Western Region,5308B,Kilrickle,Cill R�cill,1668,Polygon,1395,1724,17,1142,3392,253,237
-Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6552H,1,Northern Region,6552H,Ardara,Ard an Ratha,1063,Polygon,1290,1113,33.3,831,2176,459,430
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5303A,2,Western Region,5303A,Killimor,Cill �omair,1622,Polygon,1442,1725,18.8,1156,3347,286,271
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5672C,2,Western Region,5672C,Kilconnell,Cill Chonaill,896,Polygon,771,964,15.4,638,1860,133,119
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5354F,2,Western Region,5354F,indreabhan,Indreabh�n,1423,Polygon,1375,1502,22.2,1050,2925,325,305
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5245M,2,Western Region,5245M,Headford,Ath Cinn,2943,Polygon,2529,3004,17.6,2056,5947,473,445
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5400C,2,Western Region,5400C,Gort,An Gort,2803,Polygon,2671,2801,21.5,2058,5604,613,574
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5804A,2,Western Region,5804A,Glenamaddy,Gleann na Madadh,1098,Polygon,1042,1088,20.1,815,2186,227,209
+Galway,,Paul Creaner,5240L,Galway,223,Galway,M5240L,2,Western Region,5240L,gaillimh,Gaillimh,22889,Polygon,20328,22255,11.8,16817,45144,3511,2398
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5306F,2,Western Region,5306F,Eyrecourt,D�n an Uchta,959,Polygon,859,1006,15.4,714,1965,145,132
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5805L,2,Western Region,5805L,Dunmore,D�n M�r,1239,Polygon,1183,1337,19,934,2576,249,225
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5605G,2,Western Region,5605G,Creggs,Na Creaga,466,Polygon,473,498,25.8,342,964,131,122
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5402L,2,Western Region,5402L,Craughwell,Creaghmhaoil,3519,Polygon,2702,3594,13.5,2287,7113,415,366
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5806H,2,Western Region,5806H,Corofin,Corofinne,2168,Polygon,1627,2198,13.2,1407,4366,220,214
+Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5250G,2,Western Region,5250G,Clifden,An Cloch�n,2142,MultiPolygon,2665,2095,47.7,1376,4237,1289,1272
+Galway,,Paul Creaner,5357M,Salthill,223,Galway,M5352L,2,Western Region,5352L,an cheathru rua,An Cheathr� Rua,1250,Polygon,1269,1255,26,914,2505,355,330
+Galway,,Paul Creaner,5250G,Clifden,223,Galway,M5254L,2,Western Region,5254L,Carna,Carna,914,Polygon,1008,924,35.3,638,1838,370,356
+Galway,,Paul Creaner,5800K,Tuam,223,Galway,M5807F,2,Western Region,5807F,Barnaderg,Bearna Dhearg,1651,Polygon,1325,1763,16.7,1091,3414,234,221
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5606E,2,Western Region,5606E,Ballygar,B�al �tha Gh�rtha,1073,Polygon,1034,1068,22.3,791,2141,243,231
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5670G,2,Western Region,5670G,Ballinasloe,�tha na Sluaighe,4284,Polygon,3673,4162,17.3,2962,8446,711,637
+Galway,,Paul Creaner,5240L,Galway,223,Galway,M5247G,2,Western Region,5247G,Athenry,�tha an R�,4868,Polygon,4102,4910,14.5,3436,9778,666,594
+Galway,,Paul Creaner,5300G,Loughrea,223,Galway,M5401A,2,Western Region,5401A,Ardrahan,Ard Raithin,1409,Polygon,1122,1451,14.8,937,2860,185,166
+Galway,,Paul Creaner,5670G,Ballinasloe,223,Galway,M5671E,2,Western Region,5671E,Ahascragh,�th Eascrach,1070,Polygon,910,1148,18.7,730,2218,180,170
+Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6552H,1,Northern Region,6552H,Ard An Rátha,Ard an Ratha,1063,Polygon,1290,1113,33.3,831,2176,459,430
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6601L,1,Northern Region,6601L,Ballintra,Baile an tSratha,1296,Polygon,1468,1270,36.3,911,2566,557,533
 Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6407F,1,Northern Region,6407F,Ballybofey,Bealach F�ich,5242,Polygon,4537,5215,16.2,3714,10457,823,734
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6600A,1,Northern Region,6600A,Ballyshannon,B�al �tha Seanaidh,2043,Polygon,2112,1940,25.3,1514,3983,598,535
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6553F,1,Northern Region,6553F,Bunbeg,Bun Beag,3319,Polygon,4213,3332,37.6,2565,6651,1648,1582
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6553F,1,Northern Region,6553F,an bun beag,Bun Beag,3319,Polygon,4213,3332,37.6,2565,6651,1648,1582
 Donegal,,Paul Creaner,6470L,Buncrana,112,Donegal,M6470L,1,Northern Region,6470L,Buncrana,Bun Cranncha,4953,Polygon,4670,4907,23.4,3508,9860,1162,1091
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6602H,1,Northern Region,6602H,Bundoran,Bun Dobhr�in,1575,Polygon,2281,1500,49.6,1109,3075,1172,1132
 Donegal,,Paul Creaner,6470L,Buncrana,112,Donegal,M6471H,1,Northern Region,6471H,Burnfoot,Bun na hAbhann,2175,Polygon,1861,2147,19.3,1465,4322,396,360
 Donegal,,Paul Creaner,6470L,Buncrana,112,Donegal,M6476K,1,Northern Region,6476K,Moville,Bun an Phobail,2648,Polygon,3104,2662,35.1,1967,5310,1137,1091
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6554D,1,Northern Region,6554D,Burtonport,Ailt an Chorrain,1056,Polygon,1635,993,46.7,833,2049,802,764
-Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6558G,1,Northern Region,6558G,Carrick,An Charraig,1358,Polygon,1857,1458,40.3,1087,2816,770,749
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6554D,1,Northern Region,6554D,ailt an chorrain,Ailt an Chorrain,1056,Polygon,1635,993,46.7,833,2049,802,764
+Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6558G,1,Northern Region,6558G,an charraig,An Charraig,1358,Polygon,1857,1458,40.3,1087,2816,770,749
 Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6401G,1,Northern Region,6401G,Carrigans,An Carraig�n,1608,Polygon,1350,1656,13.5,1149,3264,201,182
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6541B,1,Northern Region,6541B,Carrigart,Carraig Airt,1228,Polygon,1995,1213,54.1,889,2441,1106,1080
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6542M,1,Northern Region,6542M,Carrowkeel,An Cheathr� Chaol,1341,MultiPolygon,1892,1451,46.1,1006,2792,886,873
-Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6402E,1,Northern Region,6402E,Castlefinn,Caisle�n na Finne,1541,Polygon,1270,1565,15.8,1049,3106,221,201
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6541B,1,Northern Region,6541B,carraig airt,Carraig Airt,1228,Polygon,1995,1213,54.1,889,2441,1106,1080
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6542M,1,Northern Region,6542M,kerrykeel,An Cheathr� Chaol,1341,MultiPolygon,1892,1451,46.1,1006,2792,886,873
+Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6402E,1,Northern Region,6402E,castlefin,Caisle�n na Finne,1541,Polygon,1270,1565,15.8,1049,3106,221,201
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6555B,1,Northern Region,6555B,Clogher [SS],An Clochar,722,Polygon,1294,735,54.6,567,1457,727,707
 Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6408D,1,Northern Region,6408D,Convoy,Conmhaigh,2062,Polygon,1824,2113,16.4,1492,4175,332,300
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6546C,1,Northern Region,6546C,Creeslough [SS],An Craoslach [SS],569,Polygon,673,548,35.1,433,1117,240,236
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6546C,1,Northern Region,6546C,an craoslach,An Craoslach [SS],569,Polygon,673,548,35.1,433,1117,240,236
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6603F,1,Northern Region,6603F,Donegal,D�n na nGall,3155,Polygon,2913,3088,20.4,2264,6243,649,595
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6545E,1,Northern Region,6545E,Dunfanaghy,D�n Fionnachaidh,868,Polygon,1703,891,62.5,622,1759,1081,1065
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6557K,1,Northern Region,6557K,Dungloe,An Cloch�n Liath,1591,Polygon,2024,1692,34.9,1275,3283,749,707
-Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6547A,1,Northern Region,6547A,Falcarragh,F�l Carrach,2327,Polygon,2789,2318,34.2,1786,4645,1003,955
-Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6550A,1,Northern Region,6550A,Glenties,Na Gleannta,1043,Polygon,1184,1075,30.5,807,2118,377,361
-Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6636B,1,Northern Region,6636B,Killybegs,Na Cealla Beaga,2446,Polygon,2682,2449,32.2,1764,4895,918,864
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6545E,1,Northern Region,6545E,dun fionnachaid,D�n Fionnachaidh,868,Polygon,1703,891,62.5,622,1759,1081,1065
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6557K,1,Northern Region,6557K,an clochan liath,An Cloch�n Liath,1591,Polygon,2024,1692,34.9,1275,3283,749,707
+Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6547A,1,Northern Region,6547A,An Fál Carrach,F�l Carrach,2327,Polygon,2789,2318,34.2,1786,4645,1003,955
+Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6550A,1,Northern Region,6550A,na gleannta,Na Gleannta,1043,Polygon,1184,1075,30.5,807,2118,377,361
+Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6636B,1,Northern Region,6636B,na cealla beaga,Na Cealla Beaga,2446,Polygon,2682,2449,32.2,1764,4895,918,864
 Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6543K,1,Northern Region,6543K,Kilmacrennan,Cill Mhic nEan�in,2364,Polygon,1868,2377,15.7,1545,4741,323,294
 Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6400K,1,Northern Region,6400K,Letterkenny,Leitir Ceanainn,12234,Polygon,11178,11685,17.5,8817,23919,2361,1958
 Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6406H,1,Northern Region,6406H,Lifford,Leifear,1849,Polygon,1543,1832,12.5,1325,3681,218,193
 Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6540D,1,Northern Region,6540D,Milford,Baile na nGall�glach,1092,Polygon,1071,1081,27.9,762,2173,309,299
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6637M,1,Northern Region,6637M,Mountcharles,Moin Searlas,1311,Polygon,1461,1382,30,993,2693,468,439
 Donegal,,Paul Creaner,6470L,Buncrana,112,Donegal,M6477G,1,Northern Region,6477G,Muff,Magh,1973,Polygon,1651,2032,14.5,1376,4005,275,239
-Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6404A,1,Northern Region,6404A,Newtown Cunningham,An Baile Nua,1876,Polygon,1556,1974,14.3,1301,3850,255,223
+Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6404A,1,Northern Region,6404A,newtowncunningham,An Baile Nua,1876,Polygon,1556,1974,14.3,1301,3850,255,223
 Donegal,,Paul Creaner,6600A,Ballyshannon,112,Donegal,M6604D,1,Northern Region,6604D,Pettigo,Paiteag�,278,Polygon,325,322,22.8,247,600,78,74
 Donegal,,Paul Creaner,6540D,Milford,112,Donegal,M6548L,1,Northern Region,6548L,Ramelton,R�th Mealtain,1860,Polygon,1674,1840,20.7,1300,3700,374,346
 Donegal,,Paul Creaner,6400K,Letterkenny,112,Donegal,M6405L,1,Northern Region,6405L,Raphoe,R�th Bhoth,2119,Polygon,1775,2210,13.6,1503,4329,272,242
@@ -426,14 +426,14 @@ Dublin,,Paul Creaner,1470B,Terenure,609,DMR South,M1471M,6,Dublin Metropolitan R
 Dublin,,Paul Creaner,1300E,Crumlin,609,DMR South,M1300E,6,Dublin Metropolitan Region,1300E,Crumlin,Croimghlinn,12922,Polygon,10791,12029,5.1,10005,24951,786,547
 Dublin,,Paul Creaner,1372B,Tallaght,609,DMR South,M1370F,6,Dublin Metropolitan Region,1370F,Rathfarnham,R�th Fearn�in,31848,Polygon,23157,29883,4.4,21497,61731,1660,1021
 Dublin,,Paul Creaner,1470B,Terenure,609,DMR South,M1470B,6,Dublin Metropolitan Region,1470B,Rathmines,R�th Maonais,12830,Polygon,13727,12096,13.2,11443,24926,2284,1806
-Dublin,,Paul Creaner,1870H,Bridewell,606,DMR North Central,M1870H,6,Dublin Metropolitan Region,1870H,Bridewell,St�isi�n na Smachtlainne,11111,Polygon,12105,11883,12.4,10246,22994,1859,1502
+Dublin,,Paul Creaner,1870H,Bridewell,606,DMR North Central,M1870H,6,Dublin Metropolitan Region,1870H,bridewell,St�isi�n na Smachtlainne,11111,Polygon,12105,11883,12.4,10246,22994,1859,1502
 Dublin,,Paul Creaner,1830K,Fitzgibbon Street,606,DMR North Central,M1830K,6,Dublin Metropolitan Region,1830K,Fitzgibbon Street,Sr�id Mhic Ghiob�in,9500,Polygon,10317,9828,19.5,8104,19328,2213,2012
 Dublin,,Paul Creaner,1830K,Fitzgibbon Street,606,DMR North Central,M1831G,6,Dublin Metropolitan Region,1831G,Mountjoy,Mountjoy,11029,Polygon,11318,11890,12.6,9536,22919,1782,1429
 Dublin,,Paul Creaner,1800G,Store Street,606,DMR North Central,M1800G,6,Dublin Metropolitan Region,1800G,Store Street,Sr�id an St�rais,10641,Polygon,9500,10782,14.8,7761,21423,1739,1403
 Dublin,,Paul Creaner,1530L,Coolock,607,DMR North,M1532F,6,Dublin Metropolitan Region,1532F,Swords,Sord,24858,Polygon,17952,24291,5.4,16605,49149,1347,961
 Dublin,,Paul Creaner,1570K,Raheny,607,DMR North,M1571G,6,Dublin Metropolitan Region,1571G,Clontarf,Cluain Tarbh,19494,Polygon,16793,17749,8.7,14778,37243,2015,1466
 Dublin,,Paul Creaner,1530L,Coolock,607,DMR North,M1530L,6,Dublin Metropolitan Region,1530L,Coolock,An Ch�l�g,26969,Polygon,20460,25244,7.4,18580,52213,1880,1520
-Dublin,,Paul Creaner,1500H,Santry,607,DMR North,M1503B,6,Dublin Metropolitan Region,1503B,Airport,Aerfort �tha Cliath,147,Polygon,9,260,11.1,8,407,1,1
+Dublin,,Paul Creaner,1500H,Santry,607,DMR North,M1503B,6,Dublin Metropolitan Region,1503B,dublin airport,Aerfort �tha Cliath,147,Polygon,9,260,11.1,8,407,1,1
 Dublin,,Paul Creaner,2200D,Balbriggan,607,DMR North,M2200D,6,Dublin Metropolitan Region,2200D,Balbriggan,Baile Brig�n,12296,Polygon,9327,11746,8,8398,24042,929,749
 Dublin,,Paul Creaner,1500H,Santry,607,DMR North,M1502D,6,Dublin Metropolitan Region,1502D,Ballymun,Baile Munna,11267,Polygon,8914,10408,8.1,8021,21675,893,724
 Dublin,,Paul Creaner,2200D,Balbriggan,607,DMR North,M2204G,6,Dublin Metropolitan Region,2204G,Garristown,Baile Gh�ire,1793,Polygon,1308,1893,10.3,1151,3686,157,135
@@ -451,18 +451,18 @@ Dublin,,Paul Creaner,1900C,Dun Laoghaire,605,DMR East,M1932A,6,Dublin Metropolit
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4305B,3,Southern Region,4305B,Kinsale,Cionn tS�ile,5963,Polygon,5231,5765,19.4,4054,11728,1177,1013
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4470K,3,Southern Region,4470K,Macroom,Macroom,3648,Polygon,3156,3647,16.2,2601,7295,555,512
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4505E,3,Southern Region,4505E,Millstreet,Sr�id an Mhuilinn,2345,Polygon,1964,2305,15.8,1626,4650,338,310
-Cork,,Paul Creaner,4400H,Clonakilty,319,Cork West,M4401F,3,Southern Region,4401F,Rosscarberry,Ros � gCairbre,1950,Polygon,2283,1958,35.3,1435,3908,848,807
+Cork,,Paul Creaner,4400H,Clonakilty,319,Cork West,M4401F,3,Southern Region,4401F,rosscarbery,Ros � gCairbre,1950,Polygon,2283,1958,35.3,1435,3908,848,807
 Cork,,Paul Creaner,4400H,Clonakilty,319,Cork West,M4402D,3,Southern Region,4402D,Skibbereen,An Sciobair�n,3912,Polygon,4385,3858,29.2,3004,7770,1381,1281
-Cork,,Paul Creaner,4370B,Bantry,319,Cork West,M4371M,3,Southern Region,4371M,Skull,An Scoil,1258,Polygon,2327,1245,55.8,998,2503,1329,1299
+Cork,,Paul Creaner,4370B,Bantry,319,Cork West,M4371M,3,Southern Region,4371M,schull,An Scoil,1258,Polygon,2327,1245,55.8,998,2503,1329,1299
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4471G,3,Southern Region,4471G,Stuake,An Stuaic,1584,Polygon,1221,1711,9.5,1091,3295,130,116
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4477F,3,Southern Region,4477F,Tarelton,T�r Eilt�n,1131,Polygon,942,1251,14.5,792,2382,150,137
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4308G,3,Southern Region,4308G,Timoleague,Tigh Molaige,1464,Polygon,1591,1559,31.2,1065,3023,526,496
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4303F,3,Southern Region,4303F,Ballineen,B�al �tha Fh�n�n,2154,Polygon,1751,2243,13.3,1503,4397,248,233
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4473C,3,Southern Region,4473C,Ballingeary,B�al �tha an Ghaorthaigh,871,Polygon,848,972,20.2,667,1843,181,171
-Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4302H,3,Southern Region,4302H,Ballinhassig,B�al �tha an Cheasaigh,2897,Polygon,2013,2946,7.8,1829,5843,184,157
+Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4302H,3,Southern Region,4302H,BÉAL ÁTHA AN GHAORTHA,B�al �tha an Cheasaigh,2897,Polygon,2013,2946,7.8,1829,5843,184,157
 Cork,,Paul Creaner,4370B,Bantry,319,Cork West,M4376A,3,Southern Region,4376A,Ballydehob,B�al an D� Chab,801,Polygon,1029,810,32.7,669,1611,360,336
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4501B,3,Southern Region,4501B,Ballydesmond,Baile Deasumhan,706,Polygon,645,748,16.4,532,1454,113,106
-Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4474A,3,Southern Region,4474A,Ballyvourney,Baile Bhuirne,1174,Polygon,1092,1254,18.5,867,2428,225,202
+Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4474A,3,Southern Region,4474A,baile bhuirne,Baile Bhuirne,1174,Polygon,1092,1254,18.5,867,2428,225,202
 Cork,,Paul Creaner,4400H,Clonakilty,319,Cork West,M4404M,3,Southern Region,4404M,Baltimore [SS],D�n na S�ad [SS],559,Polygon,1088,564,59.2,434,1123,654,644
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4300A,3,Southern Region,4300A,Bandon,Bandon,5576,Polygon,4659,5516,13.2,3973,11092,686,617
 Cork,,Paul Creaner,4370B,Bantry,319,Cork West,M4370B,3,Southern Region,4370B,Bantry,Beanntra�,2614,Polygon,2536,2526,20.3,1954,5140,582,514
@@ -486,13 +486,13 @@ Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4200E,3,Southern Region,4200E,
 Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4174B,3,Southern Region,4174B,Milford,�th an Mhuilinn,1230,Polygon,1048,1310,13.6,894,2540,154,143
 Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4105L,3,Southern Region,4105L,Mitchelstown,Baile Mhist�ala,3817,Polygon,3340,3856,13.5,2854,7673,486,452
 Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4504G,3,Southern Region,4504G,Newmarket,�th Trasna,1978,Polygon,1917,2069,19.6,1515,4047,402,375
-Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4101G,3,Southern Region,4101G,Rathcormack,R�th Chormaic,2363,Polygon,1956,2441,11.7,1690,4804,266,228
+Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4101G,3,Southern Region,4101G,rathcormac,R�th Chormaic,2363,Polygon,1956,2441,11.7,1690,4804,266,228
 Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4078K,3,Southern Region,4078K,Watergrasshill,Cnoc�n na Biolra�,2434,Polygon,1768,2533,7.5,1609,4967,159,133
 Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4203L,3,Southern Region,4203L,Whitegate,An Geata B�n,1721,Polygon,1452,1604,21.7,1109,3325,343,315
 Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4204H,3,Southern Region,4204H,Youghal,Eochaill,5264,Polygon,5453,5248,25.1,3983,10512,1470,1368
 Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4205F,3,Southern Region,4205F,Ballycotton,Baile Choit�n,1352,Polygon,1358,1337,28.8,948,2689,410,391
 Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4102E,3,Southern Region,4102E,Ballynoe,An Baile Nua,1303,Polygon,1081,1322,16.7,888,2625,193,180
-Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4171H,3,Southern Region,4171H,Buttervant,Cill na Mallach,1735,Polygon,1599,1686,17.6,1298,3421,301,281
+Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4171H,3,Southern Region,4171H,buttevant,Cill na Mallach,1735,Polygon,1599,1686,17.6,1298,3421,301,281
 Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4072L,3,Southern Region,4072L,Carrigtwohill,Carraig Thuathail,3720,Polygon,2779,3582,7.2,2508,7302,271,200
 Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4106H,3,Southern Region,4106H,Castletownroche,Baile Chaisle�n,1700,Polygon,1551,1797,15.2,1291,3497,260,235
 Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4172F,3,Southern Region,4172F,Charleville,An R�th,2808,Polygon,2572,2856,14.9,2148,5664,424,384
@@ -500,7 +500,7 @@ Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4201C,3,Southern Region,4201C,
 Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4070C,3,Southern Region,4070C,Cobh,An C�bh,7015,Polygon,6071,6871,12.7,5144,13886,927,772
 Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4173D,3,Southern Region,4173D,Doneraile,D�n ar Aill,1208,Polygon,1082,1209,15.1,900,2417,182,163
 Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4100K,3,Southern Region,4100K,Fermoy,Fhear Ma�,4500,Polygon,3807,4377,12,3265,8877,542,456
-Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4175M,3,Southern Region,4175M,Glantane,An Gleannt�n,1855,Polygon,1464,1898,12.7,1261,3753,203,186
+Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4175M,3,Southern Region,4175M,glantaine,An Gleannt�n,1855,Polygon,1464,1898,12.7,1261,3753,203,186
 Cork,,Paul Creaner,4170L,Mallow,318,Cork North,M4500D,3,Southern Region,4500D,Kanturk,Ceann Toirc,3469,Polygon,3239,3428,18.2,2603,6897,636,591
 Cork,,Paul Creaner,4100K,Fermoy,318,Cork North,M4103C,3,Southern Region,4103C,Kildorrery,Cill Dairbhre,1446,Polygon,1313,1476,17.1,1071,2922,242,224
 Cork,,Paul Creaner,4200E,Midelton,318,Cork North,M4202A,3,Southern Region,4202A,Killeagh,Cill Ia,2526,Polygon,2231,2492,17.1,1807,5018,424,382
@@ -523,21 +523,21 @@ Cork,,Paul Creaner,4020G,Gurranabraher,317,Cork City,M4020G,3,Southern Region,40
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5171C,2,Western Region,5171C,Ballyvaughan,Baile U� Bheach�in,685,Polygon,906,658,41.8,502,1343,404,379
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5170E,2,Western Region,5170E,Ennistymon,Inis D�om�in,3988,Polygon,4901,4153,35.2,3125,8141,1776,1724
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5078D,2,Western Region,5078D,Kilkee,Cill Chaoi,2496,Polygon,4336,2632,52.5,2020,5128,2316,2278
-Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5077F,2,Western Region,5077F,Killadysert,Cill an D�sirt,1486,Polygon,1428,1531,20.5,1123,3017,305,293
+Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5077F,2,Western Region,5077F,kildysart,Cill an D�sirt,1486,Polygon,1428,1531,20.5,1123,3017,305,293
 Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5130F,2,Western Region,5130F,Killaloe,Cill D�lua,4154,Polygon,3757,4193,19.3,2960,8347,797,724
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5070K,2,Western Region,5070K,Kilrush,Cill Ruis,2546,Polygon,2662,2522,27,1919,5068,743,719
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5175F,2,Western Region,5175F,Lisdoonvarna,Lios D�in Bhearna,1282,Polygon,1430,1259,38.5,847,2541,583,551
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5032F,2,Western Region,5032F,Lissycasey,Lios U� Chathasaigh,1785,Polygon,1614,1830,16.9,1320,3615,294,272
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5176D,2,Western Region,5176D,Miltown Malbay,Sr�id na Cathrach,1972,Polygon,2542,2024,37.5,1559,3996,983,954
-Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5033D,2,Western Region,5033D,Newmarket-on-Fergus,Cora Chaitl�n - Quin Cuinche,1763,Polygon,1371,1745,10,1199,3508,172,137
-Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5133M,2,Western Region,5133M,Scarriff,An Scairbh,2121,Polygon,2082,2086,24.8,1541,4207,541,516
+Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5033D,2,Western Region,5033D,newmarket on fergus,Cora Chaitl�n - Quin Cuinche,1763,Polygon,1371,1745,10,1199,3508,172,137
+Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5133M,2,Western Region,5133M,scariff,An Scairbh,2121,Polygon,2082,2086,24.8,1541,4207,541,516
 Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5035M,2,Western Region,5035M,Shannon,An Sionainn,6040,Polygon,5018,5977,9.8,4420,12017,598,494
 Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5037G,2,Western Region,5037G,Sixmilebridge,Sixmilebridge,3103,Polygon,2373,3163,9.4,2123,6266,250,223
 Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5135G,2,Western Region,5135G,Tulla,Tulla,1902,Polygon,1756,1928,18.2,1412,3830,344,319
 Clare,,Paul Creaner,5070K,Kilrush,222,Clare,M5172A,2,Western Region,5172A,Corofin,Cora Finne,1210,Polygon,1146,1156,19.8,907,2366,239,227
 Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5031H,2,Western Region,5031H,Crusheen,Crois�n,962,Polygon,953,1065,17.6,764,2027,189,168
 Clare,,Paul Creaner,5030L,Ennis,222,Clare,M5030L,2,Western Region,5030L,Ennis,Inis,17011,Polygon,14447,16042,12.2,12297,33053,2150,1756
-Cavan,,Paul Creaner,6800D,Cavan,111,Cavan/Monaghan,M6802M,1,Northern Region,6802M,Arvagh,�rmhagh,1066,Polygon,1064,1080,25.5,777,2146,287,271
+Cavan,,Paul Creaner,6800D,Cavan,111,Cavan/Monaghan,M6802M,1,Northern Region,6802M,arva,�rmhagh,1066,Polygon,1064,1080,25.5,777,2146,287,271
 Cavan,,Paul Creaner,6870E,Bailieboro,111,Cavan/Monaghan,M6870E,1,Northern Region,6870E,Bailieboro,Coill an Chollaigh,2971,Polygon,2703,3035,19.1,2138,6006,565,515
 Cavan,,Paul Creaner,6800D,Cavan,111,Cavan/Monaghan,M6801B,1,Northern Region,6801B,Ballinagh,B�al �tha na nEach,1988,Polygon,1813,2033,22.6,1386,4021,427,409
 Cavan,,Paul Creaner,6800D,Cavan,111,Cavan/Monaghan,M6900M,1,Northern Region,6900M,Ballyconnell,B�al �tha Conaill,1732,Polygon,1876,1868,27.9,1327,3600,549,523
@@ -556,7 +556,7 @@ Cavan,,Paul Creaner,6800D,Cavan,111,Cavan/Monaghan,M6902G,1,Northern Region,6902
 Cavan,,Paul Creaner,6870E,Bailieboro,111,Cavan/Monaghan,M6875F,1,Northern Region,6875F,Virginia,Achadh an I�ir,2904,Polygon,2657,2977,20.7,2056,5881,601,550
 Monaghan,,Paul Creaner,6770K,Carrickmacross,111,Cavan/Monaghan,M6771G,1,Northern Region,6771G,Ballybay,B�al �tha Beithe,1982,Polygon,1767,2072,17.4,1436,4054,331,307
 Monaghan,,Paul Creaner,6770K,Carrickmacross,111,Cavan/Monaghan,M6770K,1,Northern Region,6770K,Carrickmacross,Carraig Mhachaire Rois,6669,Polygon,5413,6735,12.3,4649,13404,764,667
-Monaghan,,Paul Creaner,6770K,Carrickmacross,111,Cavan/Monaghan,M6772E,1,Northern Region,6772E,Castleblaney,Baile na Lorgan,5391,Polygon,4612,5626,13.1,3934,11017,678,603
+Monaghan,,Paul Creaner,6770K,Carrickmacross,111,Cavan/Monaghan,M6772E,1,Northern Region,6772E,castleblayney,Baile na Lorgan,5391,Polygon,4612,5626,13.1,3934,11017,678,603
 Monaghan,,Paul Creaner,6700H,Monaghan,111,Cavan/Monaghan,M6701F,1,Northern Region,6701F,Clones,Cluain Eois,2950,Polygon,2621,3034,16.4,2154,5984,467,429
 Monaghan,,Paul Creaner,6700H,Monaghan,111,Cavan/Monaghan,M6705K,1,Northern Region,6705K,Emyvale,Scairbh na gCaorach,2204,Polygon,1795,2261,13.3,1520,4465,275,238
 Monaghan,,Paul Creaner,6700H,Monaghan,111,Cavan/Monaghan,M6700H,1,Northern Region,6700H,Monaghan,Muineach�n,8550,Polygon,6930,8238,12.5,5947,16788,983,864
