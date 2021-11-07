@@ -148,7 +148,7 @@ Roscommon,,Paul Creaner,5770C,Castlerea,225,Roscommon/Longford,M5705C,2,Western 
 Roscommon,,Paul Creaner,5770C,Castlerea,225,Roscommon/Longford,M6306A,2,Western Region,6306A,Roosky,Rooskey,1520,Polygon,1771,1613,27.6,1238,3133,533,488
 Roscommon,,Paul Creaner,5600F,Roscommon,225,Roscommon/Longford,M5600F,2,Western Region,5600F,Roscommon,Roscommon,6874,Polygon,5921,6768,16.7,4824,13642,1097,988
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2040M,4,Eastern Region,2040M,Ashbourne,Cill Dh�agl�in,12343,Polygon,8740,12239,5.9,8023,24582,717,518
-Meath,,Paul Creaner,2100H,Kells,403,Meath,M2102D,4,Eastern Region,2102D,Athboy,�tha Bu�,2959,Polygon,2236,2867,8.9,1985,5826,251,200
+Meath,,Paul Creaner,2100H,Kells,403,Meath,M2102D,4,Eastern Region,2102D,BAILE ÁTHA BUÍ,BAILE ÁTHA BUÍ,2959,Polygon,2236,2867,8.9,1985,5826,251,200
 Meath,,Paul Creaner,2170K,Trim,403,Meath,M2179B,4,Eastern Region,2179B,Ballivor,Baile �omhair,2114,Polygon,1605,2053,11.4,1397,4167,208,183
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2273L,4,Eastern Region,2273L,Duleek,Damhliag,3995,Polygon,2971,4086,8.6,2675,8081,296,256
 Meath,,Paul Creaner,2040M,Ashbourne,403,Meath,M2041K,4,Eastern Region,2041K,Dunboyne,D�n B�inne,6048,Polygon,4306,6069,7.2,3891,12117,415,312
@@ -458,7 +458,7 @@ Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4471G,3,Southern Region,4471G,St
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4477F,3,Southern Region,4477F,Tarelton,T�r Eilt�n,1131,Polygon,942,1251,14.5,792,2382,150,137
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4308G,3,Southern Region,4308G,Timoleague,Tigh Molaige,1464,Polygon,1591,1559,31.2,1065,3023,526,496
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4303F,3,Southern Region,4303F,Ballineen,B�al �tha Fh�n�n,2154,Polygon,1751,2243,13.3,1503,4397,248,233
-Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4473C,3,Southern Region,4473C,Ballingeary,B�al �tha an Ghaorthaigh,871,Polygon,848,972,20.2,667,1843,181,171
+Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4473C,3,Southern Region,4473C,BALLINHASSIG,B�al �tha an Ghaorthaigh,871,Polygon,848,972,20.2,667,1843,181,171
 Cork,,Paul Creaner,4300A,Bandon,319,Cork West,M4302H,3,Southern Region,4302H,BÉAL ÁTHA AN GHAORTHA,B�al �tha an Cheasaigh,2897,Polygon,2013,2946,7.8,1829,5843,184,157
 Cork,,Paul Creaner,4370B,Bantry,319,Cork West,M4376A,3,Southern Region,4376A,Ballydehob,B�al an D� Chab,801,Polygon,1029,810,32.7,669,1611,360,336
 Cork,,Paul Creaner,4470K,Macroom,319,Cork West,M4501B,3,Southern Region,4501B,Ballydesmond,Baile Deasumhan,706,Polygon,645,748,16.4,532,1454,113,106
