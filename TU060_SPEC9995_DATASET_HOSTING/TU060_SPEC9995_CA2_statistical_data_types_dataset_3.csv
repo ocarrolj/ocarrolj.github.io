@@ -1,0 +1,11 @@
+Attribute,Description,Statistical data type
+Divisions,The division of the Station,Categorical
+Station,Station name,Categorical
+Garda,Number of Garda officers,Numerical
+Sergt,Number of Sergeants ,Numerical
+Insp,Number of Inspectors,Numerical
+Superintendent,Number of Superintendent,Numerical
+chief_superintendent,Number of chief Superintendent,Numerical
+Assistant_Commissioner,Number of Assistent Commissioners,Numerical
+Grand Total,Total number of officers across all ranks,Numerical
+Year,Year of record,Numerical
