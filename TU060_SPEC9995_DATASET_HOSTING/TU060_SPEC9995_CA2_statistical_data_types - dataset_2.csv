@@ -1,0 +1,26 @@
+Attribute,Description,Statistical data type
+Address,Unique Address for station,Categorical
+Area Code,Area code for station,Numeric: Interval
+County,County for station,Categorical
+Division H,Divisional Headerquarters,Categorical
+Document Index (generated),Constant value,
+Eircode,Eircode of the station,Categorical
+features. Index (generated),Unique ID in this dataset for station,Numeric - Nominal
+Functional,Division,Categorical
+Id,Unique ID in this dataset for station,Numeric - Nominal
+Latitude,WGS84 Latitude,Numeric - Interval
+Longitude,WGS84 Longitude,Numeric - Interval
+Phone Numb,Station phone number,Numeric - Nominal
+Station In,Weblink for the station,-
+Station Na,Station Name,Categorical
+Station Ty,Station type (Sub-District or HQ),Categorical
+Stn Code,Unique identified for the station across datasets,Categorical
+Type,Constain value of no domain significance,
+Type (Features),Constain value of no domain significance,
+FID,Unique ID in this dataset for station,Numeric - Nominal
+Full time,Indicates if the station if full time or part time,Numeric - Binary
+Number of Records per Garda_Stations_22112021.json,Constain value of no domain significance,
+Xx Ig,Irish Gird easting,Numeric - Nominal
+Xx Itm,Irish Transverse Mercator (ITM) easting,Numeric - Nominal
+Yy Ig,Irish Gird northing,Numeric - Nominal
+Yy Itm,Irish Transverse Mercator (ITM) northing,Numeric - Nominal

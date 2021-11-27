@@ -1,0 +1,173 @@
+Attribute,Description,Statistical data type
+id,Unique ID,Numeric (nominal)
+Station,Name of the Garda station,Categorical
+Divisions,Name of the Garda station division,Categorical
+x,Irish grid reference - Easting,Numeric: Interval ratio
+y,Irish grid reference - Northing,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2004",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2005",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2006",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2007",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2008",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2009",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2010",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2011",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2012",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2013",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2014",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2015",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Attempts or threats to murder, assaults, harassments and related offences 2016*",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Dangerous or negligent acts 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Kidnapping and related offences 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2003",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2004",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2005",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2006",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2007",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2008",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2009",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2010",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2011",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2012",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2013",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2014",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2015",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Robbery, extortion and hijacking offences 2016*",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Burglary and related offences 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Theft and related offences 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2003",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2004",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2005",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2006",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2007",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2008",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2009",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2010",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2011",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2012",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2013",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2014",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2015",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Fraud, deception and related offences 2016*",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Controlled drug offences 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Weapons and Explosives Offences 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Damage to property and to the environment 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2003,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2004,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2005,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2006,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2007,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2008,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2009,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2010,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2011,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2012,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2013,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2014,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2015,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+Public order and other social code offences 2016*,Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2003",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2004",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2005",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2006",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2007",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2008",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2009",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2010",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2011",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2012",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2013",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2014",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2015",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
+"Offences against government, justice procedures and organisation of crime 2016*",Count of the number of offenses recorded in this category in this year,Numeric: Interval ratio
