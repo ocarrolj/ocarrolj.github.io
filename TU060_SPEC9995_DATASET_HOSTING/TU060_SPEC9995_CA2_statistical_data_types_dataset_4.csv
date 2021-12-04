@@ -1,0 +1,9 @@
+Attribute,Description,Statistical data type
+Male2011,The de facto count of male population,Numerical
+Female2011,The de facto count of female population,Numerical
+Total2011,The de facto count of total population,Numerical
+PPOcc2011,Permanent private housing units,Numerical
+Unocc2011,The total unoccupied dwellings on Census (total vacant dwellings + temporarily absent dwellings),Numerical
+Vacant2011,Total vacant dwellings (vacant houses + vacant flats + holiday homes),Numerical
+HS2011,Total housing stock (PPOcc2011+Unocc2011),Numerical
+PCVac2011,Vacancy rate (Vacant2011/HS2011),Numerical
